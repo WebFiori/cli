@@ -1,0 +1,13 @@
+{
+    "name": "webfiori/cli",
+    "description": "Command line component of WebFiori framework",
+    "authors": [
+        {
+            "name": "Ibrahim",
+            "email": "ibrahim@webfiori.com"
+        }
+    ],
+    "require": {
+        "webfiori/file":"1.1.3"
+    }
+}

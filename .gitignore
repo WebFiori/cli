@@ -1,0 +1,14 @@
+/nbproject
+test.*
+/tmp
+/clover.xml
+/vendor
+composer.lock
+*.cache
+cs-fixer.phar
+*.log
+src/app/storage
+app/storage
+/release/
+php-cs-fixer-v2.phar
+app/sto
