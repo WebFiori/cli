@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace webfiori\tests\cli;
 
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
