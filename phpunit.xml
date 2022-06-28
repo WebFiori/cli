@@ -9,6 +9,7 @@
             <file>./src/webfiori/cli/Formatter.php</file>
             <file>./src/webfiori/cli/KeysMap.php</file>
             <file>./src/webfiori/cli/Runner.php</file>
+            <file>./src/webfiori/cli/InputValidator.php</file>
             <file>./src/webfiori/cli/streams/ArrayInputStream.php</file>
             <file>./src/webfiori/cli/streams/ArrayOutputStream.php</file>
             <file>./src/webfiori/cli/streams/FileInputStream.php</file>

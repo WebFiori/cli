@@ -4,8 +4,350 @@ namespace webfiori\tests\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\cli\Runner;
 use webfiori\tests\cli\TestCommand;
+use webfiori\cli\streams\ArrayInputStream;
+use webfiori\cli\streams\ArrayOutputStream;
+use webfiori\cli\CommandArgument;
+use webfiori\cli\InputValidator;
 
 class CLICommandTest extends TestCase {
+    /**
+     * @test
+     */
+    public function testConfirm00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'y'
+        ]));
+        $this->assertTrue($command->confirm('Are you sure?'));
+        $this->assertEquals([
+            "Are you sure?(y/n)\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testConfirm01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'n'
+        ]));
+        $this->assertFalse($command->confirm('Are you sure?'));
+        $this->assertEquals([
+            "Are you sure?(y/n)\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testConfirm02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'hell',
+            'y'
+        ]));
+        $this->assertTrue($command->confirm('Are you sure?'));
+        $this->assertEquals([
+            "Are you sure?(y/n)\n",
+            "Error: Invalid answer. Choose 'y' or 'n'.\n",
+            "Are you sure?(y/n)\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testConfirm03() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'hell',
+            'y'
+        ]));
+        $this->assertTrue($command->confirm('Are you sure?'));
+        $this->assertEquals([
+            "\e[1;37mAre you sure?\e[0m\e[94m(y/n)\e[0m\n",
+            "\e[1;91mError: \e[0mInvalid answer. Choose 'y' or 'n'.\n",
+            "\e[1;37mAre you sure?\e[0m\e[94m(y/n)\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testConfirm04() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            " \n"
+        ]));
+        $this->assertTrue($command->confirm('Are you sure?  ', true));
+        $this->assertEquals([
+            "\e[1;37mAre you sure?\e[0m\e[94m(Y/n)\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testConfirm05() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "\n"
+        ]));
+        $this->assertFalse($command->confirm('Are you sure?', false));
+        $this->assertEquals([
+            "\e[1;37mAre you sure?\e[0m\e[94m(y/N)\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'My Name Is Ibrahim',
+        ]));
+        $input = $command->getInput('   ');
+        $this->assertNull($input);
+        $input = $command->getInput('Give me Your Name: ');
+        $this->assertEquals('My Name Is Ibrahim', $input);
+    }
+    /**
+     * @test
+     */
+    public function testGetInput01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'My Name Is Ibrahim',
+        ]));
+        $input = $command->getInput('   ');
+        $this->assertNull($input);
+        $input = $command->getInput('Give me Your Name: ');
+        $this->assertEquals('My Name Is Ibrahim', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput02() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "",
+        ]));
+        $input = $command->getInput('Give me Your Name: ', "Demon Lord");
+        $this->assertEquals('Demon Lord', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\e[94m Enter = 'Demon Lord'\e[0m\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput03() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "",
+        ]));
+        $input = $command->getInput('Give me Your Name: ');
+        $this->assertEquals('', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput04() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "",
+            "SisPro"
+        ]));
+        $input = $command->getInput('Give me Your Name: ', null, new InputValidator(function ($val) {
+            $trim = trim($val);
+            if (strlen($val) == 0) {
+                return false;
+            }
+            return true;
+        }));
+        $this->assertEquals('SisPro', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\n",
+            "\e[1;91mError: \e[0mInvalid input is given. Try again.\n",
+            "\e[1;37mGive me Your Name:\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput05() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "",
+            "SisPro"
+        ]));
+        $input = $command->getInput('Give me Your Name: ', null, new InputValidator(function ($val) {
+            $trim = trim($val);
+            if (strlen($val) == 0) {
+                return false;
+            }
+            return true;
+        }, 'Wrong Input.'));
+        $this->assertEquals('SisPro', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\n",
+            "\e[1;91mError: \e[0mWrong Input.\n",
+            "\e[1;37mGive me Your Name:\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testGetInput06() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            "SisPro"
+        ]));
+        $input = $command->getInput('Give me Your Name: ', null, new InputValidator(function ($val, $hello) {
+            if ($hello == 'Hello') {
+                return true;
+            }
+            return true;
+        }, 'Wrong Input.', [
+            'Hello'
+        ]));
+        $this->assertEquals('SisPro', $input);
+        $this->AssertEquals([
+            "\e[1;37mGive me Your Name:\e[0m\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadInteger00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '445',
+        ]));
+        $input = $command->readInteger('Give me an integer:');
+        $this->assertSame(445, $input);
+    }
+    /**
+     * @test
+     */
+    public function testReadInteger01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '',
+        ]));
+        $input = $command->readInteger('Give me an integer:', 88);
+        $this->assertSame(88, $input);
+    }
+    /**
+     * @test
+     */
+    public function testReadInteger02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'uu8',
+            '998&9',
+            '100'
+        ]));
+        $input = $command->readInteger('Give me an integer:', 88);
+        $this->assertSame(100, $input);
+        $this->assertequals([
+            "Give me an integer: Enter = '88'\n",
+            "Error: Provided value is not an integer!\n",
+            "Give me an integer: Enter = '88'\n",
+            "Error: Provided value is not an integer!\n",
+            "Give me an integer: Enter = '88'\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadFloat00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '445.1',
+        ]));
+        $input = $command->readFloat('Give me a float:');
+        $this->assertSame(445.1, $input);
+    }
+    /**
+     * @test
+     */
+    public function testReadFloat01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '',
+        ]));
+        $input = $command->readFloat('Give me a float:', 88.98876);
+        $this->assertSame(88.98876, $input);
+    }
+    /**
+     * @test
+     */
+    public function testReadFloat02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'u.u8',
+            '998.9.9',
+            '100.998'
+        ]));
+        $input = $command->readFloat('Give me a float:', 88);
+        $this->assertSame(100.998, $input);
+        $this->assertequals([
+            "Give me a float: Enter = '88'\n",
+            "Error: Provided value is not a floating number!\n",
+            "Give me a float: Enter = '88'\n",
+            "Error: Provided value is not a floating number!\n",
+            "Give me a float: Enter = '88'\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
     /**
      * @test
      */

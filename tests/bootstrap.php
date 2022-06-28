@@ -39,6 +39,7 @@ require_once $baseDir.DS.'CommandArgument.php';
 require_once $baseDir.DS.'Formatter.php';
 require_once $baseDir.DS.'KeysMap.php';
 require_once $baseDir.DS.'Runner.php';
+require_once $baseDir.DS.'InputValidator.php';
 require_once $baseDir.DS.'streams'.DS.'ArrayInputStream.php';
 require_once $baseDir.DS.'streams'.DS.'ArrayOutputStream.php';
 require_once $baseDir.DS.'streams'.DS.'FileInputStream.php';

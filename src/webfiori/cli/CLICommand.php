@@ -279,7 +279,7 @@ abstract class CLICommand {
             } else {
                 $optionsStr = '(y/n)';
             }
-            $this->prints($confirmTxt, [
+            $this->prints(trim($confirmTxt), [
                 'color' => 'gray',
                 'bold' => true
             ]);
@@ -287,7 +287,7 @@ abstract class CLICommand {
                 'color' => 'light-blue'
             ]);
 
-            $input = strtolower($this->readln());
+            $input = strtolower(trim($this->readln()));
 
             if ($input == 'n') {
                 $answer = false;
@@ -462,7 +462,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getInput(string $prompt, $default = null, callable $validator = null, array $validatorParams = []) {
+    public function getInput(string $prompt, $default = null, InputValidator $validator = null) {
         $trimidPrompt = trim($prompt);
 
         if (strlen($trimidPrompt) > 0) {
@@ -473,14 +473,14 @@ abstract class CLICommand {
                 ]);
 
                 if ($default !== null) {
-                    $this->prints(' Enter = "'.$default.'"', [
+                    $this->prints(" Enter = '".$default."'", [
                         'color' => 'light-blue'
                     ]);
                 }
                 $this->println();
                 $input = $this->readln();
 
-                $check = $this->getInputHelper($input, $validator, $default, $validatorParams);
+                $check = $this->getInputHelper($input, $validator, $default);
 
                 if ($check['valid']) {
                     return $check['value'];
@@ -501,15 +501,9 @@ abstract class CLICommand {
      * @return int
      */
     public function readInteger(string $prompt, int $default = null) : int {
-        $isInt = false;
-        do {
-            $val = $this->getInput($prompt, $default);
-            $isInt = $this->isInt($val);
-            if (!$isInt) {
-                $this->error('Provided value is not an integer!');
-            }
-        } while (!$isInt);
-        return intval($val);
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+            return InputValidator::isInt($val);
+        }, 'Provided value is not an integer!'));
     }
     /**
      * Reads a value as float.
@@ -524,7 +518,9 @@ abstract class CLICommand {
      * @return float
      */
     public function readFloat(string $prompt, float $default = null) : float {
-        return floatval($this->getInput($prompt, $default));
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+            return InputValidator::isFloat($val);
+        }, 'Provided value is not a floating number!'));
     }
     /**
      * Returns the stream at which the command is sing to read inputs.
@@ -1124,18 +1120,7 @@ abstract class CLICommand {
         }
     }
 
-    private function isInt(string $val) : bool {
-        $len = strlen($val);
-        if ($len == 0) {
-            return false;
-        }
-        $isNum = true;
-        for ($x = 0 ; $x < $len ; $x++) {
-            $char = $val[$x];
-            $isNum = $char >= '0' && $char <= '9';
-        }
-        return $isNum;
-    }
+    
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 
@@ -1207,7 +1192,7 @@ abstract class CLICommand {
      * 'value'. The 'valid' index contains a boolean that is set to true if the 
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper($input, callable $validator = null, $default = null , array $callbackParams = []) {
+    private function getInputHelper($input, InputValidator $validator = null, $default = null) {
         $retVal = [
             'valid' => true,
             'value' => $input
@@ -1216,10 +1201,10 @@ abstract class CLICommand {
         if (strlen($input) == 0 && $default !== null) {
             $retVal['value'] = $default;
         } else if ($validator !== null) {
-            $retVal['valid'] = call_user_func_array($validator, array_merge([$input], $callbackParams));
+            $retVal['valid'] = $validator->isValid($input);
 
             if (!($retVal['valid'] === true)) {
-                $this->error('Invalid input is given. Try again.');
+                $this->error($validator->getErrPrompt());
             }
         }
 
