@@ -90,6 +90,9 @@ abstract class CLICommand {
         }
     }
     /**
+     * Sets the runner that owns the command.
+     * 
+     * The runner is the instance that will execute the command.
      * 
      * @param Runner $ouner
      */
@@ -279,7 +282,7 @@ abstract class CLICommand {
             } else {
                 $optionsStr = '(y/n)';
             }
-            $this->prints($confirmTxt, [
+            $this->prints(trim($confirmTxt), [
                 'color' => 'gray',
                 'bold' => true
             ]);
@@ -287,7 +290,7 @@ abstract class CLICommand {
                 'color' => 'light-blue'
             ]);
 
-            $input = strtolower($this->readln());
+            $input = strtolower(trim($this->readln()));
 
             if ($input == 'n') {
                 $answer = false;
@@ -313,12 +316,16 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function error(string $message) {
-        $this->prints('Error: ', [
-            'color' => 'light-red',
+        $this->printMsg($message, 'Error', 'light-red');
+    }
+    private function printMsg(string $msg, string $prefix, string $color) {
+        $this->prints("$prefix: ", [
+            'color' => $color,
             'bold' => true
         ]);
-        $this->println($message);
+        $this->println($msg);
     }
+
     /**
      * Execute the command.
      * 
@@ -332,9 +339,9 @@ abstract class CLICommand {
      */
     public function excCommand() : int {
         $retVal = -1;
-        $this->_parseArgs();
+        
 
-        if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
+        if ($this->_parseArgs() && $this->_checkIsArgsSet()) {
             $retVal = $this->exec();
         }
         return $retVal;
@@ -388,6 +395,7 @@ abstract class CLICommand {
             if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isIntaractive())) {
                 return $arg->getValue();
             }
+            
             foreach ($_SERVER['argv'] as $option) {
                 $optionClean = filter_var($option, FILTER_DEFAULT);
                 $optExpl = explode('=', $optionClean);
@@ -397,13 +405,11 @@ abstract class CLICommand {
 
 
                     if (count($optExpl) == 2) {
-                        $arg->setValue($optExpl[1]);
+                        return trim($optExpl[1]);
                     } else {
-                        //If arg is provided, set its value empty string first
-                        $arg->setValue('');
+                        //If arg is provided, set its value empty string
+                        return '';
                     }
-
-                    return $arg->getValue();
                 }
             }
         }
@@ -462,7 +468,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getInput(string $prompt, $default = null, callable $validator = null, array $validatorParams = []) {
+    public function getInput(string $prompt, $default = null, InputValidator $validator = null) {
         $trimidPrompt = trim($prompt);
 
         if (strlen($trimidPrompt) > 0) {
@@ -473,14 +479,14 @@ abstract class CLICommand {
                 ]);
 
                 if ($default !== null) {
-                    $this->prints(' Enter = "'.$default.'"', [
+                    $this->prints(" Enter = '".$default."'", [
                         'color' => 'light-blue'
                     ]);
                 }
                 $this->println();
                 $input = $this->readln();
 
-                $check = $this->getInputHelper($input, $validator, $default, $validatorParams);
+                $check = $this->getInputHelper($input, $validator, $default);
 
                 if ($check['valid']) {
                     return $check['value'];
@@ -501,15 +507,9 @@ abstract class CLICommand {
      * @return int
      */
     public function readInteger(string $prompt, int $default = null) : int {
-        $isInt = false;
-        do {
-            $val = $this->getInput($prompt, $default);
-            $isInt = $this->isInt($val);
-            if (!$isInt) {
-                $this->error('Provided value is not an integer!');
-            }
-        } while (!$isInt);
-        return intval($val);
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+            return InputValidator::isInt($val);
+        }, 'Provided value is not an integer!'));
     }
     /**
      * Reads a value as float.
@@ -524,7 +524,9 @@ abstract class CLICommand {
      * @return float
      */
     public function readFloat(string $prompt, float $default = null) : float {
-        return floatval($this->getInput($prompt, $default));
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+            return InputValidator::isFloat($val);
+        }, 'Provided value is not a floating number!'));
     }
     /**
      * Returns the stream at which the command is sing to read inputs.
@@ -592,11 +594,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function info(string $message) {
-        $this->prints('Info: ', [
-            'color' => 'blue',
-            'bold' => true
-        ]);
-        $this->println($message);
+        $this->printMsg($message, 'Info', 'blue');
     }
     /**
      * Checks if an argument is provided in the CLI or not.
@@ -775,7 +773,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function prints(string $str, ...$_) {
-        $str = $this->asString($str);
 
         $argCount = count($_);
         $formattingOptions = [];
@@ -840,7 +837,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function select(string $prompt, array $choices, $defaultIndex = null) {
+    public function select(string $prompt, array $choices, int $defaultIndex = -1) {
         if (gettype($choices) == 'array' && count($choices) != 0) {
             do {
                 $this->println($prompt, [
@@ -967,11 +964,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function success(string $message) {
-        $this->prints("Success: ", [
-            'color' => 'light-green',
-            'bold' => true
-        ]);
-        $this->println($message);
+        $this->printMsg($message, 'Success', 'light-green');
     }
     /**
      * Display a message that represents a warning.
@@ -989,45 +982,6 @@ abstract class CLICommand {
             'bold' => true
         ]);
         $this->println($message);
-    }
-    private function _checkAllowedArgValues() {
-        $invalidArgsVals = [];
-
-        foreach ($this->commandArgs as $argObj) {
-            
-            $argVal = $argObj->getValue();
-            $allowed = $argObj->getAllowedValues();
-            if ($argVal !== null && count($allowed) != 0 && !in_array($argVal, $allowed)) {
-                $invalidArgsVals[] = $argObj->getName();
-            }
-        }
-
-        if (count($invalidArgsVals) != 0) {
-            $invalidStr = 'The following argument(s) have invalid values: ';
-            $comma = '';
-
-            foreach ($invalidArgsVals as $argName) {
-                $invalidStr .= $comma.'"'.$argName.'"';
-                $comma = ', ';
-            }
-            $this->error($invalidStr);
-
-            foreach ($invalidArgsVals as $argName) {
-                $this->prints('Info:', [
-                    'color' => 'light-yellow',
-                    'ansi' => $this->isArgProvided('--ansi')
-                ]);
-                $this->println("Allowed values for the argument '$argName':");
-
-                foreach ($this->commandArgs[$argName]['values'] as $val) {
-                    $this->println($val);
-                }
-            }
-
-            return false;
-        }
-
-        return true;
     }
     private function _checkArgOptions($name, $options) {
         if (strlen($name) == 0) {
@@ -1078,7 +1032,7 @@ abstract class CLICommand {
             $comma = '';
 
             foreach ($missingMandatury as $opt) {
-                $missingStr .= $comma.'"'.$opt.'"';
+                $missingStr .= $comma."'".$opt."'";
                 $comma = ', ';
             }
             $this->error($missingStr);
@@ -1089,20 +1043,22 @@ abstract class CLICommand {
         return true;
     }
     private function _checkSelectedChoice($choices, $defaultIndex, $input) {
-        
+        $retVal = null;
         if (in_array($input, $choices)) {
             //Given input is exactly same as one of choices
-            return $input;
+            $retVal = $input;
         } else if (strlen($input) == 0 && $defaultIndex !== null) {
             //Given input is empty string (enter hit). 
             //Return defult if specified.
-            return $this->_getDefault($choices, $defaultIndex);
-        } else if ($this->isInt($input)) {
+            $retVal = $this->_getDefault($choices, $defaultIndex);
+        } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
-            return $this->_getChoiceAtIndex($choices, $input);
-        } else {
+            $retVal = $this->_getChoiceAtIndex($choices, $input);
+        } 
+        if ($retVal === null) {
             $this->error('Invalid answer.');
         }
+        return $retVal;
     }
     private function _getChoiceAtIndex(array $choices, $input) {
         $index = 0;
@@ -1124,18 +1080,7 @@ abstract class CLICommand {
         }
     }
 
-    private function isInt(string $val) : bool {
-        $len = strlen($val);
-        if ($len == 0) {
-            return false;
-        }
-        $isNum = true;
-        for ($x = 0 ; $x < $len ; $x++) {
-            $char = $val[$x];
-            $isNum = $char >= '0' && $char <= '9';
-        }
-        return $isNum;
-    }
+    
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 
@@ -1162,11 +1107,35 @@ abstract class CLICommand {
             'optional' => true,
             'description' => 'Force the use of ANSI output.'
         ]);
-        $options = $this->getArgsNames();
-
-        foreach ($options as $optName) {
-            $this->getArgValue($optName);
+        $options = $this->getArgs();
+        $invalidArgsVals = [];
+        foreach ($options as $argObj) {
+            $val = $this->getArgValue($argObj->getName());
+            if ($val !== null && !$argObj->setValue($val)) {
+                $invalidArgsVals[] = $argObj->getName();
+            }
         }
+        if (count($invalidArgsVals) != 0) {
+            $invalidStr = 'The following argument(s) have invalid values: ';
+            $comma = '';
+
+            foreach ($invalidArgsVals as $argName) {
+                $invalidStr .= $comma."'".$argName."'";
+                $comma = ', ';
+            }
+            $this->error($invalidStr);
+
+            foreach ($invalidArgsVals as $argName) {
+                $this->info("Allowed values for the argument '$argName':");
+
+                foreach ($this->getArg($argName)->getAllowedValues() as $val) {
+                    $this->println($val);
+                }
+            }
+
+            return false;
+        }
+        return true;
     }
     private function _printChoices($choices, $default) {
         $index = 0;
@@ -1183,20 +1152,6 @@ abstract class CLICommand {
             $index++;
         }
     }
-
-    private function asString($var) {
-        $type = gettype($var);
-
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else {
-            if ($type == 'null') {
-                return 'null';
-            }
-        }
-
-        return $var;
-    }
     
     /**
      * Validate user input and show error message if user input is invalid.
@@ -1207,7 +1162,7 @@ abstract class CLICommand {
      * 'value'. The 'valid' index contains a boolean that is set to true if the 
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper($input, callable $validator = null, $default = null , array $callbackParams = []) {
+    private function getInputHelper($input, InputValidator $validator = null, $default = null) {
         $retVal = [
             'valid' => true,
             'value' => $input
@@ -1216,10 +1171,10 @@ abstract class CLICommand {
         if (strlen($input) == 0 && $default !== null) {
             $retVal['value'] = $default;
         } else if ($validator !== null) {
-            $retVal['valid'] = call_user_func_array($validator, array_merge([$input], $callbackParams));
+            $retVal['valid'] = $validator->isValid($input);
 
             if (!($retVal['valid'] === true)) {
-                $this->error('Invalid input is given. Try again.');
+                $this->error($validator->getErrPrompt());
             }
         }
 

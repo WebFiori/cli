@@ -30,23 +30,15 @@ class FileOutputStream implements OutputStream {
         $this->file->create();
     }
     /**
+     * Send a line of string to the stream as output.
      * 
-     * @return string
+     * @param string $str The string that will be sent.
+     * 
+     * @param type $_ Any extra arguments to supply to the output.
      */
-    public function readOutput() {
-        $f = new File($this->file->getAbsolutePath());
-        $f->read();
-        $raw = $f->getRawData();
-        $expl = explode("\n", $raw);
-        $retVal = [];
-        foreach ($expl as $str) {
-            $retVal[] = $str;
-        }
-        return $retVal;
-    }
     public function println(string $str, ...$_) {
         $toPass = [
-            $this->asString($str)."\n"
+            $str."\n"
         ];
 
         foreach ($_ as $val) {
@@ -54,7 +46,16 @@ class FileOutputStream implements OutputStream {
         }
         call_user_func_array([$this, 'prints'], $toPass);
     }
-
+    /**
+     * Send a line of string to the stream as output.
+     * 
+     * Note that the given string will be appended to the string
+     * where the pointer is currently at.
+     * 
+     * @param string $str The string that will be sent.
+     * 
+     * @param type $_ Any extra arguments to supply to the output.
+     */
     public function prints(string $str, ...$_) {
         $arrayToPass = [
             $str
@@ -71,16 +72,5 @@ class FileOutputStream implements OutputStream {
         $toWrite = call_user_func_array('sprintf', $arrayToPass);
         $this->file->setRawData($toWrite);
         $this->file->write();
-    }
-    private function asString($var) {
-        $type = gettype($var);
-
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else if ($type == 'null') {
-            return 'null';
-        }
-
-        return $var;
     }
 }

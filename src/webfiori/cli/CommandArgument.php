@@ -111,10 +111,16 @@ class CommandArgument {
     /**
      * Sets the value of the argument.
      * 
+     * Note that the method will return false only if the argument can have a
+     * fixed set of values and provided value is not one of them.
+     * 
      * @param string $val The value to set. Note that spaces in the provided value
      * will be trimmed.
+     * 
+     * @return bool If the value of the argument is set, the method will return
+     * true. If not, the method will return false.
      */
-    public function setValue(string $val) {
+    public function setValue(string $val) : bool {
         $allowed = $this->getAllowedValues();
         
         if (count($allowed) == 0 || in_array($val, $allowed)) {

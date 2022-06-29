@@ -148,6 +148,7 @@ class OutputFormatterTest extends TestCase {
             'blink' => true,
             'ansi' => true
         ]));
+        $_SERVER['NO_COLOR'] = null;
     }
     /**
      * @test
@@ -163,6 +164,7 @@ class OutputFormatterTest extends TestCase {
             'blink' => true,
             'ansi' => false
         ]));
+        $_SERVER['NO_COLOR'] = null;
     }
     
 }
