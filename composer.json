@@ -9,5 +9,10 @@
     ],
     "require": {
         "webfiori/file":"1.1.3"
+    },
+    "autoload" :{
+        "psr-4":{
+            "webfiori\\cli\\":"src\\webfiori\\cli"
+        }
     }
 }
