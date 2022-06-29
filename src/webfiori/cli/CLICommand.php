@@ -313,12 +313,16 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function error(string $message) {
-        $this->prints('Error: ', [
-            'color' => 'light-red',
+        $this->printMsg($message, 'Error', 'light-red');
+    }
+    private function printMsg(string $msg, string $prefix, string $color) {
+        $this->prints("$prefix: ", [
+            'color' => $color,
             'bold' => true
         ]);
-        $this->println($message);
+        $this->println($msg);
     }
+
     /**
      * Execute the command.
      * 
@@ -588,11 +592,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function info(string $message) {
-        $this->prints('Info: ', [
-            'color' => 'blue',
-            'bold' => true
-        ]);
-        $this->println($message);
+        $this->printMsg($message, 'Info', 'blue');
     }
     /**
      * Checks if an argument is provided in the CLI or not.
@@ -836,7 +836,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function select(string $prompt, array $choices, $defaultIndex = null) {
+    public function select(string $prompt, array $choices, int $defaultIndex = -1) {
         if (gettype($choices) == 'array' && count($choices) != 0) {
             do {
                 $this->println($prompt, [
@@ -963,11 +963,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function success(string $message) {
-        $this->prints("Success: ", [
-            'color' => 'light-green',
-            'bold' => true
-        ]);
-        $this->println($message);
+        $this->printMsg($message, 'Success', 'light-green');
     }
     /**
      * Display a message that represents a warning.
@@ -1085,20 +1081,22 @@ abstract class CLICommand {
         return true;
     }
     private function _checkSelectedChoice($choices, $defaultIndex, $input) {
-        
+        $retVal = null;
         if (in_array($input, $choices)) {
             //Given input is exactly same as one of choices
-            return $input;
+            $retVal = $input;
         } else if (strlen($input) == 0 && $defaultIndex !== null) {
             //Given input is empty string (enter hit). 
             //Return defult if specified.
-            return $this->_getDefault($choices, $defaultIndex);
-        } else if ($this->isInt($input)) {
+            $retVal = $this->_getDefault($choices, $defaultIndex);
+        } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
-            return $this->_getChoiceAtIndex($choices, $input);
-        } else {
+            $retVal = $this->_getChoiceAtIndex($choices, $input);
+        } 
+        if ($retVal === null) {
             $this->error('Invalid answer.');
         }
+        return $retVal;
     }
     private function _getChoiceAtIndex(array $choices, $input) {
         $index = 0;

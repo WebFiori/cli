@@ -13,8 +13,299 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function moveCursorUpTest() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->moveCursorUp();
+        $command->moveCursorUp(-1);
+        $command->moveCursorUp(35);
+        $this->assertEquals([
+            "\e[1A\e[35A"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSussess00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->success('All is ok');
+        $this->assertEquals([
+            "Success: All is ok\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSussess01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->success('All is ok');
+        $this->assertEquals([
+            "\e[1;92mSuccess: \e[0mAll is ok\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testInfo00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->info('Note that all files where uploaded.');
+        $this->assertEquals([
+            "Info: Note that all files where uploaded.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testInfo01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->info('Note that all files where uploaded.');
+        $this->assertEquals([
+            "\e[1;34mInfo: \e[0mNote that all files where uploaded.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testError00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->error('An exception was thrown.');
+        $this->assertEquals([
+            "Error: An exception was thrown.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testError01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->error('An exception was thrown.');
+        $this->assertEquals([
+            "\e[1;91mError: \e[0mAn exception was thrown.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '1'
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ]);
+        $this->assertEquals('Second', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'Third'
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ]);
+        $this->assertEquals('Third', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'ok',
+            '3',
+            'First'
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ]);
+        $this->assertEquals('First', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n",
+            "Error: Invalid answer.\n",
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n",
+            "Error: Invalid answer.\n",
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect03() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'ok',
+            'First'
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ], 3);
+        $this->assertEquals('First', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n",
+            "Error: Invalid answer.\n",
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect04() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'ok',
+            ''
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ], 2);
+        $this->assertEquals('Third', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third <--\n",
+            "Error: Invalid answer.\n",
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third <--\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect05() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'ok',
+            ''
+        ]));
+        $answer = $command->select('Select a value:', [
+            'First',
+            'Second',
+            'Third'
+        ], 2);
+        $this->assertEquals('Third', $answer);
+        $this->assertEquals([
+            "\e[1;37mSelect a value:\e[0m\n",
+            "0: First\n",
+            "1: Second\n",
+            "\e[1;94m2: Third\e[0m <--\n",
+            "\e[1;91mError: \e[0mInvalid answer.\n",
+            "\e[1;37mSelect a value:\e[0m\n",
+            "0: First\n",
+            "1: Second\n",
+            "\e[1;94m2: Third\e[0m <--\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testSelect06() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '1'
+        ]));
+        $answer = $command->select('Select a value:', [
+            'one' => 'First',
+            'Second',
+            'th' => 'Third'
+        ], 2);
+        $this->assertEquals('Second', $answer);
+        $this->assertEquals([
+            "Select a value:\n",
+            "0: First\n",
+            "1: Second\n",
+            "2: Third <--\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testMoveCursorTo() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->moveCursorTo();
+        $command->moveCursorTo(-1, 3);
+        $command->moveCursorTo(3, -1);
+        $command->moveCursorTo(44, 3);
+        $this->assertEquals([
+            "\e[0;0H\e[44;3H"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testConfirm00() {
         $command = new TestCommand('cool');
+        $this->assertNotNull($command->getInputStream());
+        $this->assertNotNull($command->getOutputStream());
         $command->setOutputStream(new ArrayOutputStream());
         $command->setInputStream(new ArrayInputStream([
             'y'

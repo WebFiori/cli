@@ -73,15 +73,4 @@ class FileOutputStream implements OutputStream {
         $this->file->setRawData($toWrite);
         $this->file->write();
     }
-    private function asString($var) {
-        $type = gettype($var);
-
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else if ($type == 'null') {
-            return 'null';
-        }
-
-        return $var;
-    }
 }
