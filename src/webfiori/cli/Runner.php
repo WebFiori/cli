@@ -55,10 +55,14 @@ class Runner {
      * Sets the default command that will be get executed in case no command
      * name was provided as argument.
      * 
-     * @param CLICommand $c The default command.
+     * @param string $commandName The name of the command that will be set as
+     * default command. Note that it must be a registered command.
      */
-    public function setDefaultCommand(CLICommand $c) {
-        $this->defaultCommand = $c;
+    public function setDefaultCommand(string $commandName) {
+        $c = $this->getCommandByName($commandName);
+        if ($c !== null) {
+            $this->defaultCommand = $c;
+        }
     }
     /**
      * Return the command which will get executed in case no command name
@@ -226,18 +230,27 @@ class Runner {
      * it means that there was an error in execution.
      */
     public function runCommand(CLICommand $c = null, array $args = []) {
+        $commandName = null;
         
         if ($c === null) {
             if (count($args) === 0) {
                 $c = $this->getDefaultCommand();
             } else {
-                $commandName = filter_var($args[0], FILTER_DEFAULT);
-                $args = array_slice($args, 1);
-                $c = $this->getCommandByName($commandName);
+                if (isset($args[0])) {
+                    $commandName = filter_var($args[0], FILTER_DEFAULT);
+                    $args = array_slice($args, 1);
+                    $c = $this->getCommandByName($commandName);
+                } else {
+                    $c = $this->getDefaultCommand();
+                }
             }
             
             if ($c === null) {
-                $this->getOutputStream()->println("Error: The command '".$commandName."' is not supported.");
+                if ($commandName == null) {
+                    $this->getOutputStream()->println("Info: No command was specified to run.");
+                } else {
+                    $this->getOutputStream()->println("Error: The command '".$commandName."' is not supported.");
+                }
 
                 return -1;
             }

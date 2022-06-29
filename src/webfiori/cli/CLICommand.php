@@ -90,6 +90,9 @@ abstract class CLICommand {
         }
     }
     /**
+     * Sets the runner that owns the command.
+     * 
+     * The runner is the instance that will execute the command.
      * 
      * @param Runner $ouner
      */
@@ -336,9 +339,9 @@ abstract class CLICommand {
      */
     public function excCommand() : int {
         $retVal = -1;
-        $this->_parseArgs();
+        
 
-        if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
+        if ($this->_parseArgs() && $this->_checkIsArgsSet()) {
             $retVal = $this->exec();
         }
         return $retVal;
@@ -392,6 +395,7 @@ abstract class CLICommand {
             if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isIntaractive())) {
                 return $arg->getValue();
             }
+            $invalidArgs = [];
             foreach ($_SERVER['argv'] as $option) {
                 $optionClean = filter_var($option, FILTER_DEFAULT);
                 $optExpl = explode('=', $optionClean);
@@ -401,13 +405,11 @@ abstract class CLICommand {
 
 
                     if (count($optExpl) == 2) {
-                        $arg->setValue($optExpl[1]);
+                        return trim($optExpl[1]);
                     } else {
-                        //If arg is provided, set its value empty string first
-                        $arg->setValue('');
+                        //If arg is provided, set its value empty string
+                        return '';
                     }
-
-                    return $arg->getValue();
                 }
             }
         }
@@ -982,45 +984,6 @@ abstract class CLICommand {
         ]);
         $this->println($message);
     }
-    private function _checkAllowedArgValues() {
-        $invalidArgsVals = [];
-
-        foreach ($this->commandArgs as $argObj) {
-            
-            $argVal = $argObj->getValue();
-            $allowed = $argObj->getAllowedValues();
-            if ($argVal !== null && count($allowed) != 0 && !in_array($argVal, $allowed)) {
-                $invalidArgsVals[] = $argObj->getName();
-            }
-        }
-
-        if (count($invalidArgsVals) != 0) {
-            $invalidStr = 'The following argument(s) have invalid values: ';
-            $comma = '';
-
-            foreach ($invalidArgsVals as $argName) {
-                $invalidStr .= $comma.'"'.$argName.'"';
-                $comma = ', ';
-            }
-            $this->error($invalidStr);
-
-            foreach ($invalidArgsVals as $argName) {
-                $this->prints('Info:', [
-                    'color' => 'light-yellow',
-                    'ansi' => $this->isArgProvided('--ansi')
-                ]);
-                $this->println("Allowed values for the argument '$argName':");
-
-                foreach ($this->commandArgs[$argName]['values'] as $val) {
-                    $this->println($val);
-                }
-            }
-
-            return false;
-        }
-
-        return true;
-    }
     private function _checkArgOptions($name, $options) {
         if (strlen($name) == 0) {
             return null;
@@ -1070,7 +1033,7 @@ abstract class CLICommand {
             $comma = '';
 
             foreach ($missingMandatury as $opt) {
-                $missingStr .= $comma.'"'.$opt.'"';
+                $missingStr .= $comma."'".$opt."'";
                 $comma = ', ';
             }
             $this->error($missingStr);
@@ -1145,11 +1108,35 @@ abstract class CLICommand {
             'optional' => true,
             'description' => 'Force the use of ANSI output.'
         ]);
-        $options = $this->getArgsNames();
-
-        foreach ($options as $optName) {
-            $this->getArgValue($optName);
+        $options = $this->getArgs();
+        $invalidArgsVals = [];
+        foreach ($options as $argObj) {
+            $val = $this->getArgValue($argObj->getName());
+            if ($val !== null && !$argObj->setValue($val)) {
+                $invalidArgsVals[] = $argObj->getName();
+            }
         }
+        if (count($invalidArgsVals) != 0) {
+            $invalidStr = 'The following argument(s) have invalid values: ';
+            $comma = '';
+
+            foreach ($invalidArgsVals as $argName) {
+                $invalidStr .= $comma."'".$argName."'";
+                $comma = ', ';
+            }
+            $this->error($invalidStr);
+
+            foreach ($invalidArgsVals as $argName) {
+                $this->info("Allowed values for the argument '$argName':");
+
+                foreach ($this->getArg($argName)->getAllowedValues() as $val) {
+                    $this->println($val);
+                }
+            }
+
+            return false;
+        }
+        return true;
     }
     private function _printChoices($choices, $default) {
         $index = 0;
