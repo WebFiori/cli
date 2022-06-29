@@ -8,6 +8,8 @@ use webfiori\cli\streams\StdIn;
 use webfiori\cli\streams\StdOut;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
+use Exception;
+use webfiori\cli\Formatter;
 /**
  * The core class which is used to manage command line related operations.
  *
@@ -141,7 +143,9 @@ class Runner {
             }
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-            $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+            if (defined('ROOT_DIR')) {
+                $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+            }
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');
@@ -313,11 +317,16 @@ class Runner {
                 $argsCount = count($args);
                 if ($argsCount == 0) {
                     $this->getOutputStream()->println('No input.');
+                } else if ($args[0] == 'exit') {
+                    return 0;
                 } else {
-                    if ($args[0] == 'exit') {
-                        return 0;
+                    try {
+                        $this->runCommand(null, $args);
+                    } catch (Exception $ex) {
+                        $this->getOutputStream()->println('Error: An exception was thrown.');
+                        $this->getOutputStream()->println('Exception Message: '.$ex->getMessage());
+                        $this->getOutputStream()->println('Stack Trace: '.$ex->getTraceAsString());
                     }
-                    $this->runCommand(null, $args);
                 }
                 $this->getOutputStream()->prints('>>');
             }
