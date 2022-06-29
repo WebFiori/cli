@@ -10,6 +10,7 @@ use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 use Exception;
 use webfiori\cli\Formatter;
+use Error;
 /**
  * The core class which is used to manage command line related operations.
  *
@@ -433,7 +434,11 @@ class Runner {
                     } catch (Exception $ex) {
                         $this->getOutputStream()->println('Error: An exception was thrown.');
                         $this->getOutputStream()->println('Exception Message: '.$ex->getMessage());
-                        $this->getOutputStream()->println('Stack Trace: '.$ex->getTraceAsString());
+                        $this->getOutputStream()->println('At : '.$ex->getFile().' Line '.$ex->getLine());
+                    } catch (Error $ex) {
+                        $this->getOutputStream()->println('Error: Error exception was thrown.');
+                        $this->getOutputStream()->println('Exception Message: '.$ex->getMessage());
+                        $this->getOutputStream()->println('At : '.$ex->getFile().' Line '.$ex->getLine());
                     }
                 }
                 $this->getOutputStream()->prints('>>');
