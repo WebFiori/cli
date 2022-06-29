@@ -124,6 +124,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
+        $runner->removeArgument('--ansi');
         $runner->setDefaultCommand('help');
         $runner->setInput([]);
         $this->assertEquals(0, $runner->runCommand(null, []));
@@ -149,6 +150,8 @@ class RunnerTest extends TestCase {
         $this->assertEquals([
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "Global Arguments:\n",
+            "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
             "    super-hero\n",
             "        A command to display hero's name.\n\n",
@@ -168,6 +171,8 @@ class RunnerTest extends TestCase {
         $this->assertEquals([
             "\e[1;93mUsage:\e[0m\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "\e[1;93mGlobal Arguments:\e[0m\n",
+            "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
             "\e[1;33m    super-hero\e[0m\n",
             "        A command to display hero's name.\n\n",
@@ -197,6 +202,7 @@ class RunnerTest extends TestCase {
     public function runnerTest09() {
         $_SERVER['argv'] = [];
         $runner = new Runner();
+        $runner->removeArgument('--ansi');
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->setDefaultCommand('help');
@@ -298,6 +304,8 @@ class RunnerTest extends TestCase {
             ">> Type commant name or 'exit' to close.\n",
             ">>Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "Global Arguments:\n",
+            "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
             "    super-hero\n",
             "        A command to display hero's name.\n\n",
