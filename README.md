@@ -28,3 +28,60 @@ A libray that can be used to write command line based applications using PHP.
 |<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.0/badge.svg?branch=main"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a><br>(dev)|
+
+## Features
+* Help in creating command line based applications.
+* Support for interactive mode.
+* Support for ANSI output.
+* Support for implementing custom input and output streams.
+
+## Creating and Running a Command
+
+### Creating a Command
+
+First step in creating new command is to create a new class that extends the class `CLICommand`. The class `CLICommand` is a utility class which has methods which can be used to read inputs and send outputs.
+
+The class has one abstract method that must be implemented. The code that will exist in the body of the method will represent the logic of the command.
+
+``` php
+<?php
+//File 'SampleCommand.php'
+use webfiori\cli\CLICommand;
+
+class SampleCommand extends CLICommand {
+
+    public function __construct(){
+        parent::__construct('say-hi');
+    }
+
+    public function exec(): int {
+        $this->println("Hi People!");
+    }
+
+}
+
+```
+
+### Running the Command
+
+The class `Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command.
+
+``` php
+// File app.php
+
+use webfiori\cli\Runner;
+use SampleCommand;
+
+
+$runner = new Runner();
+$runner->register(new SampleCommand());
+$runner->start();
+```
+
+Now if terminal is opened and following command is executed:
+
+``` bash
+php app.php say-hi
+```
+
+The output will be the string `Hi People!`.
