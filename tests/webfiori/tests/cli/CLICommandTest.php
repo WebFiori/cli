@@ -938,9 +938,9 @@ class CLICommandTest extends TestCase {
         $this->assertEquals([
             "\e[31mHello !\e[0m\n",
             "Ok\n",
-            "\e[32m- \e[0mone\n",
-            "\e[32m- \e[0mtwo\n",
-            "\e[32m- \e[0mthree\n"
+            "- one\n",
+            "- two\n",
+            "- three\n"
         ], $runner->getOutput());
     }
     /**
