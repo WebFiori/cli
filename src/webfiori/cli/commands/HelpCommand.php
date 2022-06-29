@@ -3,6 +3,7 @@ namespace webfiori\cli\commands;
 
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
+use webfiori\cli\CommandArgument;
 
 /**
  * A class that implements a basic help command.
@@ -51,6 +52,7 @@ class HelpCommand extends CLICommand {
             ];
             $this->println("Usage:", $formattingOptions);
             $this->println("    command [arg1 arg2=\"val\" arg3...]\n");
+            $this->printGlobalArgs($formattingOptions);
             $this->println("Available Commands:", $formattingOptions);
 
             foreach ($regCommands as $commandObj) {
@@ -60,7 +62,15 @@ class HelpCommand extends CLICommand {
 
         return 0;
     }
-
+    private function printGlobalArgs(array $formattingOptions) {
+        $args = $this->getOwner()->getArgs();
+        if (count($args) != 0) {
+            $this->println("Global Arguments:", $formattingOptions);
+            foreach ($args as $argObj) {
+                $this->printArg($argObj, 4);
+            }
+        }
+    }
     /**
      * 
      * @param CLICommand $cliCommand
@@ -82,22 +92,25 @@ class HelpCommand extends CLICommand {
                 ]);
 
                 foreach ($args as $argObj) {
-                    $this->prints("    %25s:", $argObj->getName(), [
-                        'bold' => true,
-                        'color' => 'yellow'
-                    ]);
-
-                    if ($argObj->isOptional()) {
-                        $this->prints("[Optional]");
-                    }
-
-                    if ($argObj->getDefault() != '') {
-                        $default = $argObj->getDefault();
-                        $this->prints("[Default = '$default']");
-                    }
-                    $this->println(" %s", $argObj->getDescription());
+                    $this->printArg($argObj);
                 }
             }
         }
+    }
+    private function printArg(CommandArgument $argObj, $spaces = 25) {
+        $this->prints("    %".$spaces."s:", $argObj->getName(), [
+            'bold' => true,
+            'color' => 'yellow'
+        ]);
+
+        if ($argObj->isOptional()) {
+            $this->prints("[Optional]");
+        }
+
+        if ($argObj->getDefault() != '') {
+            $default = $argObj->getDefault();
+            $this->prints("[Default = '$default']");
+        }
+        $this->println(" %s", $argObj->getDescription());
     }
 }
