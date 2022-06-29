@@ -395,7 +395,7 @@ abstract class CLICommand {
             if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isIntaractive())) {
                 return $arg->getValue();
             }
-            $invalidArgs = [];
+            
             foreach ($_SERVER['argv'] as $option) {
                 $optionClean = filter_var($option, FILTER_DEFAULT);
                 $optExpl = explode('=', $optionClean);

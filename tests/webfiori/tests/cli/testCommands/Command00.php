@@ -14,7 +14,8 @@ class Command00 extends CLICommand {
             'name' => [
                 'values' => [
                     'Ibrahim', 'Ali'
-                ]
+                ],
+                'description' => 'The name of the hero'
             ]
         ], 'A command to display hero\'s name.');
     }

@@ -301,10 +301,10 @@ class Runner {
      * the process. Usually, if the process exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public static function start() : int {
+    public function start() : int {
         if ($this->isIntaractive()) {
-            $this->getOutputStream()->println('Running CLI in interactive mode.');
-            $this->getOutputStream()->println('WF-CLI > Type commant name or "exit" to close.');
+            $this->getOutputStream()->println('>> Running in interactive mode.');
+            $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
             $this->getOutputStream()->prints('>>');
             $exit = false;
 
@@ -312,7 +312,7 @@ class Runner {
                 $args = $this->readInteractiv();
                 $argsCount = count($args);
                 if ($argsCount == 0) {
-                    $this->getOutputStream()->println('No input. Type "help" to display help.');
+                    $this->getOutputStream()->println('No input.');
                 } else {
                     if ($args[0] == 'exit') {
                         return 0;
