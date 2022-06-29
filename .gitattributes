@@ -1,6 +1,6 @@
 # Files and folders here will be not included when creating package
 /tests export-ignore
-/app export-ignore
+/example export-ignore
 /public export-ignore
 /themes export-ignore
 /.github export-ignore
