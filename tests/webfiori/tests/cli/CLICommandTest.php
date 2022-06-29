@@ -76,6 +76,31 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function testWarning00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->warning('Part of the info was not logged.');
+        $this->assertEquals([
+            "Warning: Part of the info was not logged.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testWarning01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->warning('Part of the info was not logged.');
+        $this->assertEquals([
+            "\e[1;93mWarning: \e[0mPart of the info was not logged.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testError00() {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
