@@ -141,7 +141,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function addArg(string $name, array $options = []) : bool {
-        $toAdd = $this->_checkArgOptions($name, $options);
+        $toAdd = CommandArgument::create($name, $options);
         if ($toAdd === null) {
             return false;
         }
@@ -339,12 +339,39 @@ abstract class CLICommand {
      */
     public function excCommand() : int {
         $retVal = -1;
-        
-
+        foreach ($this->getOwner()->getArgs() as $arg) {
+            $this->addArgument($arg);
+        }
         if ($this->_parseArgs() && $this->_checkIsArgsSet()) {
             $retVal = $this->exec();
         }
+        foreach ($this->getOwner()->getArgs() as $arg) {
+            $this->removeArgument($arg->getName());
+        }
         return $retVal;
+    }
+    /**
+     * Removes an argument from the command given its name.
+     * 
+     * @param string $name The name of the argument that will be removed.
+     * 
+     * @return bool If removed, true is returned. Other than that, false is
+     * returned.
+     */
+    public function removeArgument(string $name) : bool {
+        $removed = false;
+        $temp = [];
+        
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() !== $name) {
+                $temp[] = $arg;
+            } else {
+                $removed = true;
+            }
+        }
+        $this->commandArgs = $temp;
+        
+        return $removed;
     }
     /**
      * Execute the command.
@@ -396,22 +423,7 @@ abstract class CLICommand {
                 return $arg->getValue();
             }
             
-            foreach ($_SERVER['argv'] as $option) {
-                $optionClean = filter_var($option, FILTER_DEFAULT);
-                $optExpl = explode('=', $optionClean);
-                $optionNameFromCLI = $optExpl[0];
-
-                if ($optionNameFromCLI == $trimmedOptName) {
-
-
-                    if (count($optExpl) == 2) {
-                        return trim($optExpl[1]);
-                    } else {
-                        //If arg is provided, set its value empty string
-                        return '';
-                    }
-                }
-            }
+            return CommandArgument::extractValue($trimmedOptName);
         }
     }
     /**
@@ -983,36 +995,6 @@ abstract class CLICommand {
         ]);
         $this->println($message);
     }
-    private function _checkArgOptions($name, $options) {
-        if (strlen($name) == 0) {
-            return null;
-        }
-        $arg = new CommandArgument($name);
-        if ($arg->getName() == 'arg') {
-            return null;
-        }
-        if (isset($options['optional'])) {
-            $arg->setIsOptional($options['optional']);
-        }
-        $desc = isset($options['description']) ? trim($options['description']) : '<NO DESCRIPTION>';
-        
-        if (strlen($desc) != 0) {
-            $arg->setDescription($desc);
-        } else {
-            $arg->setDescription('<NO DESCRIPTION>');
-        }
-        $allowedVals = isset($options['values']) ? $options['values'] : [];
-        foreach ($allowedVals as $val) {
-            $arg->addAllowedValue($val);
-        }
-
-
-        if (isset($options['default']) && gettype($options['default']) == 'string') {
-            $arg->setDefault($options['default']);
-        }
-
-        return $arg;
-    }
     private function _checkIsArgsSet() {
         $missingMandatury = [];
 
@@ -1103,10 +1085,6 @@ abstract class CLICommand {
         }, $this->getArgs());
     }
     private function _parseArgs() {
-        $this->addArg('--ansi', [
-            'optional' => true,
-            'description' => 'Force the use of ANSI output.'
-        ]);
         $options = $this->getArgs();
         $invalidArgsVals = [];
         foreach ($options as $argObj) {
