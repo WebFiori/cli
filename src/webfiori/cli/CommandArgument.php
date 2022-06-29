@@ -213,6 +213,12 @@ class CommandArgument {
         return false;
     }
     /**
+     * Reset the value of the argument and set it to null.
+     */
+    public function resetValue() {
+        $this->value = null;
+    }
+    /**
      * Sets the name of the argument.
      * 
      * @param string $name A string such as '--config' or similar. It must be
