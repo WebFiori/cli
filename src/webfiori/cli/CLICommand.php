@@ -347,6 +347,7 @@ abstract class CLICommand {
         }
         foreach ($this->getOwner()->getArgs() as $arg) {
             $this->removeArgument($arg->getName());
+            $arg->resetValue();
         }
         return $retVal;
     }
