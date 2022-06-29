@@ -773,7 +773,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function prints(string $str, ...$_) {
-        $str = $this->asString($str);
 
         $argCount = count($_);
         $formattingOptions = [];
@@ -1152,20 +1151,6 @@ abstract class CLICommand {
             }
             $index++;
         }
-    }
-
-    private function asString($var) {
-        $type = gettype($var);
-
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else {
-            if ($type == 'null') {
-                return 'null';
-            }
-        }
-
-        return $var;
     }
     
     /**
