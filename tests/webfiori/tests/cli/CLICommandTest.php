@@ -552,6 +552,22 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function testRead00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '445',
+            "Hello World!",
+            "Super"
+        ]));
+        $this->assertEquals('445', $command->readln());
+        $this->assertEquals('Hello', $command->read(5));
+        $this->assertEquals(' World!', $command->readln());
+        $this->assertEquals('Super', $command->readln());
+    }
+    /**
+     * @test
+     */
     public function testReadInteger00() {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
