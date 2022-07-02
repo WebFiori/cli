@@ -360,7 +360,7 @@ class RunnerTest extends TestCase {
             "                         name: The name of the hero\n",
             ">>Error: An exception was thrown.\n",
             "Exception Message: Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
-            "At : ".trim(ROOT_DIR, DS)."\\tests\\webfiori\\tests\\cli\\testCommands\\WithExceptionCommand.php line 12.\n",
+            "At : ".trim(ROOT_DIR, DS)."\\tests\\webfiori\\tests\\cli\\testCommands\\WithExceptionCommand.php Line 12.\n",
             ">>"
         ], $runner->getOutput());
     }
