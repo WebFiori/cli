@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\tests\cli\testCommands\Command00;
 use webfiori\cli\commands\HelpCommand;
 use webfiori\tests\cli\testCommands\WithExceptionCommand;
+use webfiori\tests\cli\testCommands\Command01;
 /**
  * Description of RunnerTest
  *
@@ -362,4 +363,52 @@ class RunnerTest extends TestCase {
 //            ">>"
 //        ], $runner->getOutput());
 //    }
+    /**
+     * @test
+     */
+    public function runnerTest16() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(-1, $runner->runCommand(null, [
+            'show-v'
+        ]));
+        $this->assertEquals([
+            "Error: The following required argument(s) are missing: 'arg-1', 'arg-2'\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest17() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(-1, $runner->runCommand(null, [
+            'show-v',
+            '--ansi'
+        ]));
+        $this->assertEquals([
+            "\e[1;91mError: \e[0mThe following required argument(s) are missing: 'arg-1', 'arg-2'\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest18() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(0, $runner->runCommand(null, [
+            'show-v',
+            'arg-1' => 'Super Cool Arg',
+            'arg-2' => "First One is Coller",
+        ]));
+        $this->assertEquals([
+            "System version: 1.0.0\n",
+            "Super Cool Arg\n",
+            "First One is Coller\n",
+            "Hello\n"
+        ], $runner->getOutput());
+    }
 }
