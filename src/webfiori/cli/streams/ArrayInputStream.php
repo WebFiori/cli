@@ -84,7 +84,7 @@ class ArrayInputStream implements InputStream {
     private function checkLineValidity() {
         $currentLine = $this->inputsArr[$this->currentLine];
         $currentLineLen = strlen($currentLine);
-        if ($this->currentLineByte == $currentLineLen) {
+        if ($this->currentLineByte == $currentLineLen && $currentLineLen != 0) {
             $this->currentLine++;
         }
         if ($this->currentLine >= count($this->inputsArr)) {
