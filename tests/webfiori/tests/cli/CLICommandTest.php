@@ -76,6 +76,31 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function testWarning00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->warning('Part of the info was not logged.');
+        $this->assertEquals([
+            "Warning: Part of the info was not logged.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testWarning01() {
+        $command = new TestCommand('cool');
+        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->warning('Part of the info was not logged.');
+        $this->assertEquals([
+            "\e[1;93mWarning: \e[0mPart of the info was not logged.\n"
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testError00() {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
@@ -693,6 +718,12 @@ class CLICommandTest extends TestCase {
         $this->assertTrue($command->addArg('--valid-name'));
         $this->assertTrue($command->addArg('0invalid'));
         $this->assertTrue($command->addArg('valid-1'));
+        $this->assertEquals([
+            'valid',
+            '--valid-name',
+            '0invalid',
+            'valid-1'
+        ], $command->getArgsNames());
     }
     /**
      * @test
@@ -740,6 +771,20 @@ class CLICommandTest extends TestCase {
             'optional' => true
         ]));
         $this->assertFalse($command->addArg('default-options'));
+    }
+    /**
+     * @test
+     */
+    public function testAddArg05() {
+        $command = new TestCommand('new');
+        $this->assertTrue($command->addArg('default-options', [
+            'optional' => true,
+            'description' => ' ',
+            'default' => 'ok , good '
+        ]));
+        $arg = $command->getArg('default-options');
+        $this->assertEquals('<NO DESCRIPTION>', $arg->getDescription());
+        $this->assertEquals('ok , good', $arg->getDefault());
     }
     /**
      * @test
@@ -954,9 +999,9 @@ class CLICommandTest extends TestCase {
         $this->assertEquals([
             "\e[31mHello !\e[0m\n",
             "Ok\n",
-            "\e[32m- \e[0mone\n",
-            "\e[32m- \e[0mtwo\n",
-            "\e[32m- \e[0mthree\n"
+            "- one\n",
+            "- two\n",
+            "- three\n"
         ], $runner->getOutput());
     }
     /**

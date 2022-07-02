@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\cli\streams;
 
+use webfiori\cli\KeysMap;
 /**
  * A class that implements default standard output for command line interface.
  *

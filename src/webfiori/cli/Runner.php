@@ -8,12 +8,17 @@ use webfiori\cli\streams\StdIn;
 use webfiori\cli\streams\StdOut;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
+use Exception;
+use webfiori\cli\Formatter;
+use Throwable;
+use Error;
 /**
  * The core class which is used to manage command line related operations.
  *
  * @author Ibrahim
  */
 class Runner {
+    private $globalArgs;
     /**
      * 
      * @var CLICommand|null
@@ -119,10 +124,92 @@ class Runner {
         return [];
     }
     /**
+     * Returns an array that contains objects that represents global arguments.
+     * 
+     * @return array An array that contains objects that represents global arguments.
+     */
+    public function getArgs() : array {
+        return $this->globalArgs;
+    }
+    /**
+     * Adds a global command argument.
+     * 
+     * An argument is a string that comes after the name of the command. The value 
+     * of an argument can be set using equal sign. For example, if command name 
+     * is 'do-it' and one argument has the name 'what-to-do', then the full 
+     * CLI command would be "do-it what-to-do=say-hi". An argument can be 
+     * also treated as an option.
+     * 
+     * @param string $name The name of the argument. It must be non-empty string 
+     * and does not contain spaces.
+     * 
+     * @param array $options An optional array of options. Available options are:
+     * <ul>
+     * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
+     * is optional and can be ignored when running the command.</li>
+     * <li><b>default</b>: An optional default value for the argument 
+     * to use if it is not provided and is optional.</li>
+     * <li><b>description</b>: A description of the argument which 
+     * will be shown if the command 'help' is executed.</li>
+     * <li><b>values</b>: A set of values that the argument can have. If provided, 
+     * only the values on the list will be allowed. Note that if null or empty string 
+     * is in the array, it will be ignored. Also, if boolean values are 
+     * provided, true will be converted to the string 'y' and false will 
+     * be converted to the string 'n'.</li>
+     * </ul>
+     * 
+     * @return boolean If the argument is added, the method will return true. 
+     * Other than that, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public function addArg(string $name, array $options = []) : bool {
+        $toAdd = CommandArgument::create($name, $options);
+        if ($toAdd === null) {
+            return false;
+        }
+        return $this->addArgument($toAdd);
+    }
+    /**
+     * Adds an argument to the set of global arguments.
+     * 
+     * Global arguments are set of arguments that will be added automatically
+     * to any command which is registered by the runner.
+     * 
+     * @param CommandArgument $arg An object that holds argument info.
+     * 
+     * @return bool If the argument is added, the method will return true.
+     * Other than that, false is returned.
+     */
+    public function addArgument(CommandArgument $arg) : bool {
+        if (!$this->hasArg($arg->getName())) {
+            $this->globalArgs[] = $arg;
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Checks if the runner has specific global argument or not given its name.
+     * 
+     * @param string $name The name of the argument.
+     * 
+     * @return bool If the runner has such argument, true is returned. Other than
+     * that, false is returned.
+     */
+    public function hasArg(string $name) : bool {
+        foreach ($this->getArgs() as $argObj) {
+            if ($argObj->getName() == $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
         $this->commands = [];
+        $this->globalArgs = [];
         $this->isInteractive = false;
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
@@ -141,7 +228,9 @@ class Runner {
             }
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-            $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+            if (defined('ROOT_DIR')) {
+                $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+            }
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');
@@ -151,7 +240,10 @@ class Runner {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
-            
+            $this->addArg('--ansi', [
+                'optional' => true,
+                'description' => 'Force the use of ANSI output.'
+            ]);
         }
     }
     /**
@@ -261,6 +353,28 @@ class Runner {
         $this->setActiveCommand();
         return $this->commandExitVal;
     }
+    /**
+     * Removes an argument from the global args set given its name.
+     * 
+     * @param string $name The name of the argument that will be removed.
+     * 
+     * @return bool If removed, true is returned. Other than that, false is
+     * returned.
+     */
+    public function removeArgument(string $name) : bool {
+        $removed = false;
+        $temp = [];
+        
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() !== $name) {
+                $temp[] = $arg;
+            } else {
+                $removed = true;
+            }
+        }
+        $this->globalArgs = $temp;
+        return $removed;
+    }
     private function setArgV(array $args) {
         $argV = [];
         
@@ -313,11 +427,16 @@ class Runner {
                 $argsCount = count($args);
                 if ($argsCount == 0) {
                     $this->getOutputStream()->println('No input.');
+                } else if ($args[0] == 'exit') {
+                    return 0;
                 } else {
-                    if ($args[0] == 'exit') {
-                        return 0;
+                    try {
+                        $this->runCommand(null, $args);
+                    } catch (Throwable $ex) {
+                        $this->getOutputStream()->println('Error: An exception was thrown.');
+                        $this->getOutputStream()->println('Exception Message: '.$ex->getMessage());
+                        $this->getOutputStream()->println('At : '.$ex->getFile().' Line '.$ex->getLine().'.');
                     }
-                    $this->runCommand(null, $args);
                 }
                 $this->getOutputStream()->prints('>>');
             }

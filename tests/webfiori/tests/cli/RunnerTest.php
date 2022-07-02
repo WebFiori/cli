@@ -9,6 +9,8 @@ use webfiori\cli\Runner;
 use PHPUnit\Framework\TestCase;
 use webfiori\tests\cli\testCommands\Command00;
 use webfiori\cli\commands\HelpCommand;
+use webfiori\tests\cli\testCommands\WithExceptionCommand;
+use webfiori\tests\cli\testCommands\Command01;
 /**
  * Description of RunnerTest
  *
@@ -124,6 +126,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
+        $runner->removeArgument('--ansi');
         $runner->setDefaultCommand('help');
         $runner->setInput([]);
         $this->assertEquals(0, $runner->runCommand(null, []));
@@ -131,10 +134,8 @@ class RunnerTest extends TestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    super-hero\n",
-            "        A command to display hero's name.\n\n",
-            "    help\n",
-            "        Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n\n"
+            "    super-hero:     A command to display hero's name.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n"
         ], $runner->getOutput());
     }
     /**
@@ -149,9 +150,10 @@ class RunnerTest extends TestCase {
         $this->assertEquals([
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "Global Arguments:\n",
+            "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    super-hero\n",
-            "        A command to display hero's name.\n\n",
+            "    super-hero:     A command to display hero's name.\n",
         ], $runner->getOutput());
     }
     /**
@@ -168,9 +170,10 @@ class RunnerTest extends TestCase {
         $this->assertEquals([
             "\e[1;93mUsage:\e[0m\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "\e[1;93mGlobal Arguments:\e[0m\n",
+            "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
-            "\e[1;33m    super-hero\e[0m\n",
-            "        A command to display hero's name.\n\n",
+            "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
         ], $runner->getOutput());
     }
     /**
@@ -185,8 +188,7 @@ class RunnerTest extends TestCase {
             '--command-name' => 'super-hero'
         ]));
         $this->assertEquals([
-            "\e[1;33m    super-hero\e[0m\n",
-            "        A command to display hero's name.\n\n",
+            "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
             "\e[1;94m    Supported Arguments:\e[0m\n",
             "\e[1;33m                         name:\e[0m The name of the hero\n"
         ], $runner->getOutput());
@@ -197,6 +199,7 @@ class RunnerTest extends TestCase {
     public function runnerTest09() {
         $_SERVER['argv'] = [];
         $runner = new Runner();
+        $runner->removeArgument('--ansi');
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->setDefaultCommand('help');
@@ -206,10 +209,8 @@ class RunnerTest extends TestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    super-hero\n",
-            "        A command to display hero's name.\n\n",
-            "    help\n",
-            "        Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n\n",
+            "    super-hero:     A command to display hero's name.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
         ], $runner->getOutput());
     }
     /**
@@ -228,8 +229,7 @@ class RunnerTest extends TestCase {
         $runner->setInput([]);
         $runner->start();
         $this->assertEquals([
-            "    super-hero\n",
-            "        A command to display hero's name.\n\n",
+            "    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n"
         ], $runner->getOutput());
@@ -298,11 +298,11 @@ class RunnerTest extends TestCase {
             ">> Type commant name or 'exit' to close.\n",
             ">>Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "Global Arguments:\n",
+            "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    super-hero\n",
-            "        A command to display hero's name.\n\n",
-            "    help\n",
-            "        Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n\n",
+            "    super-hero:     A command to display hero's name.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
             ">>",
         ], $runner->getOutput());
     }
@@ -327,11 +327,114 @@ class RunnerTest extends TestCase {
         $this->assertEquals([
             ">> Running in interactive mode.\n",
             ">> Type commant name or 'exit' to close.\n",
-            ">>    super-hero\n",
-            "        A command to display hero's name.\n\n",
+            ">>    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
             ">>Hello hero Ibrahim\n",
+            ">>"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest15() {
+        $_SERVER['argv'] = [
+            'entry.php',
+            '-i',
+        ];
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setInput([
+            'help --command-name=super-hero',
+            'with-exception',
+            'exit'
+        ]);
+        $runner->start();
+        $this->assertEquals([
+            ">> Running in interactive mode.\n",
+            ">> Type commant name or 'exit' to close.\n",
+            ">>    super-hero:         A command to display hero's name.\n",
+            "    Supported Arguments:\n",
+            "                         name: The name of the hero\n",
+            ">>Error: An exception was thrown.\n",
+            "Exception Message: Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
+            "At : ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php Line 12.\n",
+            ">>"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest16() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(-1, $runner->runCommand(null, [
+            'show-v'
+        ]));
+        $this->assertEquals([
+            "Error: The following required argument(s) are missing: 'arg-1', 'arg-2'\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest17() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(-1, $runner->runCommand(null, [
+            'show-v',
+            '--ansi'
+        ]));
+        $this->assertEquals([
+            "\e[1;91mError: \e[0mThe following required argument(s) are missing: 'arg-1', 'arg-2'\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest18() {
+        $runner = new Runner();
+        $runner->register(new Command01());
+        $runner->setInput([]);
+        $this->assertEquals(0, $runner->runCommand(null, [
+            'show-v',
+            'arg-1' => 'Super Cool Arg',
+            'arg-2' => "First One is Coller",
+        ]));
+        $this->assertEquals([
+            "System version: 1.0.0\n",
+            "Super Cool Arg\n",
+            "First One is Coller\n",
+            "Hello\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest19() {
+        $_SERVER['argv'] = [
+            'entry.php',
+            '-i',
+        ];
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setInput([
+            '',
+            '',
+            'exit'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            ">> Running in interactive mode.\n",
+            ">> Type commant name or 'exit' to close.\n",
+            ">>No input.\n",
+            ">>No input.\n",
             ">>"
         ], $runner->getOutput());
     }

@@ -23,6 +23,89 @@ class CommandArgument {
         $this->description = '';
     }
     /**
+     * Creates an instance of the class provided its name and a set of options.
+     * 
+     * @param string $name The name of the command such as 'help'
+     * 
+     * @param array $options An associative array of options which is used to
+     * configure created instance. Supported options are:
+     * <ul>
+     * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
+     * is optional and can be ignored when running the command.</li>
+     * <li><b>default</b>: An optional default value for the argument 
+     * to use if it is not provided and is optional.</li>
+     * <li><b>description</b>: A description of the argument which 
+     * will be shown if the command 'help' is executed.</li>
+     * <li><b>values</b>: A set of values that the argument can have. If provided, 
+     * only the values on the list will be allowed. Note that if null or empty string 
+     * is in the array, it will be ignored. Also, if boolean values are 
+     * provided, true will be converted to the string 'y' and false will 
+     * be converted to the string 'n'.</li>
+     * </ul>
+     * 
+     * @return CommandArgument|null If the instance is created, the method will
+     * return it as an object. Other than that, null is returned.
+     */
+    public static function create($name, $options) {
+        if (strlen($name) == 0) {
+            return null;
+        }
+        $arg = new CommandArgument($name);
+        if ($arg->getName() == 'arg') {
+            return null;
+        }
+        if (isset($options['optional'])) {
+            $arg->setIsOptional($options['optional']);
+        }
+        $desc = isset($options['description']) ? trim($options['description']) : '<NO DESCRIPTION>';
+        
+        if (strlen($desc) != 0) {
+            $arg->setDescription($desc);
+        } else {
+            $arg->setDescription('<NO DESCRIPTION>');
+        }
+        $allowedVals = isset($options['values']) ? $options['values'] : [];
+        foreach ($allowedVals as $val) {
+            $arg->addAllowedValue($val);
+        }
+
+
+        if (isset($options['default']) && gettype($options['default']) == 'string') {
+            $arg->setDefault($options['default']);
+        }
+
+        return $arg;
+    }
+    /**
+     * Extract the value of an argument give its name.
+     * 
+     * @param string $argName The name of the argument as provided
+     * in the terminal.
+     * 
+     * @return string|null If the argument is provided and its value is set,
+     * the method will return its value. If provided without any value,
+     * the method will return empty string. If not provided, null is returned.
+     */
+    public static function extractValue(string $argName) {
+        $trimmedOptName = trim($argName);
+        
+        foreach ($_SERVER['argv'] as $option) {
+            $optionClean = filter_var($option, FILTER_DEFAULT);
+            $optExpl = explode('=', $optionClean);
+            $optionNameFromCLI = $optExpl[0];
+
+            if ($optionNameFromCLI == $trimmedOptName) {
+
+                if (count($optExpl) == 2) {
+                    return trim($optExpl[1]);
+                } else {
+                    //If arg is provided, set its value empty string
+                    return '';
+                }
+            }
+        }
+    }
+    /**
      * Sets a string as default value for the argument.
      * 
      * @param string $default A string that will be set as default value if the
@@ -128,6 +211,12 @@ class CommandArgument {
             return true;
         }
         return false;
+    }
+    /**
+     * Reset the value of the argument and set it to null.
+     */
+    public function resetValue() {
+        $this->value = null;
     }
     /**
      * Sets the name of the argument.

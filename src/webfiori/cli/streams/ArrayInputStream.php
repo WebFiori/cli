@@ -25,12 +25,13 @@ class ArrayInputStream implements InputStream {
         $this->inputsArr = $inputs;
     }
     /**
+     * Reads specific number of bytes.
      * 
-     * A method that does nothing.
+     * @param int $bytes Number of bytes that the method will read from the
+     * stream. Must be a positive number.
      * 
-     * @param type $bytes
-     * 
-     * @return string The method will always return empty string.
+     * @return string The will return a string which contains the bytes that
+     * the method fetched from the stream.
      */
     public function read(int $bytes = 1) : string {
         if ($this->currentLine >= count($this->inputsArr)) {
@@ -42,11 +43,27 @@ class ArrayInputStream implements InputStream {
         $line = $this->inputsArr[$this->currentLine];
         $retVal = '';
         $readBytes = 0;
+        $lineLength = strlen($line);
         
         while ($readBytes < $bytes) {
-            
+            if ($this->currentLineByte == $lineLength) {
+                $this->currentLineByte = 0;
+                $this->currentLine++;
+                if ($this->currentLine >= count($this->inputsArr)) {
+                    throw new InvalidArgumentException('Reached end of stream while trying to read '.$bytes.' byte(s).');
+                }
+                $line = $this->inputsArr[$this->currentLine];
+                $lineLength = strlen($line);
+            }
+            $retVal .= $line[$this->currentLineByte];
+            $readBytes++;
+            $this->currentLineByte++;
         }
+        
+        return $retVal;
     }
+    
+
     /**
      * Returns a single line from input array.
      * 
@@ -59,9 +76,20 @@ class ArrayInputStream implements InputStream {
             throw new InvalidArgumentException('Reached end of stream while trying to read line number '.($this->currentLine+1));
         }
         
-        $retVal = $this->inputsArr[$this->currentLine];
+        $this->checkLineValidity();
+        $retVal = substr($this->inputsArr[$this->currentLine], $this->currentLineByte);
         $this->currentLine++;
+        $this->currentLineByte = 0;
         return $retVal;
     }
-
+    private function checkLineValidity() {
+        $currentLine = $this->inputsArr[$this->currentLine];
+        $currentLineLen = strlen($currentLine);
+        if ($this->currentLineByte == $currentLineLen && $currentLineLen != 0) {
+            $this->currentLine++;
+        }
+        if ($this->currentLine >= count($this->inputsArr)) {
+            throw new InvalidArgumentException('Reached end of stream while trying to read line number '.($this->currentLine+1));
+        }
+    }
 }
