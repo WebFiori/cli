@@ -14,6 +14,7 @@ use InvalidArgumentException;
 class ArrayInputStream implements InputStream {
     private $inputsArr;
     private $currentLine = 0;
+    private $currentLineByte = 0;
     /**
      * Creates new instance of the class.
      * 
@@ -32,7 +33,19 @@ class ArrayInputStream implements InputStream {
      * @return string The method will always return empty string.
      */
     public function read(int $bytes = 1) : string {
-        return '';
+        if ($this->currentLine >= count($this->inputsArr)) {
+            throw new InvalidArgumentException('Reached end of stream while trying to read line number '.($this->currentLine+1));
+        }
+        if ($bytes < 0) {
+            throw new InvalidArgumentException('Bytes must be positive number.');
+        }
+        $line = $this->inputsArr[$this->currentLine];
+        $retVal = '';
+        $readBytes = 0;
+        
+        while ($readBytes < $bytes) {
+            
+        }
     }
     /**
      * Returns a single line from input array.
