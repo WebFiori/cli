@@ -20,9 +20,9 @@ class Command01 extends CLICommand {
 
     public function exec(): int {
         $this->println('System version: 1.0.0');
-        $this->println($this->getArgValue('arg-1'));
-        $this->println($this->getArgValue('arg-2'));
-        $this->println($this->getArgValue('arg-3'));
+        $this->println("%s", $this->getArgValue('arg-1'));
+        $this->println("%s", $this->getArgValue('arg-2'));
+        $this->println("%s", $this->getArgValue('arg-3'));
         return 0;
     }
 
