@@ -25,12 +25,13 @@ class ArrayInputStream implements InputStream {
         $this->inputsArr = $inputs;
     }
     /**
+     * Reads specific number of bytes.
      * 
-     * A method that does nothing.
+     * @param int $bytes Number of bytes that the method will read from the
+     * stream. Must be a positive number.
      * 
-     * @param type $bytes
-     * 
-     * @return string The method will always return empty string.
+     * @return string The will return a string which contains the bytes that
+     * the method fetched from the stream.
      */
     public function read(int $bytes = 1) : string {
         if ($this->currentLine >= count($this->inputsArr)) {
