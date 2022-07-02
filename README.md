@@ -34,10 +34,20 @@ A libray that can be used to write command line based applications using PHP.
 * Support for interactive mode.
 * Support for ANSI output.
 * Support for implementing custom input and output streams.
+* Ability to write tests for commands and test them using test automation tools.
+
+## Installation
+
+To install the library, simply include it in your `composer.json`'s `requre` section: `webfiori\cli`.
+
+## Building Command Line Application
+
+Assuming that the library was installed using composer, then your application folders structure will most likely be as follows:
 
 ## Creating and Running a Command
 
 ### Creating a Command
+
 
 First step in creating new command is to create a new class that extends the class `CLICommand`. The class `CLICommand` is a utility class which has methods which can be used to read inputs and send outputs.
 
@@ -45,7 +55,7 @@ The class has one abstract method that must be implemented. The code that will e
 
 ``` php
 <?php
-//File 'SampleCommand.php'
+//File 'src/SampleCommand.php'
 use webfiori\cli\CLICommand;
 
 class SampleCommand extends CLICommand {
@@ -67,7 +77,8 @@ class SampleCommand extends CLICommand {
 The class `Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command.
 
 ``` php
-// File app.php
+// File src/app.php
+require_once './vendor/autoload.php';
 
 use webfiori\cli\Runner;
 use SampleCommand;
@@ -85,3 +96,4 @@ php app.php say-hi
 ```
 
 The output will be the string `Hi People!`.
+
