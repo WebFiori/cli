@@ -337,32 +337,33 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-//    public function runnerTest15() {
-//        $_SERVER['argv'] = [
-//            'entry.php',
-//            '-i',
-//        ];
-//        $runner = new Runner();
-//        $runner->register(new Command00());
-//        $runner->register(new HelpCommand());
-//        $runner->register(new WithExceptionCommand());
-//        $runner->setInput([
-//            'help --command-name=super-hero',
-//            'with-exception',
-//            'exit'
-//        ]);
-//        $runner->start();
-//        $this->assertEquals([
-//            ">> Running in interactive mode.\n",
-//            ">> Type commant name or 'exit' to close.\n",
-//            ">>    super-hero\n",
-//            "        A command to display hero's name.\n\n",
-//            "    Supported Arguments:\n",
-//            "                         name: The name of the hero\n",
-//            ">>Hello hero Ibrahim\n",
-//            ">>"
-//        ], $runner->getOutput());
-//    }
+    public function runnerTest15() {
+        $_SERVER['argv'] = [
+            'entry.php',
+            '-i',
+        ];
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setInput([
+            'help --command-name=super-hero',
+            'with-exception',
+            'exit'
+        ]);
+        $runner->start();
+        $this->assertEquals([
+            ">> Running in interactive mode.\n",
+            ">> Type commant name or 'exit' to close.\n",
+            ">>    super-hero:         A command to display hero's name.\n",
+            "    Supported Arguments:\n",
+            "                         name: The name of the hero\n",
+            ">>Error: An exception was thrown.\n",
+            "Exception Message: Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
+            "At : ".trim(ROOT_DIR, DS)."\\tests\\webfiori\\tests\\cli\\testCommands\\WithExceptionCommand.php line 12.\n",
+            ">>"
+        ], $runner->getOutput());
+    }
     /**
      * @test
      */
