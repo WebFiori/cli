@@ -718,6 +718,12 @@ class CLICommandTest extends TestCase {
         $this->assertTrue($command->addArg('--valid-name'));
         $this->assertTrue($command->addArg('0invalid'));
         $this->assertTrue($command->addArg('valid-1'));
+        $this->assertEquals([
+            'valid',
+            '--valid-name',
+            '0invalid',
+            'valid-1'
+        ], $command->getArgsNames());
     }
     /**
      * @test
@@ -765,6 +771,20 @@ class CLICommandTest extends TestCase {
             'optional' => true
         ]));
         $this->assertFalse($command->addArg('default-options'));
+    }
+    /**
+     * @test
+     */
+    public function testAddArg05() {
+        $command = new TestCommand('new');
+        $this->assertTrue($command->addArg('default-options', [
+            'optional' => true,
+            'description' => ' ',
+            'default' => 'ok , good '
+        ]));
+        $arg = $command->getArg('default-options');
+        $this->assertEquals('<NO DESCRIPTION>', $arg->getDescription());
+        $this->assertEquals('ok , good', $arg->getDefault());
     }
     /**
      * @test
