@@ -40,10 +40,6 @@ A libray that can be used to write command line based applications using PHP.
 
 To install the library, simply include it in your `composer.json`'s `requre` section: `webfiori\cli`.
 
-## Building Command Line Application
-
-Assuming that the library was installed using composer, then your application folders structure will most likely be as follows:
-
 ## Creating and Running a Command
 
 ### Creating a Command
