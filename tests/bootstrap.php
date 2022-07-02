@@ -51,6 +51,7 @@ require_once $baseDir.DS.'commands'.DS.'HelpCommand.php';
 
 require_once $rootDir.'/tests/webfiori/tests/cli/TestCommand.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command00.php';
+require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command01.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/WithExceptionCommand.php';
 
 
