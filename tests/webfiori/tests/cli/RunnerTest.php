@@ -412,4 +412,30 @@ class RunnerTest extends TestCase {
             "Hello\n"
         ], $runner->getOutput());
     }
+    /**
+     * @test
+     */
+    public function runnerTest19() {
+        $_SERVER['argv'] = [
+            'entry.php',
+            '-i',
+        ];
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setInput([
+            '',
+            '',
+            'exit'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            ">> Running in interactive mode.\n",
+            ">> Type commant name or 'exit' to close.\n",
+            ">>No input.\n",
+            ">>No input.\n",
+            ">>"
+        ], $runner->getOutput());
+    }
 }
