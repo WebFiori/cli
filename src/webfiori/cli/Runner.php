@@ -25,6 +25,7 @@ class Runner {
      */
     private $defaultCommand;
     private $commandExitVal;
+    private $beforeStart;
     /**
      * 
      * @var InputStream
@@ -205,6 +206,35 @@ class Runner {
         return false;
     }
     /**
+     * Sets a callable to call before start running CLI engine.
+     * 
+     * This can be used to register custom made commands before running
+     * the engine.
+     * 
+     * @param callable $func An executable function. The function will have
+     * one parameter which is the runner that the function will be added to.
+     */
+    public function setBeforeStart(callable $func) {
+        $this->beforeStart = $func;
+    }
+    /**
+     * Sets arguments vector to have specific value.
+     * 
+     * This method is mainly used to simulate running the class using an
+     * actual terminal. Also, it can be used to setup the test run parameters
+     * for testing a command.
+     * 
+     * @param array $argsVector An array that contains arguments vector. Usually,
+     * the first argument of the vector is the entry point (such as app.php).
+     * The second argument is the name of the command that will get executed
+     * and, remaining parts are any additional arguments that the command
+     * might use.
+     */
+    public function setArgsVector(array $argsVector) {
+        $_SERVER['argv'] = $argsVector;
+        $this->checkIsIntr();
+    }
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
@@ -214,12 +244,7 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         if (self::isCLI()) {
-            if (isset($_SERVER['argv'])) {
-                foreach ($_SERVER['argv'] as $arg) {
-                    $this->isInteractive = $arg == '-i' || $this->isInteractive;
-                }
-            }
-
+            $this->checkIsIntr();
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
             } else {
@@ -246,6 +271,14 @@ class Runner {
             ]);
         }
     }
+    private function checkIsIntr() {
+        if (isset($_SERVER['argv'])) {
+            foreach ($_SERVER['argv'] as $arg) {
+                $this->isInteractive = $arg == '-i' || $this->isInteractive;
+            }
+        }
+    }
+
     /**
      * Reset input stream, output stream and, registered commands to default.
      */
@@ -416,6 +449,9 @@ class Runner {
      * it means that there was an error in execution.
      */
     public function start() : int {
+        if ($this->beforeStart !== null) {
+            call_user_func_array($this->beforeStart, [$this]);
+        }
         if ($this->isIntaractive()) {
             $this->getOutputStream()->println('>> Running in interactive mode.');
             $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
