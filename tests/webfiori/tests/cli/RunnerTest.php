@@ -11,6 +11,7 @@ use webfiori\tests\cli\testCommands\Command00;
 use webfiori\cli\commands\HelpCommand;
 use webfiori\tests\cli\testCommands\WithExceptionCommand;
 use webfiori\tests\cli\testCommands\Command01;
+use webfiori\cli\CommandArgument;
 /**
  * Description of RunnerTest
  *
@@ -37,9 +38,23 @@ class RunnerTest extends TestCase {
      */
     public function runnerTest00() {
         $runner = new Runner();
+        $this->assertEquals([], $runner->getOutput());
         $this->assertEquals([], $runner->getCommands());
+        $this->assertFalse($runner->addArg(' '));
+        $this->assertFalse($runner->addArg(' invalid name '));
         $this->assertNull($runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
+        
+        $argObj = new CommandArgument('--ansi');
+        $this->assertFalse($runner->addArgument($argObj));
+        
+        $this->assertTrue($runner->addArg('global-arg', [
+            'optional' => true
+        ]));
+        $this->assertEquals(2, count($runner->getArgs()));
+        $runner->removeArgument('--ansi');
+        $this->assertEquals(1, count($runner->getArgs()));
+        $this->assertFalse($runner->hasArg('--ansi'));
         $runner->register(new Command00());
         $this->assertEquals(1, count($runner->getCommands()));
         $runner->register(new Command00());
