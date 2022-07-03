@@ -1,4 +1,5 @@
 <?php
+
 use webfiori\cli\CLICommand;
 
 class HelloWorldCommand extends CLICommand {
@@ -8,7 +9,7 @@ class HelloWorldCommand extends CLICommand {
 
     public function exec(): int {
         $this->println("Hello World!");
+
         return 0;
     }
-
 }

@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\cli\streams;
 
-use webfiori\cli\streams\OutputStream;
 use webfiori\framework\File;
 /**
  * A class that implements output stream which can be based on files.
@@ -21,13 +20,6 @@ class FileOutputStream implements OutputStream {
     public function __construct($path) {
         $this->file = new File($path);
         $this->reset();
-    }
-    /**
-     * Removes the file that represents output stream and re-create it.
-     */
-    public function reset() {
-        $this->file->remove();
-        $this->file->create();
     }
     /**
      * Send a line of string to the stream as output.
@@ -68,9 +60,16 @@ class FileOutputStream implements OutputStream {
                 $arrayToPass[] = $val;
             }
         }
-        
+
         $toWrite = call_user_func_array('sprintf', $arrayToPass);
         $this->file->setRawData($toWrite);
         $this->file->write();
+    }
+    /**
+     * Removes the file that represents output stream and re-create it.
+     */
+    public function reset() {
+        $this->file->remove();
+        $this->file->create();
     }
 }

@@ -2,7 +2,6 @@
 namespace webfiori\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\Runner;
 use webfiori\cli\CommandArgument;
 
 /**
@@ -39,6 +38,7 @@ class HelpCommand extends CLICommand {
         $regCommands = $this->getOwner()->getCommands();
         $commandName = $this->getArgValue('--command-name');
         $len = $this->getMaxCommandNameLen();
+
         if ($commandName !== null) {
             if (isset($regCommands[$commandName])) {
                 $this->printCommandInfo($regCommands[$commandName], $len, true);
@@ -54,7 +54,7 @@ class HelpCommand extends CLICommand {
             $this->println("    command [arg1 arg2=\"val\" arg3...]\n");
             $this->printGlobalArgs($formattingOptions);
             $this->println("Available Commands:", $formattingOptions);
-            
+
             foreach ($regCommands as $commandObj) {
                 $this->printCommandInfo($commandObj, $len);
             }
@@ -62,14 +62,34 @@ class HelpCommand extends CLICommand {
 
         return 0;
     }
-    private function printGlobalArgs(array $formattingOptions) {
-        $args = $this->getOwner()->getArgs();
-        if (count($args) != 0) {
-            $this->println("Global Arguments:", $formattingOptions);
-            foreach ($args as $argObj) {
-                $this->printArg($argObj, 4);
+    private function getMaxCommandNameLen() {
+        $len = 0;
+
+        foreach ($this->getOwner()->getCommands() as $c) {
+            $xLen = strlen($c->getName());
+
+            if ($xLen > $len) {
+                $len = $xLen;
             }
         }
+
+        return $len;
+    }
+    private function printArg(CommandArgument $argObj, $spaces = 25) {
+        $this->prints("    %".$spaces."s:", $argObj->getName(), [
+            'bold' => true,
+            'color' => 'yellow'
+        ]);
+
+        if ($argObj->isOptional()) {
+            $this->prints("[Optional]");
+        }
+
+        if ($argObj->getDefault() != '') {
+            $default = $argObj->getDefault();
+            $this->prints("[Default = '$default']");
+        }
+        $this->println(" %s", $argObj->getDescription());
     }
     /**
      * 
@@ -99,30 +119,15 @@ class HelpCommand extends CLICommand {
             }
         }
     }
-    private function getMaxCommandNameLen() {
-        $len = 0;
-        foreach ($this->getOwner()->getCommands() as $c) {
-            $xLen = strlen($c->getName());
-            if ($xLen > $len) {
-                $len = $xLen;
+    private function printGlobalArgs(array $formattingOptions) {
+        $args = $this->getOwner()->getArgs();
+
+        if (count($args) != 0) {
+            $this->println("Global Arguments:", $formattingOptions);
+
+            foreach ($args as $argObj) {
+                $this->printArg($argObj, 4);
             }
         }
-        return $len;
-    }
-    private function printArg(CommandArgument $argObj, $spaces = 25) {
-        $this->prints("    %".$spaces."s:", $argObj->getName(), [
-            'bold' => true,
-            'color' => 'yellow'
-        ]);
-
-        if ($argObj->isOptional()) {
-            $this->prints("[Optional]");
-        }
-
-        if ($argObj->getDefault() != '') {
-            $default = $argObj->getDefault();
-            $this->prints("[Default = '$default']");
-        }
-        $this->println(" %s", $argObj->getDescription());
     }
 }

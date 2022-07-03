@@ -115,9 +115,11 @@ class Formatter {
         if (!isset($formatArr['bg-color'])) {
             $formatArr['bg-color'] = $noColor;
         }
+
         if (!isset($formatArr['ansi'])) {
             $formatArr['ansi'] = false;
         }
+
         return $formatArr;
     }
     private static function addManner($str, $code) {
@@ -155,6 +157,7 @@ class Formatter {
             return $mannerStr;
         }
         $colorsArr = self::COLORS;
+
         if ($options['color'] != 'NO_COLOR' && isset($colorsArr[$options['color']])) {
             $mannerStr = self::addManner($mannerStr, $colorsArr[$options['color']]);
         }

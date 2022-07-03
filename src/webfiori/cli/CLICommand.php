@@ -1,8 +1,6 @@
 <?php
 namespace webfiori\cli;
 
-use webfiori\cli\CommandArgument;
-use webfiori\cli\Runner;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 /**
@@ -16,7 +14,6 @@ use webfiori\cli\streams\OutputStream;
  * @version 1.0.1
  */
 abstract class CLICommand {
-    private $owner;
     /**
      * An associative array that contains extra options that can be added to 
      * the command.
@@ -50,6 +47,7 @@ abstract class CLICommand {
      * @since 1.0.1
      */
     private $outputStream;
+    private $owner;
     /**
      * Creates new instance of the class.
      * 
@@ -90,23 +88,6 @@ abstract class CLICommand {
         }
     }
     /**
-     * Sets the runner that owns the command.
-     * 
-     * The runner is the instance that will execute the command.
-     * 
-     * @param Runner $ouner
-     */
-    public function setOuner(Runner $ouner = null) {
-        $this->owner = $ouner;
-    }
-    /**
-     * 
-     * @return Runner|null
-     */
-    public function getOwner() {
-        return $this->owner;
-    }
-    /**
      * Add command argument.
      * 
      * An argument is a string that comes after the name of the command. The value 
@@ -142,26 +123,12 @@ abstract class CLICommand {
      */
     public function addArg(string $name, array $options = []) : bool {
         $toAdd = CommandArgument::create($name, $options);
+
         if ($toAdd === null) {
             return false;
         }
+
         return $this->addArgument($toAdd);
-    }
-    /**
-     * Adds new command argument.
-     * 
-     * @param CommandArgument $arg The argument that will be added.
-     * 
-     * @return boolean If the argument is added, the method will return true.
-     * If not, false is returned. The argument will not be added only if an argument
-     * which has same name is added.
-     */
-    public function addArgument(CommandArgument $arg) : bool {
-        if (!$this->hasArg($arg->getName())) {
-            $this->commandArgs[] = $arg;
-            return true;
-        }
-        return false;
     }
     /**
      * Adds multiple arguments to the command.
@@ -191,6 +158,24 @@ abstract class CLICommand {
         }
     }
     /**
+     * Adds new command argument.
+     * 
+     * @param CommandArgument $arg The argument that will be added.
+     * 
+     * @return boolean If the argument is added, the method will return true.
+     * If not, false is returned. The argument will not be added only if an argument
+     * which has same name is added.
+     */
+    public function addArgument(CommandArgument $arg) : bool {
+        if (!$this->hasArg($arg->getName())) {
+            $this->commandArgs[] = $arg;
+
+            return true;
+        }
+
+        return false;
+    }
+    /**
      * Clears the output before or after cursor position.
      * 
      * This method will replace the visible characters with spaces.
@@ -206,7 +191,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clear(int $numberOfCols = 1, bool $beforeCursor = true) {
-
         if ($numberOfCols >= 1) {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
@@ -318,13 +302,6 @@ abstract class CLICommand {
     public function error(string $message) {
         $this->printMsg($message, 'Error', 'light-red');
     }
-    private function printMsg(string $msg, string $prefix, string $color) {
-        $this->prints("$prefix: ", [
-            'color' => $color,
-            'bold' => true
-        ]);
-        $this->println($msg);
-    }
 
     /**
      * Execute the command.
@@ -339,40 +316,21 @@ abstract class CLICommand {
      */
     public function excCommand() : int {
         $retVal = -1;
+
         foreach ($this->getOwner()->getArgs() as $arg) {
             $this->addArgument($arg);
         }
+
         if ($this->_parseArgs() && $this->_checkIsArgsSet()) {
             $retVal = $this->exec();
         }
+
         foreach ($this->getOwner()->getArgs() as $arg) {
             $this->removeArgument($arg->getName());
             $arg->resetValue();
         }
+
         return $retVal;
-    }
-    /**
-     * Removes an argument from the command given its name.
-     * 
-     * @param string $name The name of the argument that will be removed.
-     * 
-     * @return bool If removed, true is returned. Other than that, false is
-     * returned.
-     */
-    public function removeArgument(string $name) : bool {
-        $removed = false;
-        $temp = [];
-        
-        foreach ($this->getArgs() as $arg) {
-            if ($arg->getName() !== $name) {
-                $temp[] = $arg;
-            } else {
-                $removed = true;
-            }
-        }
-        $this->commandArgs = $temp;
-        
-        return $removed;
     }
     /**
      * Execute the command.
@@ -387,6 +345,21 @@ abstract class CLICommand {
      * @since 1.0
      */
     public abstract function exec() : int;
+    /**
+     * Returns an object that holds argument info if the command.
+     * 
+     * @param string $name The name of command argument.
+     * 
+     * @return CommandArgument|null If the command has an argument with the
+     * given name, it will be returned. Other than that, null is returned.
+     */
+    public function getArg(string $name) {
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() == $name) {
+                return $arg;
+            }
+        }
+    }
     /**
      * Returns an associative array that contains command args.
      * 
@@ -406,6 +379,17 @@ abstract class CLICommand {
         return $this->commandArgs;
     }
     /**
+     * Returns an array that contains the names of command arguments.
+     * 
+     * @return array An array of strings.
+     */
+    public function getArgsNames() : array {
+        return array_map(function ($el)
+        {
+            return $el->getName();
+        }, $this->getArgs());
+    }
+    /**
      * Returns the value of command option from CLI given its name.
      * 
      * @param string $optionName The name of the option.
@@ -418,28 +402,13 @@ abstract class CLICommand {
     public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
         $arg = $this->getArg($trimmedOptName);
-        
+
         if ($arg !== null) {
             if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isIntaractive())) {
                 return $arg->getValue();
             }
-            
+
             return CommandArgument::extractValue($trimmedOptName);
-        }
-    }
-    /**
-     * Returns an object that holds argument info if the command.
-     * 
-     * @param string $name The name of command argument.
-     * 
-     * @return CommandArgument|null If the command has an argument with the
-     * given name, it will be returned. Other than that, null is returned.
-     */
-    public function getArg(string $name) {
-        foreach ($this->getArgs() as $arg) {
-            if ($arg->getName() == $name) {
-                return $arg;
-            }
         }
     }
     /**
@@ -508,40 +477,6 @@ abstract class CLICommand {
         }
     }
     /**
-     * Reads a value as an integer.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
-     * string must be non-empty.
-     * 
-     * @param int $default An optional default value to use in case the user 
-     * hit "Enter" without entering any value. If null is passed, no default 
-     * value will be set.
-     * 
-     * @return int
-     */
-    public function readInteger(string $prompt, int $default = null) : int {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
-            return InputValidator::isInt($val);
-        }, 'Provided value is not an integer!'));
-    }
-    /**
-     * Reads a value as float.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
-     * string must be non-empty.
-     * 
-     * @param int $default An optional default value to use in case the user 
-     * hit "Enter" without entering any value. If null is passed, no default 
-     * value will be set.
-     * 
-     * @return float
-     */
-    public function readFloat(string $prompt, float $default = null) : float {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
-            return InputValidator::isFloat($val);
-        }, 'Provided value is not a floating number!'));
-    }
-    /**
      * Returns the stream at which the command is sing to read inputs.
      * 
      * @return null|InputStream If the stream is set, it will be returned as 
@@ -578,6 +513,13 @@ abstract class CLICommand {
         return $this->outputStream;
     }
     /**
+     * 
+     * @return Runner|null
+     */
+    public function getOwner() {
+        return $this->owner;
+    }
+    /**
      * Checks if the command has a specific command line argument or not.
      * 
      * @param string $argName The name of the command line argument.
@@ -594,6 +536,7 @@ abstract class CLICommand {
                 return true;
             }
         }
+
         return false;
     }
     /**
@@ -623,7 +566,7 @@ abstract class CLICommand {
      */
     public function isArgProvided(string $argName) {
         $argObj = $this->getArg($argName);
-        
+
 
         if ($argObj !== null) {
             return $argObj->getValue() !== null;
@@ -643,7 +586,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorDown(int $lines = 1) {
-
         if ($lines >= 1) {
             $this->prints("\e[".$lines."B");
         }
@@ -660,7 +602,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorLeft(int $numberOfCols = 1) {
-
         if ($numberOfCols >= 1) {
             $this->prints("\e[".$numberOfCols."D");
         }
@@ -677,7 +618,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorRight(int $numberOfCols = 1) {
-
         if ($numberOfCols >= 1) {
             $this->prints("\e[".$numberOfCols."C");
         }
@@ -699,7 +639,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorTo(int $line = 0, int $col = 0) {
-
         if ($line > -1 && $col > -1) {
             $this->prints("\e[".$line.";".$col."H");
         }
@@ -716,7 +655,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorUp(int $lines = 1) {
-
         if ($lines >= 1) {
             $this->prints("\e[".$lines."A");
         }
@@ -786,7 +724,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function prints(string $str, ...$_) {
-
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -815,6 +752,42 @@ abstract class CLICommand {
         return $this->getInputStream()->read($bytes);
     }
     /**
+     * Reads a value as float.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     * 
+     * @param int $default An optional default value to use in case the user 
+     * hit "Enter" without entering any value. If null is passed, no default 
+     * value will be set.
+     * 
+     * @return float
+     */
+    public function readFloat(string $prompt, float $default = null) : float {
+        return $this->getInput($prompt, $default, new InputValidator(function ($val)
+        {
+            return InputValidator::isFloat($val);
+        }, 'Provided value is not a floating number!'));
+    }
+    /**
+     * Reads a value as an integer.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     * 
+     * @param int $default An optional default value to use in case the user 
+     * hit "Enter" without entering any value. If null is passed, no default 
+     * value will be set.
+     * 
+     * @return int
+     */
+    public function readInteger(string $prompt, int $default = null) : int {
+        return $this->getInput($prompt, $default, new InputValidator(function ($val)
+        {
+            return InputValidator::isInt($val);
+        }, 'Provided value is not an integer!'));
+    }
+    /**
      * Reads one line from input stream.
      * 
      * The method will continue to read from input stream till it finds end of 
@@ -827,6 +800,29 @@ abstract class CLICommand {
      */
     public function readln() : string {
         return $this->getInputStream()->readLine();
+    }
+    /**
+     * Removes an argument from the command given its name.
+     * 
+     * @param string $name The name of the argument that will be removed.
+     * 
+     * @return bool If removed, true is returned. Other than that, false is
+     * returned.
+     */
+    public function removeArgument(string $name) : bool {
+        $removed = false;
+        $temp = [];
+
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() !== $name) {
+                $temp[] = $arg;
+            } else {
+                $removed = true;
+            }
+        }
+        $this->commandArgs = $temp;
+
+        return $removed;
     }
 
     /**
@@ -896,7 +892,7 @@ abstract class CLICommand {
         if ($argObj !== null) {
             return $argObj->setValue($argValue);
         }
-        
+
         return false;
     }
     /**
@@ -958,6 +954,16 @@ abstract class CLICommand {
         return false;
     }
     /**
+     * Sets the runner that owns the command.
+     * 
+     * The runner is the instance that will execute the command.
+     * 
+     * @param Runner $ouner
+     */
+    public function setOuner(Runner $ouner = null) {
+        $this->owner = $ouner;
+    }
+    /**
      * Sets the stream at which the command will send output to.
      * 
      * @param OutputStream $stream An instance that implements output stream.
@@ -1000,7 +1006,6 @@ abstract class CLICommand {
         $missingMandatury = [];
 
         foreach ($this->commandArgs as $argObj) {
-            
             if (!$argObj->isOptional() && $argObj->getValue() === null) {
                 if ($argObj->getDefault() != '') {
                     $argObj->setValue($argObj->getDefault());
@@ -1027,6 +1032,7 @@ abstract class CLICommand {
     }
     private function _checkSelectedChoice($choices, $defaultIndex, $input) {
         $retVal = null;
+
         if (in_array($input, $choices)) {
             //Given input is exactly same as one of choices
             $retVal = $input;
@@ -1037,33 +1043,16 @@ abstract class CLICommand {
         } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
             $retVal = $this->_getChoiceAtIndex($choices, $input);
-        } 
+        }
+ 
         if ($retVal === null) {
             $this->error('Invalid answer.');
         }
+
         return $retVal;
     }
-    private function _getChoiceAtIndex(array $choices, $input) {
-        $index = 0;
-            
-        foreach ($choices as $choice) {
-            if ($index == $input) {
-                return $choice;
-            }
-            $index++;
-        }
-    }
-    private function _getDefault(array $choices, $defaultIndex) {
-        $index = 0;
-        foreach ($choices as $choice) {
-            if ($index == $defaultIndex) {
-                return $choice;
-            }
-            $index++;
-        }
-    }
 
-    
+
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 
@@ -1075,25 +1064,38 @@ abstract class CLICommand {
 
         return $retVal;
     }
-    /**
-     * Returns an array that contains the names of command arguments.
-     * 
-     * @return array An array of strings.
-     */
-    public function getArgsNames() : array {
-        return array_map(function ($el) {
-            return $el->getName();
-        }, $this->getArgs());
+    private function _getChoiceAtIndex(array $choices, $input) {
+        $index = 0;
+
+        foreach ($choices as $choice) {
+            if ($index == $input) {
+                return $choice;
+            }
+            $index++;
+        }
+    }
+    private function _getDefault(array $choices, $defaultIndex) {
+        $index = 0;
+
+        foreach ($choices as $choice) {
+            if ($index == $defaultIndex) {
+                return $choice;
+            }
+            $index++;
+        }
     }
     private function _parseArgs() {
         $options = $this->getArgs();
         $invalidArgsVals = [];
+
         foreach ($options as $argObj) {
             $val = $this->getArgValue($argObj->getName());
+
             if ($val !== null && !$argObj->setValue($val)) {
                 $invalidArgsVals[] = $argObj->getName();
             }
         }
+
         if (count($invalidArgsVals) != 0) {
             $invalidStr = 'The following argument(s) have invalid values: ';
             $comma = '';
@@ -1114,10 +1116,12 @@ abstract class CLICommand {
 
             return false;
         }
+
         return true;
     }
     private function _printChoices($choices, $default) {
         $index = 0;
+
         foreach ($choices as $choiceTxt) {
             if ($default !== null && $index == $default) {
                 $this->prints($index.": ".$choiceTxt, [
@@ -1131,7 +1135,7 @@ abstract class CLICommand {
             $index++;
         }
     }
-    
+
     /**
      * Validate user input and show error message if user input is invalid.
      * @param type $input
@@ -1158,5 +1162,12 @@ abstract class CLICommand {
         }
 
         return $retVal;
+    }
+    private function printMsg(string $msg, string $prefix, string $color) {
+        $this->prints("$prefix: ", [
+            'color' => $color,
+            'bold' => true
+        ]);
+        $this->println($msg);
     }
 }

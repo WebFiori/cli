@@ -1,43 +1,28 @@
 <?php
 namespace webfiori\cli;
 
-use webfiori\cli\CLICommand;
+use Error;
+use Throwable;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
-use webfiori\cli\streams\StdIn;
-use webfiori\cli\streams\StdOut;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
-use Exception;
-use webfiori\cli\Formatter;
-use Throwable;
-use Error;
+use webfiori\cli\streams\StdIn;
+use webfiori\cli\streams\StdOut;
 /**
  * The core class which is used to manage command line related operations.
  *
  * @author Ibrahim
  */
 class Runner {
-    private $globalArgs;
-    /**
-     * 
-     * @var CLICommand|null
-     */
-    private $defaultCommand;
-    private $commandExitVal;
-    private $beforeStart;
-    /**
-     * 
-     * @var InputStream
-     * 
-     */
-    private $inputStream;
     /**
      * The command that will be executed now.
      * 
      * @var CLICommand|null
      */
     private $activeCommand;
+    private $beforeStart;
+    private $commandExitVal;
     /**
      * An associative array that contains supported commands. 
      * 
@@ -45,6 +30,18 @@ class Runner {
      * 
      */
     private $commands;
+    /**
+     * 
+     * @var CLICommand|null
+     */
+    private $defaultCommand;
+    private $globalArgs;
+    /**
+     * 
+     * @var InputStream
+     * 
+     */
+    private $inputStream;
     /**
      * An attribute which is set to true if CLI is running in interactive mode 
      * or not.
@@ -58,79 +55,44 @@ class Runner {
      */
     private $outputStream;
     /**
-     * Sets the default command that will be get executed in case no command
-     * name was provided as argument.
-     * 
-     * @param string $commandName The name of the command that will be set as
-     * default command. Note that it must be a registered command.
+     * Creates new instance of the class.
      */
-    public function setDefaultCommand(string $commandName) {
-        $c = $this->getCommandByName($commandName);
-        if ($c !== null) {
-            $this->defaultCommand = $c;
+    public function __construct() {
+        $this->commands = [];
+        $this->globalArgs = [];
+        $this->isInteractive = false;
+        $this->inputStream = new StdIn();
+        $this->outputStream = new StdOut();
+
+        if (self::isCLI()) {
+            $this->checkIsIntr();
+
+            if (defined('CLI_HTTP_HOST')) {
+                $host = CLI_HTTP_HOST;
+            } else {
+                $host = '127.0.0.1';
+                define('CLI_HTTP_HOST', $host);
+            }
+            $_SERVER['HTTP_HOST'] = $host;
+            $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+            if (defined('ROOT_DIR')) {
+                $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+            }
+            $_SERVER['REQUEST_URI'] = '/';
+            putenv('HTTP_HOST='.$host);
+            putenv('REQUEST_URI=/');
+
+            if (defined('USE_HTTP') && USE_HTTP === true) {
+                $_SERVER['HTTPS'] = 'no';
+            } else {
+                $_SERVER['HTTPS'] = 'yes';
+            }
+            $this->addArg('--ansi', [
+                'optional' => true,
+                'description' => 'Force the use of ANSI output.'
+            ]);
         }
-    }
-    /**
-     * Return the command which will get executed in case no command name
-     * was provided as argument.
-     * 
-     * @return CLICommand|null If set, it will be returned as object. Other
-     * than that, null is returned.
-     */
-    public function getDefaultCommand() {
-        return $this->defaultCommand;
-    }
-    /**
-     * Register new command.
-     * 
-     * @param CLICommand $cliCommand The command that will be registered.
-     * 
-     */
-    public function register(CLICommand $cliCommand) {
-        $this->commands[$cliCommand->getName()] = $cliCommand;
-    }
-    /**
-     * Sets an array as an input for running specific command.
-     * 
-     * This method is used to test the execution process of specific command.
-     * The developer can use it to mimic the inputs which could be provided
-     * by the user when actually running the command through a terminal.
-     * The developer can use the method 'Runner::getOutput()' to get generated
-     * output and compare it with expected output.
-     * 
-     * Note that this method will set the input stream to 'ArrayInputStream' 
-     * and output stream to 'ArrayOutputStream'.
-     * 
-     * @param array $inputs An array that contain lines of inputs.
-     */
-    public function setInput(array $inputs = []) {
-        $this->setInputStream(new ArrayInputStream($inputs));
-        $this->setOutputStream(new ArrayOutputStream());
-    }
-    /**
-     * Returns an array that contain all generated output by executing a command.
-     * 
-     * This method should be only used when testing the execution process of a
-     * command The method will return empty array if output stream type
-     * is not ArrayOutputStream.
-     * 
-     * @return array An array that contains all output lines which are generated
-     * by executing a specific command.
-     */
-    public function getOutput() : array {
-        $outputStream = $this->getOutputStream();
-        if ($outputStream instanceof ArrayOutputStream) {
-            return $outputStream->getOutputArray();
-        }
-        return [];
-    }
-    /**
-     * Returns an array that contains objects that represents global arguments.
-     * 
-     * @return array An array that contains objects that represents global arguments.
-     */
-    public function getArgs() : array {
-        return $this->globalArgs;
     }
     /**
      * Adds a global command argument.
@@ -166,9 +128,11 @@ class Runner {
      */
     public function addArg(string $name, array $options = []) : bool {
         $toAdd = CommandArgument::create($name, $options);
+
         if ($toAdd === null) {
             return false;
         }
+
         return $this->addArgument($toAdd);
     }
     /**
@@ -185,9 +149,100 @@ class Runner {
     public function addArgument(CommandArgument $arg) : bool {
         if (!$this->hasArg($arg->getName())) {
             $this->globalArgs[] = $arg;
+
             return true;
         }
+
         return false;
+    }
+    /**
+     * Returns the command which is being executed.
+     * 
+     * @return CLICommand|null If a command is requested and currently in execute 
+     * stage, the method will return it as an object. If 
+     * no command is active, the method will return null.
+     * 
+     */
+    public function getActiveCommand() {
+        return $this->activeCommand;
+    }
+    /**
+     * Returns an array that contains objects that represents global arguments.
+     * 
+     * @return array An array that contains objects that represents global arguments.
+     */
+    public function getArgs() : array {
+        return $this->globalArgs;
+    }
+    /**
+     * Returns a registered command given its name.
+     * 
+     * @param string $name The name of the command as specified when it was
+     * initialized.
+     * 
+     * @return CLICommand|null If the command is registered, it is returned
+     * as an object. Other than that, null is returned.
+     */
+    public function getCommandByName(string $name) {
+        if (isset($this->getCommands()[$name])) {
+            return $this->getCommands()[$name];
+        }
+    }
+    /**
+     * Returns an associative array of registered commands.
+     * 
+     * @return array The method will return an associative array. The keys of 
+     * the array are the names of the commands and the value of the key is 
+     * an object that holds command information.
+     * 
+     */
+    public function getCommands() : array {
+        return $this->commands;
+    }
+    /**
+     * Return the command which will get executed in case no command name
+     * was provided as argument.
+     * 
+     * @return CLICommand|null If set, it will be returned as object. Other
+     * than that, null is returned.
+     */
+    public function getDefaultCommand() {
+        return $this->defaultCommand;
+    }
+    /**
+     * Returns the stream at which the engine is using to get inputs.
+     * 
+     * @return InputStream The default input stream is 'StdIn'.
+     */
+    public function getInputStream() : InputStream {
+        return $this->inputStream;
+    }
+    /**
+     * Returns an array that contain all generated output by executing a command.
+     * 
+     * This method should be only used when testing the execution process of a
+     * command The method will return empty array if output stream type
+     * is not ArrayOutputStream.
+     * 
+     * @return array An array that contains all output lines which are generated
+     * by executing a specific command.
+     */
+    public function getOutput() : array {
+        $outputStream = $this->getOutputStream();
+
+        if ($outputStream instanceof ArrayOutputStream) {
+            return $outputStream->getOutputArray();
+        }
+
+        return [];
+    }
+    /**
+     * Returns the stream at which the engine is using to send outputs.
+     * 
+     * @return OutputStream The default input stream is 'StdOut'.
+     */
+    public function getOutputStream() : OutputStream {
+        return $this->outputStream;
     }
     /**
      * Checks if the runner has specific global argument or not given its name.
@@ -203,89 +258,22 @@ class Runner {
                 return true;
             }
         }
+
         return false;
     }
     /**
-     * Sets a callable to call before start running CLI engine.
+     * Checks if the class is running through command line interface (CLI) or 
+     * through a web server.
      * 
-     * This can be used to register custom made commands before running
-     * the engine.
+     * @return boolean If the class is running through a command line, 
+     * the method will return true. False if not.
      * 
-     * @param callable $func An executable function. The function will have
-     * one parameter which is the runner that the function will be added to.
      */
-    public function setBeforeStart(callable $func) {
-        $this->beforeStart = $func;
-    }
-    /**
-     * Sets arguments vector to have specific value.
-     * 
-     * This method is mainly used to simulate running the class using an
-     * actual terminal. Also, it can be used to setup the test run parameters
-     * for testing a command.
-     * 
-     * @param array $argsVector An array that contains arguments vector. Usually,
-     * the first argument of the vector is the entry point (such as app.php).
-     * The second argument is the name of the command that will get executed
-     * and, remaining parts are any additional arguments that the command
-     * might use.
-     */
-    public function setArgsVector(array $argsVector) {
-        $_SERVER['argv'] = $argsVector;
-        $this->checkIsIntr();
-    }
-    /**
-     * Creates new instance of the class.
-     */
-    public function __construct() {
-        $this->commands = [];
-        $this->globalArgs = [];
-        $this->isInteractive = false;
-        $this->inputStream = new StdIn();
-        $this->outputStream = new StdOut();
-        if (self::isCLI()) {
-            $this->checkIsIntr();
-            if (defined('CLI_HTTP_HOST')) {
-                $host = CLI_HTTP_HOST;
-            } else {
-                $host = '127.0.0.1';
-                define('CLI_HTTP_HOST', $host);
-            }
-            $_SERVER['HTTP_HOST'] = $host;
-            $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-            if (defined('ROOT_DIR')) {
-                $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
-            }
-            $_SERVER['REQUEST_URI'] = '/';
-            putenv('HTTP_HOST='.$host);
-            putenv('REQUEST_URI=/');
-
-            if (defined('USE_HTTP') && USE_HTTP === true) {
-                $_SERVER['HTTPS'] = 'no';
-            } else {
-                $_SERVER['HTTPS'] = 'yes';
-            }
-            $this->addArg('--ansi', [
-                'optional' => true,
-                'description' => 'Force the use of ANSI output.'
-            ]);
-        }
-    }
-    private function checkIsIntr() {
-        if (isset($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $arg) {
-                $this->isInteractive = $arg == '-i' || $this->isInteractive;
-            }
-        }
-    }
-
-    /**
-     * Reset input stream, output stream and, registered commands to default.
-     */
-    public function reset() {
-        $this->inputStream = new StdIn();
-        $this->outputStream = new StdOut();
-        $this->commands = [];
+    public static function isCLI() : bool {
+        //best way to check if app is runing through CLi
+        // or in a web server.
+        // Did a lot of reaseach on that.
+        return http_response_code() === false;
     }
     /**
      * Checks if CLI is running in interactive mode or not.
@@ -298,45 +286,45 @@ class Runner {
         return $this->isInteractive;
     }
     /**
-     * Returns the stream at which the engine is using to get inputs.
+     * Register new command.
      * 
-     * @return InputStream The default input stream is 'StdIn'.
+     * @param CLICommand $cliCommand The command that will be registered.
+     * 
      */
-    public function getInputStream() : InputStream {
-        return $this->inputStream;
+    public function register(CLICommand $cliCommand) {
+        $this->commands[$cliCommand->getName()] = $cliCommand;
     }
     /**
-     * Returns the stream at which the engine is using to send outputs.
+     * Removes an argument from the global args set given its name.
      * 
-     * @return OutputStream The default input stream is 'StdOut'.
+     * @param string $name The name of the argument that will be removed.
+     * 
+     * @return bool If removed, true is returned. Other than that, false is
+     * returned.
      */
-    public function getOutputStream() : OutputStream {
-        return $this->outputStream;
-    }
-    /**
-     * Returns an associative array of registered commands.
-     * 
-     * @return array The method will return an associative array. The keys of 
-     * the array are the names of the commands and the value of the key is 
-     * an object that holds command information.
-     * 
-     */
-    public function getCommands() : array {
-        return $this->commands;
-    }
-    /**
-     * Returns a registered command given its name.
-     * 
-     * @param string $name The name of the command as specified when it was
-     * initialized.
-     * 
-     * @return CLICommand|null If the command is registered, it is returned
-     * as an object. Other than that, null is returned.
-     */
-    public function getCommandByName(string $name) {
-        if (isset($this->getCommands()[$name])) {
-            return $this->getCommands()[$name];
+    public function removeArgument(string $name) : bool {
+        $removed = false;
+        $temp = [];
+
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() !== $name) {
+                $temp[] = $arg;
+            } else {
+                $removed = true;
+            }
         }
+        $this->globalArgs = $temp;
+
+        return $removed;
+    }
+
+    /**
+     * Reset input stream, output stream and, registered commands to default.
+     */
+    public function reset() {
+        $this->inputStream = new StdIn();
+        $this->outputStream = new StdOut();
+        $this->commands = [];
     }
     /**
      * Executes a command given as object.
@@ -356,7 +344,7 @@ class Runner {
      */
     public function runCommand(CLICommand $c = null, array $args = []) {
         $commandName = null;
-        
+
         if ($c === null) {
             if (count($args) === 0) {
                 $c = $this->getDefaultCommand();
@@ -369,7 +357,7 @@ class Runner {
                     $c = $this->getDefaultCommand();
                 }
             }
-            
+
             if ($c === null) {
                 if ($commandName == null) {
                     $this->getOutputStream()->println("Info: No command was specified to run.");
@@ -384,41 +372,89 @@ class Runner {
         $this->setActiveCommand($c);
         $this->commandExitVal = $c->excCommand();
         $this->setActiveCommand();
+
         return $this->commandExitVal;
     }
     /**
-     * Removes an argument from the global args set given its name.
+     * Sets the command which is currently in execution stage.
      * 
-     * @param string $name The name of the argument that will be removed.
+     * This method is used internally by execution engine to set the command which
+     * is being executed.
      * 
-     * @return bool If removed, true is returned. Other than that, false is
-     * returned.
+     * @param CLICommand $c The command which is in execution stage.
      */
-    public function removeArgument(string $name) : bool {
-        $removed = false;
-        $temp = [];
-        
-        foreach ($this->getArgs() as $arg) {
-            if ($arg->getName() !== $name) {
-                $temp[] = $arg;
-            } else {
-                $removed = true;
-            }
+    public function setActiveCommand(CLICommand $c = null) {
+        if ($this->getActiveCommand() !== null) {
+            $this->getActiveCommand()->setOuner();
         }
-        $this->globalArgs = $temp;
-        return $removed;
+        $this->activeCommand = $c;
+
+        if ($this->getActiveCommand() !== null) {
+            $this->getActiveCommand()->setOutputStream($this->getOutputStream());
+            $this->getActiveCommand()->setInputStream($this->getInputStream());
+            $this->getActiveCommand()->setOuner($this);
+        }
     }
-    private function setArgV(array $args) {
-        $argV = [];
-        
-        foreach ($args as $argName => $argVal) {
-            if (gettype($argName) == 'integer') {
-                $argV[] = $argVal;
-            } else {
-                $argV[] = $argName.'='.$argVal;
-            }
+    /**
+     * Sets arguments vector to have specific value.
+     * 
+     * This method is mainly used to simulate running the class using an
+     * actual terminal. Also, it can be used to setup the test run parameters
+     * for testing a command.
+     * 
+     * @param array $argsVector An array that contains arguments vector. Usually,
+     * the first argument of the vector is the entry point (such as app.php).
+     * The second argument is the name of the command that will get executed
+     * and, remaining parts are any additional arguments that the command
+     * might use.
+     */
+    public function setArgsVector(array $argsVector) {
+        $_SERVER['argv'] = $argsVector;
+        $this->checkIsIntr();
+    }
+    /**
+     * Sets a callable to call before start running CLI engine.
+     * 
+     * This can be used to register custom made commands before running
+     * the engine.
+     * 
+     * @param callable $func An executable function. The function will have
+     * one parameter which is the runner that the function will be added to.
+     */
+    public function setBeforeStart(callable $func) {
+        $this->beforeStart = $func;
+    }
+    /**
+     * Sets the default command that will be get executed in case no command
+     * name was provided as argument.
+     * 
+     * @param string $commandName The name of the command that will be set as
+     * default command. Note that it must be a registered command.
+     */
+    public function setDefaultCommand(string $commandName) {
+        $c = $this->getCommandByName($commandName);
+
+        if ($c !== null) {
+            $this->defaultCommand = $c;
         }
-        $_SERVER['argv'] = $argV;
+    }
+    /**
+     * Sets an array as an input for running specific command.
+     * 
+     * This method is used to test the execution process of specific command.
+     * The developer can use it to mimic the inputs which could be provided
+     * by the user when actually running the command through a terminal.
+     * The developer can use the method 'Runner::getOutput()' to get generated
+     * output and compare it with expected output.
+     * 
+     * Note that this method will set the input stream to 'ArrayInputStream' 
+     * and output stream to 'ArrayOutputStream'.
+     * 
+     * @param array $inputs An array that contain lines of inputs.
+     */
+    public function setInput(array $inputs = []) {
+        $this->setInputStream(new ArrayInputStream($inputs));
+        $this->setOutputStream(new ArrayOutputStream());
     }
 
     /**
@@ -437,10 +473,6 @@ class Runner {
     public function setOutputStream(OutputStream $stream) {
         $this->outputStream = $stream;
     }
-    private function readInteractiv() {
-        $input = trim($this->getInputStream()->readLine());
-        return strlen($input) != 0 ? explode(' ', $input) : [];
-    }
     /**
      * Start command line process.
      * 
@@ -452,6 +484,7 @@ class Runner {
         if ($this->beforeStart !== null) {
             call_user_func_array($this->beforeStart, [$this]);
         }
+
         if ($this->isIntaractive()) {
             $this->getOutputStream()->println('>> Running in interactive mode.');
             $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
@@ -461,6 +494,7 @@ class Runner {
             while (!$exit) {
                 $args = $this->readInteractiv();
                 $argsCount = count($args);
+
                 if ($argsCount == 0) {
                     $this->getOutputStream()->println('No input.');
                 } else if ($args[0] == 'exit') {
@@ -479,7 +513,20 @@ class Runner {
         } else {
             return $this->run();
         }
+
         return 0;
+    }
+    private function checkIsIntr() {
+        if (isset($_SERVER['argv'])) {
+            foreach ($_SERVER['argv'] as $arg) {
+                $this->isInteractive = $arg == '-i' || $this->isInteractive;
+            }
+        }
+    }
+    private function readInteractiv() {
+        $input = trim($this->getInputStream()->readLine());
+
+        return strlen($input) != 0 ? explode(' ', $input) : [];
     }
     /**
      * Run the command line as single run.
@@ -489,6 +536,7 @@ class Runner {
      */
     private function run() {
         $argsArr = array_splice($_SERVER['argv'], 1);
+
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
 
@@ -499,48 +547,16 @@ class Runner {
 
         return $this->runCommand(null, $argsArr);
     }
-    /**
-     * Sets the command which is currently in execution stage.
-     * 
-     * This method is used internally by execution engine to set the command which
-     * is being executed.
-     * 
-     * @param CLICommand $c The command which is in execution stage.
-     */
-    public function setActiveCommand(CLICommand $c = null) {
-        if ($this->getActiveCommand() !== null) {
-            $this->getActiveCommand()->setOuner();
+    private function setArgV(array $args) {
+        $argV = [];
+
+        foreach ($args as $argName => $argVal) {
+            if (gettype($argName) == 'integer') {
+                $argV[] = $argVal;
+            } else {
+                $argV[] = $argName.'='.$argVal;
+            }
         }
-        $this->activeCommand = $c;
-        if ($this->getActiveCommand() !== null) {
-            $this->getActiveCommand()->setOutputStream($this->getOutputStream());
-            $this->getActiveCommand()->setInputStream($this->getInputStream());
-            $this->getActiveCommand()->setOuner($this);
-        }
-    }
-    /**
-     * Returns the command which is being executed.
-     * 
-     * @return CLICommand|null If a command is requested and currently in execute 
-     * stage, the method will return it as an object. If 
-     * no command is active, the method will return null.
-     * 
-     */
-    public function getActiveCommand() {
-        return $this->activeCommand;
-    }
-    /**
-     * Checks if the class is running through command line interface (CLI) or 
-     * through a web server.
-     * 
-     * @return boolean If the class is running through a command line, 
-     * the method will return true. False if not.
-     * 
-     */
-    public static function isCLI() : bool {
-        //best way to check if app is runing through CLi
-        // or in a web server.
-        // Did a lot of reaseach on that.
-        return http_response_code() === false;
+        $_SERVER['argv'] = $argV;
     }
 }
