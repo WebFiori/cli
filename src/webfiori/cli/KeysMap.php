@@ -62,10 +62,11 @@ class KeysMap {
      */
     public static function read(InputStream $stream, $bytes = 1) {
         $input = '';
-
-        while (strlen($input) < $bytes) {
+        $len = strlen($input);
+        while ($len < $bytes) {
             $char = self::readAndTranslate($stream);
             self::appendChar($char, $input);
+            $len = strlen($input);
         }
 
         return $input;
@@ -115,13 +116,16 @@ class KeysMap {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
             $input = substr($input, 0, strlen($input) - 1);
         } else if ($ch == 'ESC') {
-            return '';
+            $input .= ' ';
         } else if ($ch == 'CR') {
             // Do nothing?
+            $input .= ' ';
         } else if ($ch == 'DOWN') {
             // read history;
+            $input .= ' ';
         } else if ($ch == 'UP') {
             // read history;
+            $input .= ' ';
         } else if ($ch != 'CR' && $ch != 'LF') {
             if ($ch == 'SPACE') {
                 $input .= ' ';
