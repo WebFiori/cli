@@ -66,28 +66,6 @@ class Runner {
 
         if (self::isCLI()) {
             $this->checkIsIntr();
-
-            if (defined('CLI_HTTP_HOST')) {
-                $host = CLI_HTTP_HOST;
-            } else {
-                $host = '127.0.0.1';
-                define('CLI_HTTP_HOST', $host);
-            }
-            $_SERVER['HTTP_HOST'] = $host;
-            $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-
-            if (defined('ROOT_DIR')) {
-                $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
-            }
-            $_SERVER['REQUEST_URI'] = '/';
-            putenv('HTTP_HOST='.$host);
-            putenv('REQUEST_URI=/');
-
-            if (defined('USE_HTTP') && USE_HTTP === true) {
-                $_SERVER['HTTPS'] = 'no';
-            } else {
-                $_SERVER['HTTPS'] = 'yes';
-            }
             $this->addArg('--ansi', [
                 'optional' => true,
                 'description' => 'Force the use of ANSI output.'
@@ -513,8 +491,6 @@ class Runner {
         } else {
             return $this->run();
         }
-
-        return 0;
     }
     private function checkIsIntr() {
         if (isset($_SERVER['argv'])) {
@@ -539,10 +515,7 @@ class Runner {
 
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
-
-            if (!defined('__PHPUNIT_PHAR__') && $command !== null) {
-                return $this->runCommand($command);
-            }
+            return $this->runCommand($command);
         }
 
         return $this->runCommand(null, $argsArr);
