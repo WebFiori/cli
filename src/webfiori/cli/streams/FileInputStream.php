@@ -1,11 +1,10 @@
 <?php
 namespace webfiori\cli\streams;
 
-use webfiori\cli\streams\InputStream;
-use webfiori\framework\File;
-use webfiori\cli\KeysMap;
 use webfiori\cli\exceptions\IOException;
+use webfiori\cli\KeysMap;
 use webfiori\framework\exceptions\FileException;
+use webfiori\framework\File;
 /**
  * A class that implements input stream which can be based on files.
  *
@@ -38,6 +37,7 @@ class FileInputStream implements InputStream {
         try {
             $this->file->read($this->seek, $this->seek + $bytes);
             $this->seek += $bytes;
+
             return $this->file->getRawData();
         } catch (FileException $ex) {
             throw new IOException('Unable to read '.$bytes.' byte(s) due to an error: "'.$ex->getMessage().'"', $ex->getCode(), $ex);

@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\cli\streams;
 
-use webfiori\cli\streams\OutputStream;
 /**
  * A stream that uses array as its source of output.
  * 
@@ -11,13 +10,22 @@ use webfiori\cli\streams\OutputStream;
  * @author Ibrahim
  */
 class ArrayOutputStream implements OutputStream {
-    private $outputArr;
-    private $isPrintln;
     private $isLastPrintLn;
+    private $isPrintln;
+    private $outputArr;
     public function __construct() {
         $this->outputArr = [];
         $this->isPrintln = false;
         $this->isLastPrintLn = false;
+    }
+    /**
+     * Returns the array that holds all output values.
+     * 
+     * @return array The array will have the output with selected formatting
+     * options.
+     */
+    public function getOutputArray() {
+        return $this->outputArr;
     }
     /**
      * Sends a line as output to the array.
@@ -56,6 +64,7 @@ class ArrayOutputStream implements OutputStream {
             }
         }
         $index = count($this->outputArr);
+
         if ($index >= 1) {
             if ($this->isLastPrintLn) {
                 $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
@@ -67,17 +76,8 @@ class ArrayOutputStream implements OutputStream {
         } else {
             $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
         }
-        
+
         $this->isLastPrintLn = $this->isPrintln;
-    }
-    /**
-     * Returns the array that holds all output values.
-     * 
-     * @return array The array will have the output with selected formatting
-     * options.
-     */
-    public function getOutputArray() {
-        return $this->outputArr;
     }
     /**
      * Removes all stored output.

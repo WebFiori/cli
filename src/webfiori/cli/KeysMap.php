@@ -30,6 +30,26 @@ class KeysMap {
         "\e" => 'ESC'
     ];
     /**
+     * Maps a control character to a string that represents its value.
+     * 
+     * @param string $ch The control character such as '\n'.
+     * 
+     * @return string If the given character maps to a control character, its
+     * value is returned as string. For expmple, if the character is '\n',
+     * the method will return the value "LF" which stands for "line feed". If the
+     * character does not map to any control character, the same character is
+     * returned.
+     */
+    public static function map($ch) {
+        $keyMap = self::KEY_MAP;
+
+        if (isset($keyMap[$ch])) {
+            return $keyMap[$ch];
+        }
+
+        return $ch;
+    }
+    /**
      * Reads a string of bytes from specific input stream.
      * 
      * This method is used to read specific number of bytes from any
@@ -42,13 +62,31 @@ class KeysMap {
      */
     public static function read(InputStream $stream, $bytes = 1) {
         $input = '';
-
-        while (strlen($input) < $bytes) {
+        $len = strlen($input);
+        while ($len < $bytes) {
             $char = self::readAndTranslate($stream);
             self::appendChar($char, $input);
+            $len = strlen($input);
         }
 
         return $input;
+    }
+
+
+    /**
+     * Reads one character from specific input stream and check if the character
+     * maps to any control character.
+     * 
+     * @param InputStream $stream
+     * 
+     * @return string If the character maps to control character, a value from
+     * the array InputTranslator::KEY_MAP is returned. Other than that,
+     * the character it self will be returned.
+     */
+    public static function readAndTranslate(InputStream $stream) {
+        $keypress = $stream->read();
+
+        return self::map($keypress);
     }
     /**
      * Reads one line from specific input stream.
@@ -78,13 +116,16 @@ class KeysMap {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
             $input = substr($input, 0, strlen($input) - 1);
         } else if ($ch == 'ESC') {
-            return '';
+            $input .= ' ';
         } else if ($ch == 'CR') {
             // Do nothing?
+            $input .= ' ';
         } else if ($ch == 'DOWN') {
             // read history;
+            $input .= ' ';
         } else if ($ch == 'UP') {
             // read history;
+            $input .= ' ';
         } else if ($ch != 'CR' && $ch != 'LF') {
             if ($ch == 'SPACE') {
                 $input .= ' ';
@@ -92,42 +133,5 @@ class KeysMap {
                 $input .= $ch;
             }
         }
-    }
-
-
-    /**
-     * Reads one character from specific input stream and check if the character
-     * maps to any control character.
-     * 
-     * @param InputStream $stream
-     * 
-     * @return string If the character maps to control character, a value from
-     * the array InputTranslator::KEY_MAP is returned. Other than that,
-     * the character it self will be returned.
-     */
-    public static function readAndTranslate(InputStream $stream) {
-        $keypress = $stream->read();
-
-        return self::map($keypress);
-    }
-    /**
-     * Maps a control character to a string that represents its value.
-     * 
-     * @param string $ch The control character such as '\n'.
-     * 
-     * @return string If the given character maps to a control character, its
-     * value is returned as string. For expmple, if the character is '\n',
-     * the method will return the value "LF" which stands for "line feed". If the
-     * character does not map to any control character, the same character is
-     * returned.
-     */
-    public static function map($ch) {
-        $keyMap = self::KEY_MAP;
-
-        if (isset($keyMap[$ch])) {
-            return $keyMap[$ch];
-        }
-
-        return $ch;
     }
 }

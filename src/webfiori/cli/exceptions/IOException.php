@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\cli\exceptions;
+
 use Exception;
 /**
  * An exception which is thrown to indicate that input or output stream
@@ -8,5 +9,4 @@ use Exception;
  * @author Ibrahim
  */
 class IOException extends Exception {
-
 }

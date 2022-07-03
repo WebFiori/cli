@@ -11,6 +11,7 @@ use webfiori\tests\cli\testCommands\Command00;
 use webfiori\cli\commands\HelpCommand;
 use webfiori\tests\cli\testCommands\WithExceptionCommand;
 use webfiori\tests\cli\testCommands\Command01;
+use webfiori\cli\CommandArgument;
 /**
  * Description of RunnerTest
  *
@@ -37,9 +38,23 @@ class RunnerTest extends TestCase {
      */
     public function runnerTest00() {
         $runner = new Runner();
+        $this->assertEquals([], $runner->getOutput());
         $this->assertEquals([], $runner->getCommands());
+        $this->assertFalse($runner->addArg(' '));
+        $this->assertFalse($runner->addArg(' invalid name '));
         $this->assertNull($runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
+        
+        $argObj = new CommandArgument('--ansi');
+        $this->assertFalse($runner->addArgument($argObj));
+        
+        $this->assertTrue($runner->addArg('global-arg', [
+            'optional' => true
+        ]));
+        $this->assertEquals(2, count($runner->getArgs()));
+        $runner->removeArgument('--ansi');
+        $this->assertEquals(1, count($runner->getArgs()));
+        $this->assertFalse($runner->hasArg('--ansi'));
         $runner->register(new Command00());
         $this->assertEquals(1, count($runner->getCommands()));
         $runner->register(new Command00());
@@ -238,17 +253,18 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest11() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            'help',
-            '--command-name' => 'super hero',
-            '--ansi'
-        ];
         $runner = new Runner();
-        $runner->register(new Command00());
-        $runner->register(new HelpCommand());
-
-        $runner->setInput([]);
+        $runner->setBeforeStart(function (Runner $r) {
+            $r->setArgsVector([
+                'entry.php',
+                'help',
+                '--command-name' => 'super hero',
+                '--ansi'
+            ]);
+            $r->register(new Command00());
+            $r->register(new HelpCommand());
+            $r->setInput([]);
+        });
         $runner->start();
         $this->assertEquals([
             "\e[1;91mError: \e[0mCommand 'super hero' is not supported.\n"
@@ -258,14 +274,16 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest12() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            '-i',
-        ];
+        
         $runner = new Runner();
+        
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
-
+        
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
         $runner->setInput([
             'exit'
         ]);
@@ -280,14 +298,15 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest13() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            '-i',
-        ];
+        
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
 
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
         $runner->setInput([
             'help',
             'exit'
@@ -310,14 +329,15 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest14() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            '-i',
-        ];
         $runner = new Runner();
+        
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
 
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
         $runner->setInput([
             'help --command-name=super-hero',
             'super-hero name=Ibrahim',
@@ -338,14 +358,14 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest15() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            '-i',
-        ];
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->register(new WithExceptionCommand());
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
         $runner->setInput([
             'help --command-name=super-hero',
             'with-exception',
