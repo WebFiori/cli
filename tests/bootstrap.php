@@ -31,7 +31,7 @@ require_once $fileLibPath.DS.'File.php';
 require_once $fileLibPath.DS.'MIME.php';
 require_once $fileLibPath.DS.'exceptions'.DS.'FileException.php';
 
-$baseDir = $rootDir.'src'.DS.'webfiori'.DS.'cli';
+$baseDir = $rootDir.'webfiori'.DS.'cli';
 require_once $baseDir.DS.'streams'.DS.'InputStream.php';
 require_once $baseDir.DS.'streams'.DS.'OutputStream.php';
 require_once $baseDir.DS.'CLICommand.php';
