@@ -3,7 +3,7 @@ namespace webfiori\cli\streams;
 
 use webfiori\cli\exceptions\IOException;
 use webfiori\cli\KeysMap;
-use webfiori\framework\exceptions\FileException;
+use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 /**
  * A class that implements input stream which can be based on files.
