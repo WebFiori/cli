@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\cli\streams;
 
-use webfiori\framework\File;
+use webfiori\file\File;
 /**
  * A class that implements output stream which can be based on files.
  *
