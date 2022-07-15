@@ -26,12 +26,12 @@ require_once $jsonLibPath.DS.'CaseConverter.php';
 require_once $jsonLibPath.DS.'JsonTypes.php';
 require_once $jsonLibPath.DS.'Property.php';
 
-$fileLibPath = $rootDir.'vendor'.DS.'webfiori'.DS.'file'.DS.'src'.DS.'webfiori'.DS.'framework';
+$fileLibPath = $rootDir.'vendor'.DS.'webfiori'.DS.'file'.DS.'webfiori'.DS.'file';
 require_once $fileLibPath.DS.'File.php';
 require_once $fileLibPath.DS.'MIME.php';
 require_once $fileLibPath.DS.'exceptions'.DS.'FileException.php';
 
-$baseDir = $rootDir.'src'.DS.'webfiori'.DS.'cli';
+$baseDir = $rootDir.'webfiori'.DS.'cli';
 require_once $baseDir.DS.'streams'.DS.'InputStream.php';
 require_once $baseDir.DS.'streams'.DS.'OutputStream.php';
 require_once $baseDir.DS.'CLICommand.php';
