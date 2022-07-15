@@ -26,7 +26,7 @@ require_once $jsonLibPath.DS.'CaseConverter.php';
 require_once $jsonLibPath.DS.'JsonTypes.php';
 require_once $jsonLibPath.DS.'Property.php';
 
-$fileLibPath = $rootDir.'vendor'.DS.'webfiori'.DS.'file'.DS.'src'.DS.'webfiori'.DS.'framework';
+$fileLibPath = $rootDir.'vendor'.DS.'webfiori'.DS.'file'.DS.'webfiori'.DS.'framework';
 require_once $fileLibPath.DS.'File.php';
 require_once $fileLibPath.DS.'MIME.php';
 require_once $fileLibPath.DS.'exceptions'.DS.'FileException.php';
