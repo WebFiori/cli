@@ -3,12 +3,46 @@
 namespace webfiori\tests\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\cli\CommandArgument;
+use webfiori\cli\Runner;
 /**
  * Description of CommandArgumentTest
  *
  * @author Ibrahim
  */
 class CommandArgumentTest extends TestCase {
+    /**
+     * @test
+     */
+    public function extractValueTest00() {
+        $_SERVER['argv'] = [
+            'name=ibrahim'
+        ];
+        $this->assertEquals('ibrahim', CommandArgument::extractValue('name'));
+    }
+    /**
+     * @test
+     */
+    public function extractValueTest01() {
+        $_SERVER['argv'] = [
+            'name=ibrahim'
+        ];
+        $r = new Runner();
+        $r->setArgsVector([
+            'name=ali' 
+        ]);
+        $this->assertEquals('ali', CommandArgument::extractValue('name', $r));
+    }
+    /**
+     * @test
+     */
+    public function extractValueTest03() {
+        $_SERVER['argv'] = [
+            'name="ibrahim Ali"',
+            "last-name='bin'"
+        ];
+        $this->assertEquals('ibrahim Ali', CommandArgument::extractValue('name'));
+        $this->assertEquals('bin', CommandArgument::extractValue('last-name'));
+    }
     /**
      * @test
      */

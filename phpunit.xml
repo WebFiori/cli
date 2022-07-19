@@ -4,16 +4,16 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <file>./src/webfiori/cli/CLICommand.php</file>
-            <file>./src/webfiori/cli/CommandArgument.php</file>
-            <file>./src/webfiori/cli/Formatter.php</file>
-            <file>./src/webfiori/cli/KeysMap.php</file>
-            <file>./src/webfiori/cli/Runner.php</file>
-            <file>./src/webfiori/cli/InputValidator.php</file>
-            <file>./src/webfiori/cli/streams/ArrayInputStream.php</file>
-            <file>./src/webfiori/cli/streams/ArrayOutputStream.php</file>
-            <file>./src/webfiori/cli/streams/FileInputStream.php</file>
-            <file>./src/webfiori/cli/streams/FileOutputStream.php</file>
+            <file>./webfiori/cli/CLICommand.php</file>
+            <file>./webfiori/cli/CommandArgument.php</file>
+            <file>./webfiori/cli/Formatter.php</file>
+            <file>./webfiori/cli/KeysMap.php</file>
+            <file>./webfiori/cli/Runner.php</file>
+            <file>./webfiori/cli/InputValidator.php</file>
+            <file>./webfiori/cli/streams/ArrayInputStream.php</file>
+            <file>./webfiori/cli/streams/ArrayOutputStream.php</file>
+            <file>./webfiori/cli/streams/FileInputStream.php</file>
+            <file>./webfiori/cli/streams/FileOutputStream.php</file>
         </whitelist>
     </filter>
     <logging>

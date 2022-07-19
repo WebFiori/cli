@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\cli;
 
-use Error;
 use Throwable;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
@@ -21,8 +20,9 @@ class Runner {
      * @var CLICommand|null
      */
     private $activeCommand;
-    private $beforeStart;
+    private $beforeStartPool;
     private $commandExitVal;
+    private $argsV;
     /**
      * An associative array that contains supported commands. 
      * 
@@ -60,17 +60,21 @@ class Runner {
     public function __construct() {
         $this->commands = [];
         $this->globalArgs = [];
+        $this->argsV = [];
         $this->isInteractive = false;
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
 
-        if (self::isCLI()) {
-            $this->checkIsIntr();
-            $this->addArg('--ansi', [
-                'optional' => true,
-                'description' => 'Force the use of ANSI output.'
-            ]);
-        }
+        $this->addArg('--ansi', [
+            'optional' => true,
+            'description' => 'Force the use of ANSI output.'
+        ]);
+        $this->setBeforeStart(function (Runner $r) {
+            if (count($r->getArgsVector()) == 0) {
+                $r->setArgsVector($_SERVER['argv']);
+            }
+            $r->checkIsIntr();
+        });
     }
     /**
      * Adds a global command argument.
@@ -151,6 +155,14 @@ class Runner {
      */
     public function getArgs() : array {
         return $this->globalArgs;
+    }
+    /**
+     * Returns an array that contains arguments vector values.
+     * 
+     * @return array Each index will have one part of arguments vector.
+     */
+    public function getArgsVector() : array {
+        return $this->argsV;
     }
     /**
      * Returns a registered command given its name.
@@ -387,8 +399,7 @@ class Runner {
      * might use.
      */
     public function setArgsVector(array $argsVector) {
-        $_SERVER['argv'] = $argsVector;
-        $this->checkIsIntr();
+        $this->argsV = $argsVector;
     }
     /**
      * Sets a callable to call before start running CLI engine.
@@ -400,7 +411,7 @@ class Runner {
      * one parameter which is the runner that the function will be added to.
      */
     public function setBeforeStart(callable $func) {
-        $this->beforeStart = $func;
+        $this->beforeStartPool[] = $func;
     }
     /**
      * Sets the default command that will be get executed in case no command
@@ -459,10 +470,9 @@ class Runner {
      * it means that there was an error in execution.
      */
     public function start() : int {
-        if ($this->beforeStart !== null) {
-            call_user_func_array($this->beforeStart, [$this]);
+        foreach ($this->beforeStartPool as $func) {
+            call_user_func_array($func, [$this]);
         }
-
         if ($this->isIntaractive()) {
             $this->getOutputStream()->println('>> Running in interactive mode.');
             $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
@@ -471,6 +481,7 @@ class Runner {
 
             while (!$exit) {
                 $args = $this->readInteractiv();
+                $this->setArgsVector($args);
                 $argsCount = count($args);
 
                 if ($argsCount == 0) {
@@ -493,12 +504,12 @@ class Runner {
         }
     }
     private function checkIsIntr() {
-        if (isset($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $arg) {
-                $this->isInteractive = $arg == '-i' || $this->isInteractive;
-            }
+
+        foreach ($this->getArgsVector() as $arg) {
+            $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
+
     private function readInteractiv() {
         $input = trim($this->getInputStream()->readLine());
 
@@ -511,7 +522,7 @@ class Runner {
      * @return type
      */
     private function run() {
-        $argsArr = array_splice($_SERVER['argv'], 1);
+        $argsArr = array_slice($this->getArgsVector(), 1);
 
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
@@ -530,6 +541,6 @@ class Runner {
                 $argV[] = $argName.'='.$argVal;
             }
         }
-        $_SERVER['argv'] = $argV;
+        $this->argsV = $argV;
     }
 }
