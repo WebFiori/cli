@@ -12,6 +12,9 @@ A libray that can be used to write command line based applications using PHP.
   <a href="https://sonarcloud.io/dashboard?id=WebFiori_cli">
       <img src="https://sonarcloud.io/api/project_badges/measure?project=WebFiori_cli&metric=alert_status" />
   </a>
+  <a href="https://github.com/WebFiori/cli/releases">
+      <img src="https://img.shields.io/github/release/WebFiori/cli.svg?label=latest" />
+  </a>
   <a href="https://packagist.org/packages/webfiori/cli">
     <img src="https://img.shields.io/packagist/dt/webfiori/cli?color=light-green">
   </a>
