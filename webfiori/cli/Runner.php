@@ -504,10 +504,7 @@ class Runner {
         }
     }
     private function checkIsIntr() {
-        if ($this->isInteractive === true) {
-            return;
-        }
-        
+
         foreach ($this->getArgsVector() as $arg) {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
