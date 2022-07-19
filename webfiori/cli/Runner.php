@@ -375,14 +375,14 @@ class Runner {
      */
     public function setActiveCommand(CLICommand $c = null) {
         if ($this->getActiveCommand() !== null) {
-            $this->getActiveCommand()->setOuner();
+            $this->getActiveCommand()->setOwner();
         }
         $this->activeCommand = $c;
 
         if ($this->getActiveCommand() !== null) {
             $this->getActiveCommand()->setOutputStream($this->getOutputStream());
             $this->getActiveCommand()->setInputStream($this->getInputStream());
-            $this->getActiveCommand()->setOuner($this);
+            $this->getActiveCommand()->setOwner($this);
         }
     }
     /**
