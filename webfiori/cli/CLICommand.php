@@ -963,7 +963,7 @@ abstract class CLICommand {
      * 
      * @param Runner $ouner
      */
-    public function setOuner(Runner $ouner = null) {
+    public function setOwner(Runner $ouner = null) {
         $this->owner = $ouner;
     }
     /**
