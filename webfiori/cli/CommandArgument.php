@@ -107,7 +107,7 @@ class CommandArgument {
         if ($runner !== null) {
             $argsV = $runner->getArgsVector();
         } else {
-            $argsV = $_SERVER;
+            $argsV = $_SERVER['argv'];
         }
         foreach ($argsV as $option) {
             $optionClean = filter_var($option, FILTER_DEFAULT);
@@ -116,7 +116,7 @@ class CommandArgument {
 
             if ($optionNameFromCLI == $trimmedOptName) {
                 if (count($optExpl) == 2) {
-                    return trim($optExpl[1]);
+                    return trim(trim(trim($optExpl[1],'"'), "'"));
                 } else {
                     //If arg is provided, set its value empty string
                     return '';
