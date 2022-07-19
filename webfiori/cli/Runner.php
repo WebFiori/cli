@@ -341,7 +341,7 @@ class Runner {
             } else {
                 if (isset($args[0])) {
                     $commandName = filter_var($args[0], FILTER_DEFAULT);
-                    $args = array_slice($args, 1);
+                    
                     $c = $this->getCommandByName($commandName);
                 } else {
                     $c = $this->getDefaultCommand();
