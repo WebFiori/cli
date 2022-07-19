@@ -20,7 +20,7 @@ class Runner {
      * @var CLICommand|null
      */
     private $activeCommand;
-    private $beforeStart;
+    private $beforeStartPool;
     private $commandExitVal;
     private $argsV;
     /**
@@ -65,13 +65,16 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
 
-        if (self::isCLI()) {
-            $this->checkIsIntr();
-            $this->addArg('--ansi', [
-                'optional' => true,
-                'description' => 'Force the use of ANSI output.'
-            ]);
-        }
+        $this->addArg('--ansi', [
+            'optional' => true,
+            'description' => 'Force the use of ANSI output.'
+        ]);
+        $this->setBeforeStart(function (Runner $r) {
+            if (count($r->getArgsVector()) == 0) {
+                $r->setArgsVector($_SERVER['argv']);
+            }
+            $r->checkIsIntr();
+        });
     }
     /**
      * Adds a global command argument.
@@ -397,7 +400,6 @@ class Runner {
      */
     public function setArgsVector(array $argsVector) {
         $this->argsV = $argsVector;
-        $this->checkIsIntr();
     }
     /**
      * Sets a callable to call before start running CLI engine.
@@ -409,7 +411,7 @@ class Runner {
      * one parameter which is the runner that the function will be added to.
      */
     public function setBeforeStart(callable $func) {
-        $this->beforeStart = $func;
+        $this->beforeStartPool[] = $func;
     }
     /**
      * Sets the default command that will be get executed in case no command
@@ -468,10 +470,9 @@ class Runner {
      * it means that there was an error in execution.
      */
     public function start() : int {
-        if ($this->beforeStart !== null) {
-            call_user_func_array($this->beforeStart, [$this]);
+        foreach ($this->beforeStartPool as $func) {
+            call_user_func_array($func, [$this]);
         }
-
         if ($this->isIntaractive()) {
             $this->getOutputStream()->println('>> Running in interactive mode.');
             $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
@@ -511,6 +512,7 @@ class Runner {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
+
     private function readInteractiv() {
         $input = trim($this->getInputStream()->readLine());
 
@@ -523,12 +525,7 @@ class Runner {
      * @return type
      */
     private function run() {
-        $v = $this->getArgsVector();
-        $argsArr = array_splice($v, 1);
-        
-        if (count($argsArr) == 0) {
-            $argsArr = array_splice($_SERVER['argv'], 1);
-        }
+        $argsArr = array_slice($this->getArgsVector(), 1);
 
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
