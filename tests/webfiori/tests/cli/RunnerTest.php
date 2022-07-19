@@ -33,6 +33,9 @@ class RunnerTest extends TestCase {
         $this->assertTrue($runner->getInputStream() instanceof ArrayInputStream);
         $this->assertTrue($runner->getOutputStream() instanceof ArrayOutputStream);
     }
+    public function testIsCLI() {
+        $this->assertTrue(Runner::isCLI());
+    }
     /**
      * @test
      */
