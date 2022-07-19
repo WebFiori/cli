@@ -513,8 +513,11 @@ abstract class CLICommand {
         return $this->outputStream;
     }
     /**
+     * Returns the runner which is used to execute the command.
      * 
-     * @return Runner|null
+     * @return Runner|null If the command was called using a runner, this method
+     * will return an instance that can be used to access runner's properties.
+     * If not called through a runner, null is returned.
      */
     public function getOwner() {
         return $this->owner;
