@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\cli;
 
-use Error;
 use Throwable;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
@@ -23,6 +22,7 @@ class Runner {
     private $activeCommand;
     private $beforeStart;
     private $commandExitVal;
+    private $argsV;
     /**
      * An associative array that contains supported commands. 
      * 
@@ -60,6 +60,7 @@ class Runner {
     public function __construct() {
         $this->commands = [];
         $this->globalArgs = [];
+        $this->argsV = [];
         $this->isInteractive = false;
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
@@ -151,6 +152,14 @@ class Runner {
      */
     public function getArgs() : array {
         return $this->globalArgs;
+    }
+    /**
+     * Returns an array that contains arguments vector values.
+     * 
+     * @return array Each index will have one part of arguments vector.
+     */
+    public function getArgsVector() : array {
+        return $this->argsV;
     }
     /**
      * Returns a registered command given its name.
@@ -387,7 +396,7 @@ class Runner {
      * might use.
      */
     public function setArgsVector(array $argsVector) {
-        $_SERVER['argv'] = $argsVector;
+        $this->argsV = $argsVector;
         $this->checkIsIntr();
     }
     /**
@@ -471,6 +480,7 @@ class Runner {
 
             while (!$exit) {
                 $args = $this->readInteractiv();
+                $this->setArgsVector($args);
                 $argsCount = count($args);
 
                 if ($argsCount == 0) {
@@ -493,10 +503,12 @@ class Runner {
         }
     }
     private function checkIsIntr() {
-        if (isset($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $arg) {
-                $this->isInteractive = $arg == '-i' || $this->isInteractive;
-            }
+        if ($this->isInteractive === true) {
+            return;
+        }
+        
+        foreach ($this->getArgsVector() as $arg) {
+            $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
     private function readInteractiv() {
@@ -511,7 +523,12 @@ class Runner {
      * @return type
      */
     private function run() {
-        $argsArr = array_splice($_SERVER['argv'], 1);
+        $v = $this->getArgsVector();
+        $argsArr = array_splice($v, 1);
+        
+        if (count($argsArr) == 0) {
+            $argsArr = array_splice($_SERVER['argv'], 1);
+        }
 
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
@@ -530,6 +547,6 @@ class Runner {
                 $argV[] = $argName.'='.$argVal;
             }
         }
-        $_SERVER['argv'] = $argV;
+        $this->argsV = $argV;
     }
 }

@@ -436,14 +436,14 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest19() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            '-i',
-        ];
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->register(new WithExceptionCommand());
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
         $runner->setInput([
             '',
             '',

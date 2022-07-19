@@ -101,10 +101,15 @@ class CommandArgument {
      * the method will return its value. If provided without any value,
      * the method will return empty string. If not provided, null is returned.
      */
-    public static function extractValue(string $argName) {
+    public static function extractValue(string $argName, Runner $runner = null) {
         $trimmedOptName = trim($argName);
-
-        foreach ($_SERVER['argv'] as $option) {
+        
+        if ($runner !== null) {
+            $argsV = $runner->getArgsVector();
+        } else {
+            $argsV = $_SERVER;
+        }
+        foreach ($argsV as $option) {
             $optionClean = filter_var($option, FILTER_DEFAULT);
             $optExpl = explode('=', $optionClean);
             $optionNameFromCLI = $optExpl[0];

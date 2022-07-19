@@ -408,7 +408,7 @@ abstract class CLICommand {
                 return $arg->getValue();
             }
 
-            return CommandArgument::extractValue($trimmedOptName);
+            return CommandArgument::extractValue($trimmedOptName, $this->getOwner());
         }
     }
     /**
