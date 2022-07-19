@@ -232,16 +232,15 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function runnerTest10() {
-        $_SERVER['argv'] = [
-            'entry.php',
-            'help',
-            '--command-name' => 'super-hero'
-        ];
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
-
         $runner->setInput([]);
+        $runner->setArgsVector([
+            'entry.php',
+            'help',
+            '--command-name' => 'super-hero'
+        ]);
         $runner->start();
         $this->assertEquals([
             "    super-hero:     A command to display hero's name.\n",
