@@ -110,7 +110,7 @@ class KeysMap {
             self::appendChar($char, $input);
         }
 
-        return $input;
+        return trim($input);
     }
     private static function appendChar($ch, &$input) {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
