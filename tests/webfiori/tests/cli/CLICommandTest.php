@@ -432,7 +432,7 @@ class CLICommandTest extends TestCase {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
         $command->setInputStream(new ArrayInputStream([
-            'My Name Is Ibrahim',
+            "My Name Is Ibrahim\r\n",
         ]));
         $input = $command->getInput('   ');
         $this->assertNull($input);
@@ -582,12 +582,12 @@ class CLICommandTest extends TestCase {
         $command->setOutputStream(new ArrayOutputStream());
         $command->setInputStream(new ArrayInputStream([
             '445',
-            "Hello World!",
+            "Hello World!\r\n",
             "Super"
         ]));
         $this->assertEquals('445', $command->readln());
         $this->assertEquals('Hello', $command->read(5));
-        $this->assertEquals(' World!', $command->readln());
+        $this->assertEquals(" World!\r\n", $command->readln());
         $this->assertEquals('Super', $command->readln());
     }
     /**

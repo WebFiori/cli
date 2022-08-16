@@ -20,7 +20,7 @@ class FileInputOutputStreamsTest extends TestCase {
         
         $stream = new FileInputStream(self::STREAMS_PATH.'stream1.txt');
         $line = $stream->readLine();
-        $this->assertEquals('Hello World!', $line);
+        $this->assertEquals("Hello World!\n", $line);
     }
     /**
      * @test
@@ -30,7 +30,7 @@ class FileInputOutputStreamsTest extends TestCase {
         $this->expectExceptionMessage('Unable to read 1 byte(s) due to an error: "Reached end of file while trying to read 1 byte(s)."');
         $stream = new FileInputStream(self::STREAMS_PATH.'stream1.txt');
         $line = $stream->readLine();
-        $this->assertEquals('Hello World!', $line);
+        $this->assertEquals("Hello World!\n", $line);
         $stream->readLine();
     }
     /**
@@ -66,13 +66,13 @@ class FileInputOutputStreamsTest extends TestCase {
      */
     public function testInputStream05() {
         $stream = new FileInputStream(self::STREAMS_PATH.'stream2.txt');
-        $this->assertEquals("My", $stream->readLine());
-        $this->assertEquals("Name Is ", $stream->readLine());
+        $this->assertEquals("My\n", $stream->readLine());
+        $this->assertEquals("Name Is \n", $stream->readLine());
         $this->assertEquals("Super", $stream->read(5));
-        $this->assertEquals(" Hero Ibrahim", $stream->readLine());
+        $this->assertEquals(" Hero Ibrahim\n", $stream->readLine());
         $this->assertEquals("Even Though I'm Not A Hero\nBut ", $stream->read(31));
-        $this->assertEquals('I\'m A', $stream->readLine());
-        $this->assertEquals("Hero in Programming", $stream->readLine());
+        $this->assertEquals("I'm A\n", $stream->readLine());
+        $this->assertEquals("Hero in Programming\n", $stream->readLine());
     }
     /**
      * @test
@@ -81,7 +81,7 @@ class FileInputOutputStreamsTest extends TestCase {
         $stream = new FileOutputStream(self::STREAMS_PATH.'output-stream1.txt');
         $stream2 = new FileInputStream(self::STREAMS_PATH.'output-stream1.txt');
         $stream->println('Hello World!');
-        $this->assertEquals("Hello World!", $stream2->readLine());
+        $this->assertEquals("Hello World!\n", $stream2->readLine());
     }
     /**
      * @test
@@ -91,7 +91,7 @@ class FileInputOutputStreamsTest extends TestCase {
         $stream2 = new FileInputStream(self::STREAMS_PATH.'output-stream1.txt');
         $stream->prints('Hello Mr %s!', 'Ibrahim');
         $stream->println('');
-        $this->assertEquals("Hello Mr Ibrahim!", $stream2->readLine());
+        $this->assertEquals("Hello Mr Ibrahim!\n", $stream2->readLine());
     }
     /**
      * @test
@@ -101,6 +101,6 @@ class FileInputOutputStreamsTest extends TestCase {
         $stream2 = new FileInputStream(self::STREAMS_PATH.'output-stream1.txt');
         $stream->prints('Im Cool');
         $stream->println('. You are cool.');
-        $this->assertEquals("Im Cool. You are cool.", $stream2->readLine());
+        $this->assertEquals("Im Cool. You are cool.\n", $stream2->readLine());
     }
 }

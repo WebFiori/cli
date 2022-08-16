@@ -17,7 +17,7 @@ class KeysMapTest extends TestCase {
         $stream = new ArrayInputStream([
             "\e"
         ]);
-        $this->assertEquals(" ", KeysMap::read($stream));
+        $this->assertEquals("\e", KeysMap::read($stream));
     }
     /**
      * @test
@@ -26,7 +26,7 @@ class KeysMapTest extends TestCase {
         $stream = new ArrayInputStream([
             "\r"
         ]);
-        $this->assertEquals(" ", KeysMap::read($stream));
+        $this->assertEquals("\r", KeysMap::read($stream));
     }
     /**
      * @test
@@ -35,6 +35,7 @@ class KeysMapTest extends TestCase {
         $stream = new ArrayInputStream([
             "\r\n"
         ]);
-        $this->assertEquals(" ", KeysMap::read($stream));
+        $this->assertEquals("\r", KeysMap::read($stream));
+        $this->assertEquals("\n", KeysMap::read($stream));
     }
 }

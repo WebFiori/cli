@@ -446,7 +446,8 @@ abstract class CLICommand {
      * which can be passed to the validation callback.
      * 
      * @return string The method will return the value which was taken from the 
-     * user.
+     * user. Note that if the input has special characters or spaces at the
+     * beginning or the end, they will be trimmed.
      * 
      * @since 1.0
      */
@@ -466,7 +467,7 @@ abstract class CLICommand {
                     ]);
                 }
                 $this->println();
-                $input = $this->readln();
+                $input = trim($this->readln());
 
                 $check = $this->getInputHelper($input, $validator, $default);
 
