@@ -107,25 +107,27 @@ class KeysMap {
 
         while ($char != 'LF') {
             $char = self::readAndTranslate($stream);
-            self::appendChar($char, $input);
+            if ($char != 'LF') {
+                self::appendChar($char, $input);
+            }
         }
 
-        return trim($input);
+        return $input;
     }
     private static function appendChar($ch, &$input) {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
             $input = substr($input, 0, strlen($input) - 1);
         } else if ($ch == 'ESC') {
-            $input .= ' ';
+            //$input .= ' ';
         } else if ($ch == 'CR') {
             // Do nothing?
-            $input .= ' ';
+            //$input .= ' ';
         } else if ($ch == 'DOWN') {
             // read history;
-            $input .= ' ';
+            //$input .= ' ';
         } else if ($ch == 'UP') {
             // read history;
-            $input .= ' ';
+            //$input .= ' ';
         } else if ($ch != 'CR' && $ch != 'LF') {
             if ($ch == 'SPACE') {
                 $input .= ' ';
