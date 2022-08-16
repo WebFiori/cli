@@ -38,7 +38,20 @@ class KeysMap {
      * value is returned as string. For expmple, if the character is '\n',
      * the method will return the value "LF" which stands for "line feed". If the
      * character does not map to any control character, the same character is
-     * returned.
+     * returned. Possible return values are:
+     * <ul>
+     * <li>TAP for control character \t</li>
+     * <li>ESC for control character \e</li>
+     * <li>BACKSPACE for control character \010 and \177</li>
+     * <li>SPACE for control character 'space'</li>
+     * <li>CR for control character \r</li>
+     * <li>LF for control character \n</li>
+     * <li>UP for control character \033[A</li>
+     * <li>DOWN for control character \033[B</li>
+     * <li>RIGHT for control character \033[C</li>
+     * <li>LEFT for control character \033[D</li>
+     * 
+     * </ul>
      */
     public static function map($ch) {
         $keyMap = self::KEY_MAP;
@@ -97,7 +110,8 @@ class KeysMap {
      * @param InputStream $stream
      * 
      * @return string The method will return the string which was taken from 
-     * the stream without the end of line character.
+     * the stream. Note that end of line character will be included in the
+     * final input.
      * 
      * @since 1.0
      */
@@ -107,9 +121,7 @@ class KeysMap {
 
         while ($char != 'LF') {
             $char = self::readAndTranslate($stream);
-            if ($char != 'LF') {
-                self::appendChar($char, $input);
-            }
+            self::appendChar($char, $input);
         }
 
         return $input;
@@ -118,10 +130,13 @@ class KeysMap {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
             $input = substr($input, 0, strlen($input) - 1);
         } else if ($ch == 'ESC') {
-            //$input .= ' ';
-        } else if ($ch == 'CR') {
+            $input .= "\e";
+        } else if ($ch == "CR") {
             // Do nothing?
-            //$input .= ' ';
+            $input .= "\r";
+        } else if ($ch == "LF") {
+            // Do nothing?
+            $input .= "\n";
         } else if ($ch == 'DOWN') {
             // read history;
             //$input .= ' ';
