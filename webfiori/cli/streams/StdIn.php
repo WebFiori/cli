@@ -3,7 +3,7 @@ namespace webfiori\cli\streams;
 
 use webfiori\cli\KeysMap;
 /**
- * A class that implements default standard output for command line interface.
+ * A class that implements default standard input for command line interface.
  *
  * @author Ibrahim
  * 
@@ -13,30 +13,10 @@ use webfiori\cli\KeysMap;
  */
 class StdIn implements InputStream {
     /**
-     * An array that holds a map of special keyboard keys codes and the 
-     * meaning of each code.
-     * 
-     * @var array
-     * 
-     * @since 1.0
-     */
-    const KEY_MAP = [
-        "\033[A" => 'UP',
-        "\033[B" => 'DOWN',
-        "\033[C" => 'RIGHT',
-        "\033[D" => 'LEFT',
-        "\n" => 'LF',
-        "\r" => 'CR',
-        " " => 'SPACE',
-        "\010" => 'BACKSPACE',
-        "\177" => 'BACKSPACE',
-        "\t" => 'TAP',
-        "\e" => 'ESC'
-    ];
-    /**
      * Reads a string of bytes from STDIN.
      * 
-     * This method is used to read specific number of characters from STDIN.
+     * This method is used to read specific number of characters from STDIN. Each
+     * character is represented as a single byte.
      * 
      * @return string The method will return the string which was given as input 
      * in STDIN.
