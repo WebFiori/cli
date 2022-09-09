@@ -2,12 +2,14 @@
 namespace webfiori\tests\cli;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\cli\CommandArgument;
+use webfiori\cli\exceptions\IOException;
+use webfiori\cli\InputValidator;
 use webfiori\cli\Runner;
-use webfiori\tests\cli\TestCommand;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
-use webfiori\cli\CommandArgument;
-use webfiori\cli\InputValidator;
+use webfiori\tests\cli\TestCommand;
+use webfiori\tests\TestStudent;
 
 class CLICommandTest extends TestCase {
     /**
@@ -678,6 +680,171 @@ class CLICommandTest extends TestCase {
             "Give me a float: Enter = '88'\n",
             "Error: Provided value is not a floating number!\n",
             "Give me a float: Enter = '88'\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadInstance00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '\\webfiori\\tests\\TestStudentXO',
+            '\\webfiori\\tests\\TestStudent',
+        ]));
+        $input = $command->readInstance('Give me class:', 'Not a class!');
+        $this->assertTrue($input instanceof TestStudent);
+        $this->assertequals([
+            "Give me class:\n",
+            "Error: Not a class!\n",
+            "Give me class:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadClassName00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'SuperClass',
+        ]));
+        $input = $command->readClassName('Give me class name:');
+        $this->assertEquals('SuperClass', $input);
+        $this->assertequals([
+            "Give me class name:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadClassName01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'Super Class',
+            "ValidSuper"
+        ]));
+        $input = $command->readClassName('Give me class name:', 'Not valid Class Name!');
+        $this->assertEquals('ValidSuper', $input);
+        $this->assertequals([
+            "Give me class name:\n",
+            "Error: Not valid Class Name!\n",
+            "Give me class name:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace00() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '\\webfiori\\tests\\',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:');
+        $this->assertEquals('\\webfiori\\tests\\', $input);
+        $this->assertequals([
+            "Give me class namespace:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '\\webfiori\\tests',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:');
+        $this->assertEquals('\\webfiori\\tests', $input);
+        $this->assertequals([
+            "Give me class namespace:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'webfiori\\tests',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:');
+        $this->assertEquals('webfiori\\tests', $input);
+        $this->assertequals([
+            "Give me class namespace:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace03() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '/webfiori\\tests',
+            "",
+            'webfiori\\tests',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:', null, "Please provide a valid NS!");
+        $this->assertEquals('webfiori\\tests', $input);
+        $this->assertequals([
+            "Give me class namespace:\n",
+            "Error: Please provide a valid NS!\n",
+            "Give me class namespace:\n",
+            "Error: Please provide a valid NS!\n",
+            "Give me class namespace:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace04() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '\\',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:', null, "Please provide a valid NS!");
+        $this->assertEquals('\\', $input);
+        $this->assertequals([
+            "Give me class namespace:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace05() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:', 'wfx\\xyz', "Please provide a valid NS!");
+        $this->assertEquals('wfx\\xyz', $input);
+        $this->assertequals([
+            "Give me class namespace: Enter = 'wfx\xyz'\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadNamespace06() {
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('Provided default namespace is not valid.');
+        
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '',
+        ]));
+        $input = $command->readNamespace('Give me class namespace:', 'wfx//xyz', "Please provide a valid NS!");
+        $this->assertEquals('wfx\\xyz', $input);
+        $this->assertequals([
+            "Give me class namespace: Enter = 'wfx\xyz'\n",
         ], $command->getOutputStream()->getOutputArray());
     }
     /**

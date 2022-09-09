@@ -1,6 +1,8 @@
 <?php
 namespace webfiori\cli;
 
+use Throwable;
+
 /**
  * A class which is used to validate input using a callback.
  *
@@ -15,7 +17,8 @@ class InputValidator {
      * Creates new instance of the class.
      * 
      * @param callable $func The function that will be used to validate input.
-     * It must return true for valid input and false for invalid.
+     * It must return true for valid input and false for invalid. The first parameter
+     * of the function will be the input.
      * 
      * @param string $errMessage The message that will appear in case the user
      * provided invalid value.
@@ -37,10 +40,97 @@ class InputValidator {
      * Returns the string that should be shown to the user if the validation 
      * fails.
      * 
-     * @return string
+     * @return string The string that should be shown to the user if the validation 
+     * fails. Default value is 'Invalid input is given. Try again.'.
      */
     public function getErrPrompt() : string {
         return $this->errPrompt;
+    }
+    /**
+     * Checks if a string represents a valid class or not.
+     * 
+     * Note that the method will attempt to create an instance of the given
+     * class to check validity.
+     * 
+     * @param string $classNs The namespace of the class.
+     * 
+     * @return bool If the class exist and loaded, the method will return 
+     * true. Other than that, false is returned.
+     */
+    public static function isClass(string $classNs) : bool {
+        try {
+            if (class_exists($classNs)) {
+                $clazz = new $classNs();
+                return true;
+            }
+        } catch (Throwable $ex) {
+            return false;
+        }
+        return false;
+    }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     * 
+     * @param string $ns A string to be validated.
+     * 
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) {
+        if ($ns == '\\') {
+            return true;
+        }
+        if (strlen($ns) == 0) {
+            return false;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    /**
+     * Checks if a given string represents a valid class name or not.
+     * 
+     * @param string $name A string to check such as 'My_Super_Class'.
+     * 
+     * @return bool If the given string is a valid class name, the method
+     * will return true. False otherwise.
+     */
+    public static function isValidClassName(string $name) : bool {
+        $len = strlen($name);
+
+        if ($len > 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $name[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * Checks if given string represents floating number or not.

@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\cli;
 
+use webfiori\cli\exceptions\IOException;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 /**
@@ -790,6 +791,76 @@ abstract class CLICommand {
         {
             return InputValidator::isInt($val);
         }, 'Provided value is not an integer!'));
+    }
+    /**
+     * Reads the namespace of class and return an instance of it.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     *  
+     * @param string $errMsg A string to show in case provided namespace is
+     * invalid or an instance of the class cannot be created.
+     * 
+     * @return object The method will return an instance of the class.
+     */
+    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!') {
+        $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input) {
+            
+            if (InputValidator::isClass($input)) {
+                return true;
+            }
+            return false;
+        }, $errMsg));
+        
+        return new $clazzNs();
+    }
+    /**
+     * Reads a string that represents class name.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     * 
+     * @param string $errMsg A string that will be shown if provided input does
+     * not represent a valid class name.
+     * 
+     * @return string The method will return a string that represent a valid class name.
+     */
+    public function readClassName(string $prompt, string $errMsg = 'Invalid Class Name!') {
+        return $this->getInput($prompt, null, new InputValidator(function ($input) {
+            $trimmed = trim($input);
+            if (InputValidator::isValidClassName($input)) {
+                return true;
+            }
+            return false;
+        }, $errMsg));
+    }
+    /**
+     * Reads a string that represents class namespace.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     * 
+     * @param string $defaultNs A default string that represents default namespace.
+     * Note that the method will throw an exception if this parameter does not
+     * represent a valid namespace.
+     * 
+     * @param string $errMsg A string that will be shown if provided input does
+     * not represent a valid namespace.
+     * 
+     * @return string The method will return a string that represent a valid namespace.
+     */
+    public function readNamespace(string $prompt, string $defaultNs = null, string $errMsg = 'Invalid Namespace!') {
+        if ($defaultNs !== null && !InputValidator::isValidNamespace($defaultNs)) {
+            throw new IOException('Provided default namespace is not valid.');
+        }
+        return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input) {
+            $trimmed = trim($input);
+            if (InputValidator::isValidNamespace($input)) {
+                return true;
+            }
+            return false;
+        }, $errMsg));
+        
     }
     /**
      * Reads one line from input stream.
