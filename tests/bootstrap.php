@@ -54,5 +54,6 @@ require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command00.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command01.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/WithExceptionCommand.php';
 require_once $rootDir.'/tests/webfiori/tests/TestStudent.php';
+require_once $rootDir.'/tests/webfiori/tests/TestStudent2.php';
 
 

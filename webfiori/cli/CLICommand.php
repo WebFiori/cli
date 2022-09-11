@@ -861,7 +861,7 @@ abstract class CLICommand {
             throw new IOException('Provided default namespace is not valid.');
         }
         return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input) {
-            $trimmed = trim($input);
+            
             if (InputValidator::isValidNamespace($input)) {
                 return true;
             }
@@ -1233,7 +1233,7 @@ abstract class CLICommand {
         ];
 
         if (strlen($input) == 0 && $default !== null) {
-            $retVal['value'] = $default;
+            $input = $default;
         } else if ($validator !== null) {
             $retVal['valid'] = $validator->isValid($input);
 

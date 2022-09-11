@@ -703,6 +703,24 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function testReadInstance01() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '\\webfiori\\tests\\TestStudent2',
+            '\\webfiori\\tests\\TestStudent',
+        ]));
+        $input = $command->readInstance('Give me class:', 'Not a class!');
+        $this->assertTrue($input instanceof TestStudent);
+        $this->assertequals([
+            "Give me class:\n",
+            "Error: Not a class!\n",
+            "Give me class:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testReadClassName00() {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
@@ -780,7 +798,7 @@ class CLICommandTest extends TestCase {
             "ValidSuperXUYYS"
         ]));
         $input = $command->readClassName('Give me class name:', '12X', 'Not valid Class Name!');
-        $this->assertEquals('ValidSuperXUYYS', $input);
+        $this->assertEquals('ValidSuperXUYYS12X', $input);
         $this->assertequals([
             "Give me class name:\n",
             "Error: Not valid Class Name!\n",

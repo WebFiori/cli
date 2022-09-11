@@ -26,4 +26,30 @@ class InputValidatorTest extends TestCase {
         $this->assertTrue(InputValidator::isFloat('77.9'));
         $this->assertFalse(InputValidator::isFloat('6&r7.90'));
     }
+    /**
+     * @test
+     */
+    public function testIsValidClassName00() {
+        $this->assertFalse(InputValidator::isValidClassName(''));
+        $this->assertFalse(InputValidator::isValidClassName('Hello World'));
+        $this->assertFalse(InputValidator::isValidClassName('Hello=World'));
+        $this->assertTrue(InputValidator::isValidClassName('Hello9World'));
+        $this->assertFalse(InputValidator::isValidClassName('7HelloWorld'));
+        $this->assertTrue(InputValidator::isValidClassName('HelloWorld0'));
+        $this->assertFalse(InputValidator::isValidClassName('!HelloWorld'));
+        $this->assertFalse(InputValidator::isValidClassName('Hello\World'));
+    }
+    /**
+     * @test
+     */
+    public function testIsValidNs00() {
+        $this->assertFalse(InputValidator::isValidNamespace(''));
+        $this->assertFalse(InputValidator::isValidNamespace('//'));
+        $this->assertTrue(InputValidator::isValidNamespace('\\'));
+        $this->assertTrue(InputValidator::isValidNamespace('\\HelloWorld'));
+        $this->assertTrue(InputValidator::isValidNamespace('\\HelloWorld\\'));
+        $this->assertFalse(InputValidator::isValidNamespace('\\7elloWorld'));
+        $this->assertFalse(InputValidator::isValidNamespace('\\HelloWorld\HelloIbrahim\\7ood'));
+        $this->assertTrue(InputValidator::isValidNamespace('\\HelloWorld\HelloIbrahim\\Uood7'));
+    }
 }
