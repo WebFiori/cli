@@ -815,24 +815,31 @@ abstract class CLICommand {
         return new $clazzNs();
     }
     /**
-     * Reads a string that represents class name.
+     * Reads and validates class name.
      * 
-     * @param string $prompt The string that will be shown to the user. The 
-     * string must be non-empty.
+     * @param string|null $suffix An optional string to append to class name.
      * 
-     * @param string $errMsg A string that will be shown if provided input does
-     * not represent a valid class name.
+     * @param string $prompt The text that will be shown to the user as prompt for
+     * class name.
      * 
-     * @return string The method will return a string that represent a valid class name.
+     * @param string $errMsg A string to show in case provided class name is
+     * not valid.
+     * 
+     * @return string A string that represents a valid class name. If suffix is
+     * not null, the method will return the name with the suffix included.
      */
-    public function readClassName(string $prompt, string $errMsg = 'Invalid Class Name!') {
-        return $this->getInput($prompt, null, new InputValidator(function ($input) {
-            $trimmed = trim($input);
-            if (InputValidator::isValidClassName($input)) {
-                return true;
+    public function readClassName(string $prompt, $suffix = null, string $errMsg = 'Invalid class name is given.') {
+        return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix) {
+            if ($suffix !== null) {
+                $subSuffix = substr($className, strlen($className) - strlen($suffix));
+
+                if ($subSuffix != $suffix) {
+                    $className .= $suffix;
+                }
             }
-            return false;
-        }, $errMsg));
+            
+            return InputValidator::isValidClassName($className);
+        }, $errMsg, [$suffix]));
     }
     /**
      * Reads a string that represents class namespace.
@@ -1220,10 +1227,9 @@ abstract class CLICommand {
      * 'value'. The 'valid' index contains a boolean that is set to true if the 
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper($input, InputValidator $validator = null, $default = null) {
+    private function getInputHelper(&$input, InputValidator $validator = null, $default = null) {
         $retVal = [
-            'valid' => true,
-            'value' => $input
+            'valid' => true
         ];
 
         if (strlen($input) == 0 && $default !== null) {
@@ -1235,7 +1241,7 @@ abstract class CLICommand {
                 $this->error($validator->getErrPrompt());
             }
         }
-
+        $retVal['value'] = $input;
         return $retVal;
     }
     private function printMsg(string $msg, string $prefix, string $color) {

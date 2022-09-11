@@ -725,8 +725,62 @@ class CLICommandTest extends TestCase {
             'Super Class',
             "ValidSuper"
         ]));
-        $input = $command->readClassName('Give me class name:', 'Not valid Class Name!');
+        $input = $command->readClassName('Give me class name:', null, 'Not valid Class Name!');
         $this->assertEquals('ValidSuper', $input);
+        $this->assertequals([
+            "Give me class name:\n",
+            "Error: Not valid Class Name!\n",
+            "Give me class name:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadClassName02() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'Super Class',
+            "ValidSuper"
+        ]));
+        $input = $command->readClassName('Give me class name:', 'Suffix', 'Not valid Class Name!');
+        $this->assertEquals('ValidSuperSuffix', $input);
+        $this->assertequals([
+            "Give me class name:\n",
+            "Error: Not valid Class Name!\n",
+            "Give me class name:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadClassName03() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'Super Class',
+            "ValidSuperXUYYS"
+        ]));
+        $input = $command->readClassName('Give me class name:', 'XUYYS', 'Not valid Class Name!');
+        $this->assertEquals('ValidSuperXUYYS', $input);
+        $this->assertequals([
+            "Give me class name:\n",
+            "Error: Not valid Class Name!\n",
+            "Give me class name:\n",
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testReadClassName04() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            'Super Class',
+            "ValidSuperXUYYS"
+        ]));
+        $input = $command->readClassName('Give me class name:', '12X', 'Not valid Class Name!');
+        $this->assertEquals('ValidSuperXUYYS', $input);
         $this->assertequals([
             "Give me class name:\n",
             "Error: Not valid Class Name!\n",

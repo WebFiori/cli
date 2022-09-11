@@ -193,13 +193,15 @@ class InputValidator {
     /**
      * Execute the validation function.
      * 
-     * @param string $input The input that will be validated.
+     * @param string $input The input that will be validated. Note that if
+     * the value of the input is changed on the validation callback, it will
+     * affect original variable as the passed value is a reference.
      * 
      * @return bool The return value of this method will depends on the implementation
      * of the validation callback. If it returns true, the method will
      * return true. If it returns false, the method will return false.
      */
-    public function isValid(string $input) : bool {
-        return call_user_func_array($this->callback, array_merge([$input], $this->params));
+    public function isValid(string &$input) : bool {
+        return call_user_func_array($this->callback, array_merge([&$input], $this->params));
     }
 }
