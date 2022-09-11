@@ -30,6 +30,7 @@ class InputValidatorTest extends TestCase {
      * @test
      */
     public function testIsValidClassName00() {
+        $this->assertFalse(InputValidator::isValidClassName(''));
         $this->assertFalse(InputValidator::isValidClassName('Hello World'));
         $this->assertFalse(InputValidator::isValidClassName('Hello=World'));
         $this->assertTrue(InputValidator::isValidClassName('Hello9World'));
@@ -42,6 +43,7 @@ class InputValidatorTest extends TestCase {
      * @test
      */
     public function testIsValidNs00() {
+        $this->assertFalse(InputValidator::isValidNamespace(''));
         $this->assertFalse(InputValidator::isValidNamespace('//'));
         $this->assertTrue(InputValidator::isValidNamespace('\\'));
         $this->assertTrue(InputValidator::isValidNamespace('\\HelloWorld'));
