@@ -780,7 +780,7 @@ class CLICommandTest extends TestCase {
             "ValidSuperXUYYS"
         ]));
         $input = $command->readClassName('Give me class name:', '12X', 'Not valid Class Name!');
-        $this->assertEquals('ValidSuperXUYYS', $input);
+        $this->assertEquals('ValidSuperXUYYS12X', $input);
         $this->assertequals([
             "Give me class name:\n",
             "Error: Not valid Class Name!\n",
