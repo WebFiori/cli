@@ -135,7 +135,8 @@ abstract class CLICommand {
      * Adds multiple arguments to the command.
      * 
      * @param array $arr An associative array of sub associative arrays. The 
-     * key of each sub array is argument name. Each 
+     * key of each sub array is argument name. This can also be
+     * an array of objects of type 'CommandArgument'. For arrays, Each 
      * sub-array can have the following indices:
      * <ul>
      * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
@@ -155,7 +156,12 @@ abstract class CLICommand {
         $this->commandArgs = [];
 
         foreach ($arr as $optionName => $options) {
-            $this->addArg($optionName, $options);
+            
+            if ($options instanceof CommandArgument) {
+                $this->addArgument($options);
+            } else {
+                $this->addArg($optionName, $options);
+            }
         }
     }
     /**
