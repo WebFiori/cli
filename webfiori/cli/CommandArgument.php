@@ -13,14 +13,25 @@ class CommandArgument {
     private $isOptional;
     private $name;
     private $value;
-    public function __construct(string $name = 'arg') {
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param string $name The name of the argument such as '--version'.
+     * 
+     * @param string $description A short description of the argument and how
+     * it affects the execution of the command that it belongs to.
+     * 
+     * @param bool $optional If set to true, the argument will be considered as
+     * optional.
+     */
+    public function __construct(string $name = 'arg', string $description = '', bool $optional = false) {
         if (!$this->setName($name)) {
             $this->name = 'arg';
         }
-        $this->isOptional = false;
+        $this->isOptional = $optional;
         $this->allowedVals = [];
         $this->default = '';
-        $this->description = '';
+        $this->description = $description;
     }
     /**
      * Adds a value to the set of allowed argument values.
