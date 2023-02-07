@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\cli\streams;
 
+use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 /**
  * A class that implements output stream which can be based on files.
@@ -17,7 +18,7 @@ class FileOutputStream implements OutputStream {
      * @param string $path The absolute path to the file that CLI engine
      * will send outputs to.
      */
-    public function __construct($path) {
+    public function __construct(string $path) {
         $this->file = new File($path);
         $this->reset();
     }
@@ -38,15 +39,17 @@ class FileOutputStream implements OutputStream {
         }
         call_user_func_array([$this, 'prints'], $toPass);
     }
+
     /**
      * Send a line of string to the stream as output.
-     * 
+     *
      * Note that the given string will be appended to the string
      * where the pointer is currently at.
-     * 
+     *
      * @param string $str The string that will be sent.
-     * 
+     *
      * @param type $_ Any extra arguments to supply to the output.
+     * @throws FileException
      */
     public function prints(string $str, ...$_) {
         $arrayToPass = [
@@ -65,11 +68,13 @@ class FileOutputStream implements OutputStream {
         $this->file->setRawData($toWrite);
         $this->file->write();
     }
+
     /**
      * Removes the file that represents output stream and re-create it.
+     * @throws FileException
      */
     public function reset() {
         $this->file->remove();
-        $this->file->create();
+        $this->file->create(true);
     }
 }

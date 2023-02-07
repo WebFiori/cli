@@ -69,7 +69,7 @@ class CommandArgument {
      * @return CommandArgument|null If the instance is created, the method will
      * return it as an object. Other than that, null is returned.
      */
-    public static function create($name, $options) {
+    public static function create(string $name, array $options) {
         if (strlen($name) == 0) {
             return null;
         }

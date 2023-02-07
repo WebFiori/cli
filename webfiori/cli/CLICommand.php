@@ -117,7 +117,7 @@ abstract class CLICommand {
      * be converted to the string 'n'.</li>
      * </ul>
      * 
-     * @return boolean If the argument is added, the method will return true. 
+     * @return bool If the argument is added, the method will return true.
      * Other than that, the method will return false.
      * 
      * @since 1.0
@@ -169,7 +169,7 @@ abstract class CLICommand {
      * 
      * @param CommandArgument $arg The argument that will be added.
      * 
-     * @return boolean If the argument is added, the method will return true.
+     * @return bool If the argument is added, the method will return true.
      * If not, false is returned. The argument will not be added only if an argument
      * which has same name is added.
      */
@@ -192,7 +192,7 @@ abstract class CLICommand {
      * @param int $numberOfCols Number of columns to clear. The columns that 
      * will be cleared are before and after cursor position. They don't include 
      * the character at which the cursor is currently pointing to.
-     * @param boolean $beforeCursor If set to true, the characters which 
+     * @param bool $beforeCursor If set to true, the characters which
      * are before the cursor will be cleared. Default is true.
      * 
      * @since 1.0
@@ -252,10 +252,10 @@ abstract class CLICommand {
      * 
      * @param string $confirmTxt The text of the question which will be asked. 
      * 
-     * @return boolean If the user choose 'y', the method will return true. If 
+     * @return bool If the user choose 'y', the method will return true. If
      * he choose 'n', the method will return false. 
      * 
-     * @param boolean|null $default Default answer to use if empty input is given. 
+     * @param bool|null $default Default answer to use if empty input is given.
      * It can be true for 'y' and false for 'n'. Default value is null which 
      * means no default will be used.
      * 
@@ -422,7 +422,7 @@ abstract class CLICommand {
      * Returns the description of the command.
      * 
      * The description of the command is a string that describes what does the 
-     * command do and it will appear in CLI if the command 'help' is executed.
+     * command do, and it will appear in CLI if the command 'help' is executed.
      * 
      * @return string The description of the command. Default return value 
      * is '&lt;NO DESCRIPTION&gt;'
@@ -432,38 +432,38 @@ abstract class CLICommand {
     public function getDescription() : string {
         return $this->description;
     }
+
     /**
      * Take an input value from the user.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
+     *
+     * @param string $prompt The string that will be shown to the user. The
      * string must be non-empty.
-     * 
-     * @param string $default An optional default value to use in case the user 
-     * hit "Enter" without entering any value. If null is passed, no default 
+     *
+     * @param string|null $default An optional default value to use in case the user
+     * hit "Enter" without entering any value. If null is passed, no default
      * value will be set.
-     * 
-     * @param callable $validator A callback that can be used to validate user 
-     * input. The callback accepts one parameter which is the value that 
-     * the user has given. If the value is valid, the callback must return true. 
-     * If the callback returns anything else, it means the value which is given 
-     * by the user is invalid and this method will ask the user to enter the 
+     *
+     * @param InputValidator|null $validator A callback that can be used to validate user
+     * input. The callback accepts one parameter which is the value that
+     * the user has given. If the value is valid, the callback must return true.
+     * If the callback returns anything else, it means the value which is given
+     * by the user is invalid and this method will ask the user to enter the
      * value again.
-     * 
-     * @param array $validatorParams An optional array that can hold extra parameters
-     * which can be passed to the validation callback.
-     * 
-     * @return string The method will return the value which was taken from the 
+     *
+     * @return string|null The method will return the value which was taken from the
      * user. Note that if the input has special characters or spaces at the
      * beginning or the end, they will be trimmed.
-     * 
+     *
      * @since 1.0
      */
-    public function getInput(string $prompt, $default = null, InputValidator $validator = null) {
-        $trimidPrompt = trim($prompt);
-
-        if (strlen($trimidPrompt) > 0) {
+    public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
+        $trimmed = trim($prompt);
+        if (strlen($trimmed) == 0) {
+            $trimmed = 'Waiting for your input: ';
+        }
+        if (strlen($trimmed) > 0) {
             do {
-                $this->prints($trimidPrompt, [
+                $this->prints($trimmed, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
@@ -535,13 +535,13 @@ abstract class CLICommand {
      * 
      * @param string $argName The name of the command line argument.
      * 
-     * @return boolean If the argument is added to the command, the method will 
+     * @return bool If the argument is added to the command, the method will
      * return true. If no argument which has the given name does exist, the method 
      * will return false.
      * 
      * @since 1.0
      */
-    public function hasArg(string $argName) {
+    public function hasArg(string $argName) : bool {
         foreach ($this->getArgs() as $arg) {
             if ($arg->getName() == $argName) {
                 return true;
@@ -570,12 +570,12 @@ abstract class CLICommand {
      * 
      * @param string $argName The name of the command line argument.
      * 
-     * @return boolean If the argument is provided, the method will return 
+     * @return bool If the argument is provided, the method will return
      * true. Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public function isArgProvided(string $argName) {
+    public function isArgProvided(string $argName) : bool {
         $argObj = $this->getArg($argName);
 
 
@@ -759,19 +759,20 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function read(int $bytes = 1) {
+    public function read(int $bytes = 1) : string {
         return $this->getInputStream()->read($bytes);
     }
+
     /**
      * Reads a value as float.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
+     *
+     * @param string $prompt The string that will be shown to the user. The
      * string must be non-empty.
-     * 
-     * @param int $default An optional default value to use in case the user 
-     * hit "Enter" without entering any value. If null is passed, no default 
+     *
+     * @param float|null $default An optional default value to use in case the user
+     * hit "Enter" without entering any value. If null is passed, no default
      * value will be set.
-     * 
+     *
      * @return float
      */
     public function readFloat(string $prompt, float $default = null) : float {
@@ -809,7 +810,7 @@ abstract class CLICommand {
      * 
      * @return object The method will return an instance of the class.
      */
-    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!') {
+    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
         $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input) {
             
             if (InputValidator::isClass($input)) {
@@ -817,8 +818,9 @@ abstract class CLICommand {
             }
             return false;
         }, $errMsg));
-        
-        return new $clazzNs();
+
+        $reflection = new \ReflectionClass($clazzNs);
+        return $reflection->newInstanceArgs($constructorArgs);
     }
     /**
      * Reads and validates class name.
@@ -834,7 +836,7 @@ abstract class CLICommand {
      * @return string A string that represents a valid class name. If suffix is
      * not null, the method will return the name with the suffix included.
      */
-    public function readClassName(string $prompt, $suffix = null, string $errMsg = 'Invalid class name is given.') {
+    public function readClassName(string $prompt, string $suffix = null, string $errMsg = 'Invalid class name is given.') {
         return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix) {
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));
@@ -847,20 +849,23 @@ abstract class CLICommand {
             return InputValidator::isValidClassName($className);
         }, $errMsg, [$suffix]));
     }
+
     /**
      * Reads a string that represents class namespace.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
+     *
+     * @param string $prompt The string that will be shown to the user. The
      * string must be non-empty.
-     * 
+     *
      * @param string $defaultNs A default string that represents default namespace.
      * Note that the method will throw an exception if this parameter does not
      * represent a valid namespace.
-     * 
+     *
      * @param string $errMsg A string that will be shown if provided input does
      * not represent a valid namespace.
-     * 
+     *
      * @return string The method will return a string that represent a valid namespace.
+     *
+     * @throws IOException If given default namespace does not represent a namespace.
      */
     public function readNamespace(string $prompt, string $defaultNs = null, string $errMsg = 'Invalid Namespace!') {
         if ($defaultNs !== null && !InputValidator::isValidNamespace($defaultNs)) {
@@ -917,8 +922,8 @@ abstract class CLICommand {
      * Ask the user to select one of multiple values.
      * 
      * This method will display a prompt and wait for the user to select 
-     * the a value from a set of values. If the user give something other than the listed values, 
-     * it will shows an error and ask him to select again again. The 
+     * a value from a set of values. If the user give something other than the listed values,
+     * it will show an error and ask him to select again. The
      * user can select an answer by typing its text or its number which will appear 
      * in the terminal.
      * 
@@ -929,8 +934,8 @@ abstract class CLICommand {
      * @param int $defaultIndex The index of the default value in case no value 
      * is selected and the user hit enter.
      * 
-     * @return string The method will return the value which is selected by 
-     * the user.
+     * @return string|null The method will return the value which is selected by
+     * the user. If choices array is empty, null is returned.
      * 
      * @since 1.0
      */
@@ -962,7 +967,7 @@ abstract class CLICommand {
      * 
      * @param string $argValue The value to set.
      * 
-     * @return boolean If the value of the argument is set, the method will return 
+     * @return bool If the value of the argument is set, the method will return
      * true. If not set, the method will return false. The value of the attribute 
      * will be not set in the following cases:
      * <ul>
@@ -973,7 +978,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function setArgValue(string $argName, $argValue = '') {
+    public function setArgValue(string $argName, string $argValue = ''): bool {
         $trimmedArgName = trim($argName);
         $argObj = $this->getArg($trimmedArgName);
 
@@ -987,15 +992,15 @@ abstract class CLICommand {
      * Sets the description of the command.
      * 
      * The description of the command is a string that describes what does the 
-     * command do and it will appear in CLI if the command 'help' is executed.
+     * command do, and it will appear in CLI if the command 'help' is executed.
      * 
      * @param string $str A string that describes the command. It must be non-empty 
      * string.
      * 
-     * @return boolean If the description of the command is set, the method will return 
+     * @return bool If the description of the command is set, the method will return
      * true. Other than that, the method will return false.
      */
-    public function setDescription(string $str) {
+    public function setDescription(string $str) : bool {
         $trimmed = trim($str);
 
         if (strlen($trimmed) > 0) {
@@ -1025,12 +1030,12 @@ abstract class CLICommand {
      * @param string $name The name of the command (such as 'v' or 'help'). 
      * It must be non-empty string and does not contain spaces.
      * 
-     * @return boolean If the name of the command is set, the method will return 
+     * @return bool If the name of the command is set, the method will return
      * true. Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public function setName(string $name) {
+    public function setName(string $name) : bool {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
@@ -1046,10 +1051,10 @@ abstract class CLICommand {
      * 
      * The runner is the instance that will execute the command.
      * 
-     * @param Runner $ouner
+     * @param Runner $owner
      */
-    public function setOwner(Runner $ouner = null) {
-        $this->owner = $ouner;
+    public function setOwner(Runner $owner = null) {
+        $this->owner = $owner;
     }
     /**
      * Sets the stream at which the command will send output to.
@@ -1091,23 +1096,23 @@ abstract class CLICommand {
         $this->println($message);
     }
     private function _checkIsArgsSet() {
-        $missingMandatury = [];
+        $missingMandatory = [];
 
         foreach ($this->commandArgs as $argObj) {
             if (!$argObj->isOptional() && $argObj->getValue() === null) {
                 if ($argObj->getDefault() != '') {
                     $argObj->setValue($argObj->getDefault());
                 } else {
-                    $missingMandatury[] = $argObj->getName();
+                    $missingMandatory[] = $argObj->getName();
                 }
             }
         }
 
-        if (count($missingMandatury) != 0) {
+        if (count($missingMandatory) != 0) {
             $missingStr = 'The following required argument(s) are missing: ';
             $comma = '';
 
-            foreach ($missingMandatury as $opt) {
+            foreach ($missingMandatory as $opt) {
                 $missingStr .= $comma."'".$opt."'";
                 $comma = ', ';
             }
@@ -1126,7 +1131,7 @@ abstract class CLICommand {
             $retVal = $input;
         } else if (strlen($input) == 0 && $defaultIndex !== null) {
             //Given input is empty string (enter hit). 
-            //Return defult if specified.
+            //Return default if specified.
             $retVal = $this->_getDefault($choices, $defaultIndex);
         } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
@@ -1141,7 +1146,7 @@ abstract class CLICommand {
     }
 
 
-    private function _createPassArray($string, array $args) {
+    private function _createPassArray($string, array $args) : array {
         $retVal = [$string];
 
         foreach ($args as $arg) {
@@ -1172,7 +1177,7 @@ abstract class CLICommand {
             $index++;
         }
     }
-    private function _parseArgs() {
+    private function _parseArgs() : bool {
         $options = $this->getArgs();
         $invalidArgsVals = [];
 
@@ -1227,13 +1232,13 @@ abstract class CLICommand {
     /**
      * Validate user input and show error message if user input is invalid.
      * @param type $input
-     * @param type $validator
-     * @param type $default
-     * @return array The method will return an array with two indices, 'valid' and 
-     * 'value'. The 'valid' index contains a boolean that is set to true if the 
+     * @param InputValidator|null $validator
+     * @param string|null $default
+     * @return array The method will return an array with two indices, 'valid' and
+     * 'value'. The 'valid' index contains a boolean that is set to true if the
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper(&$input, InputValidator $validator = null, $default = null) {
+    private function getInputHelper(&$input, InputValidator $validator = null, string $default = null) : array {
         $retVal = [
             'valid' => true
         ];

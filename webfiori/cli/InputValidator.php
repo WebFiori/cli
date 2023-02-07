@@ -53,15 +53,19 @@ class InputValidator {
      * class to check validity.
      * 
      * @param string $classNs The namespace of the class.
-     * 
+     *
+     * @param array $args An optional array that holds arguments that will be passed to
+     * class constructor.
+     *
      * @return bool If the class exist and loaded, the method will return 
      * true. Other than that, false is returned.
      */
-    public static function isClass(string $classNs) : bool {
+    public static function isClass(string $classNs, array $args = []) : bool {
         try {
             if (class_exists($classNs)) {
-                $clazz = new $classNs();
-                return true;
+                $reflection = new \ReflectionClass($classNs);
+                $clazz = $reflection->newInstanceArgs($args);
+                return gettype($clazz) == 'object';
             }
         } catch (Throwable $ex) {
             return false;
@@ -76,7 +80,7 @@ class InputValidator {
      * @return bool If the provided string represents a valid namespace, the
      * method will return true. False if it does not represent a valid namespace.
      */
-    public static function isValidNamespace(string $ns) {
+    public static function isValidNamespace(string $ns) : bool {
         if ($ns == '\\') {
             return true;
         }
@@ -140,7 +144,7 @@ class InputValidator {
      * @return bool If the given string represents a floating number, true is returned.
      * False otherwise.
      */
-    public static function isFloat(string $val) {
+    public static function isFloat(string $val) : bool {
         $len = strlen($val);
 
         if ($len == 0) {
