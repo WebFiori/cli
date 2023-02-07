@@ -411,7 +411,7 @@ abstract class CLICommand {
         $arg = $this->getArg($trimmedOptName);
 
         if ($arg !== null) {
-            if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isIntaractive())) {
+            if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isInteractive())) {
                 return $arg->getValue();
             }
 
@@ -1253,7 +1253,8 @@ abstract class CLICommand {
     private function printMsg(string $msg, string $prefix, string $color) {
         $this->prints("$prefix: ", [
             'color' => $color,
-            'bold' => true
+            'bold' => true,
+
         ]);
         $this->println($msg);
     }

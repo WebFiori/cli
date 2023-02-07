@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\cli;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
@@ -8,6 +9,8 @@ use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 use webfiori\cli\streams\StdIn;
 use webfiori\cli\streams\StdOut;
+use webfiori\tests\cli\OutputFormatterTest;
+
 /**
  * The core class which is used to manage command line related operations.
  *
@@ -23,6 +26,7 @@ class Runner {
     private $beforeStartPool;
     private $commandExitVal;
     private $argsV;
+    private $isAnsi;
     /**
      * An associative array that contains supported commands. 
      * 
@@ -46,7 +50,7 @@ class Runner {
      * An attribute which is set to true if CLI is running in interactive mode 
      * or not.
      * 
-     * @var boolean
+     * @var bool
      */
     private $isInteractive;
     /**
@@ -62,6 +66,7 @@ class Runner {
         $this->globalArgs = [];
         $this->argsV = [];
         $this->isInteractive = false;
+        $this->isAnsi = false;
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
 
@@ -90,7 +95,7 @@ class Runner {
      * 
      * @param array $options An optional array of options. Available options are:
      * <ul>
-     * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
+     * <li><b>optional</b>: A boolean. if set to true, it means that the argument
      * is optional and can be ignored when running the command.</li>
      * <li><b>default</b>: An optional default value for the argument 
      * to use if it is not provided and is optional.</li>
@@ -103,7 +108,7 @@ class Runner {
      * be converted to the string 'n'.</li>
      * </ul>
      * 
-     * @return boolean If the argument is added, the method will return true. 
+     * @return bool If the argument is added, the method will return true.
      * Other than that, the method will return false.
      * 
      * @since 1.0
@@ -255,24 +260,24 @@ class Runner {
      * Checks if the class is running through command line interface (CLI) or 
      * through a web server.
      * 
-     * @return boolean If the class is running through a command line, 
+     * @return bool If the class is running through a command line,
      * the method will return true. False if not.
      * 
      */
     public static function isCLI() : bool {
-        //best way to check if app is runing through CLi
+        //best way to check if app is running through CLi
         // or in a web server.
-        // Did a lot of reaseach on that.
+        // Did a lot of research on that.
         return http_response_code() === false;
     }
     /**
      * Checks if CLI is running in interactive mode or not.
      * 
-     * @return boolean If CLI is running in interactive mode, the method will 
+     * @return bool If CLI is running in interactive mode, the method will
      * return true. False otherwise.
      * 
      */
-    public function isIntaractive() : bool {
+    public function isInteractive() : bool {
         return $this->isInteractive;
     }
     /**
@@ -316,6 +321,29 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commands = [];
     }
+
+    /**
+     * Returns exit status code of last executed command.
+     *
+     * @return int For success run, the method should return 0. Other than that,
+     * it means the command was executed with an error.
+     */
+    public function getLastCommandExitStatus() : int {
+        return $this->commandExitVal;
+    }
+    private function printMsg(string $msg, string $prefix = null, string $color = null) {
+        if ($prefix !== null) {
+            $prefix = Formatter::format($prefix, [
+                'color' => $color,
+                'bold' => true,
+                'ansi' => $this->isAnsi
+            ]);
+            $this->getOutputStream()->prints("$prefix ");
+        }
+        if (strlen($msg) != 0) {
+            $this->getOutputStream()->println($msg);
+        }
+    }
     /**
      * Executes a command given as object.
      * 
@@ -327,16 +355,18 @@ class Runner {
      * is the value of the argument. Note that if the first parameter of the
      * method is null, the first index of the array should hold
      * the name of the command that will be executed.
+     *
+     * @param bool $ansi If set to true, then the output will render with ANSI escape sequences.
      * 
      * @return int The method will return an integer that represents exit status of
      * running the command. Usually, if the command exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public function runCommand(CLICommand $c = null, array $args = []) {
+    public function runCommand(CLICommand $c = null, array $args = [], bool $ansi = false) : int {
         $commandName = null;
 
         if ($c === null) {
-            if (count($args) === 0) {
+            if (count($args) == 0) {
                 $c = $this->getDefaultCommand();
             } else {
                 if (isset($args[0])) {
@@ -350,13 +380,18 @@ class Runner {
 
             if ($c === null) {
                 if ($commandName == null) {
-                    $this->getOutputStream()->println("Info: No command was specified to run.");
+
+                    $this->printMsg("No command was specified to run.", 'Info:', 'blue');
+                    return 0;
                 } else {
-                    $this->getOutputStream()->println("Error: The command '".$commandName."' is not supported.");
+                    $this->printMsg("The command '".$commandName."' is not supported.", 'Error:', 'red');
+                    return -1;
                 }
 
-                return -1;
             }
+        }
+        if ($ansi) {
+            $args[] = '--ansi';
         }
         $this->setArgV($args);
         $this->setActiveCommand($c);
@@ -473,14 +508,14 @@ class Runner {
         foreach ($this->beforeStartPool as $func) {
             call_user_func_array($func, [$this]);
         }
-        if ($this->isIntaractive()) {
-            $this->getOutputStream()->println('>> Running in interactive mode.');
-            $this->getOutputStream()->println(">> Type commant name or 'exit' to close.");
-            $this->getOutputStream()->prints('>>');
-            $exit = false;
+        if ($this->isInteractive()) {
+            $this->isAnsi = in_array('--ansi', $this->getArgsVector());
+            $this->printMsg('Running in interactive mode.', '>>', 'blue');
+            $this->printMsg("Type command name or 'exit' to close.", ">>", 'blue');
+            $this->printMsg('', '>>', 'blue');
 
-            while (!$exit) {
-                $args = $this->readInteractiv();
+            while (true) {
+                $args = $this->readInteractive();
                 $this->setArgsVector($args);
                 $argsCount = count($args);
 
@@ -490,46 +525,64 @@ class Runner {
                     return 0;
                 } else {
                     try {
-                        $this->runCommand(null, $args);
+                        $this->runCommand(null, $args, $this->isAnsi);
                     } catch (Throwable $ex) {
-                        $this->getOutputStream()->println('Error: An exception was thrown.');
-                        $this->getOutputStream()->println('Exception Message: '.$ex->getMessage());
-                        $this->getOutputStream()->println('At : '.$ex->getFile().' Line '.$ex->getLine().'.');
+                        $this->printMsg('An exception was thrown.', 'Error:', 'red');
+                        $this->printMsg($ex->getMessage(), 'Exception Message:', 'yellow');
+                        $this->printMsg($ex->getFile(), 'At:', 'yellow');
+                        $this->printMsg($ex->getLine(), 'Line:', 'yellow');
                     }
                 }
-                $this->getOutputStream()->prints('>>');
+                $this->printMsg('', '>>', 'blue');
             }
         } else {
             return $this->run();
         }
     }
     private function checkIsIntr() {
-
         foreach ($this->getArgsVector() as $arg) {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
 
-    private function readInteractiv() {
+    private function readInteractive() {
         $input = trim($this->getInputStream()->readLine());
 
-        return strlen($input) != 0 ? explode(' ', $input) : [];
+        $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
+        if (in_array('--ansi', $argsArr)) {
+            return array_diff($argsArr, ['--ansi']);
+        }
+        return $argsArr;
     }
     /**
      * Run the command line as single run.
-     * 
-     * @param type $args
+     *
      * @return type
      */
     private function run() {
         $argsArr = array_slice($this->getArgsVector(), 1);
 
+        if (in_array('--ansi', $argsArr)) {
+            $this->isAnsi = true;
+            $tempArgs = [];
+
+            foreach ($argsArr as $argName => $val) {
+                if (gettype($argName) == 'integer') {
+                    if ($val != '--ansi') {
+                        $tempArgs[] = $val;
+                    }
+                } else {
+                    $tempArgs[$argName] = $val;
+                }
+            }
+            $argsArr = $tempArgs;
+        }
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
-            return $this->runCommand($command);
+            return $this->runCommand($command, [], $this->isAnsi);
         }
 
-        return $this->runCommand(null, $argsArr);
+        return $this->runCommand(null, $argsArr, $this->isAnsi);
     }
     private function setArgV(array $args) {
         $argV = [];

@@ -95,7 +95,7 @@ class RunnerTest extends TestCase {
         $runner->setDefaultCommand('super-hero');
         $this->assertNull($runner->getDefaultCommand());
         $runner->setInput([]);
-        $this->assertEquals(-1, $runner->runCommand());
+        $this->assertEquals(0, $runner->runCommand());
         $this->assertEquals([
             "Info: No command was specified to run.\n"
         ], $runner->getOutput());
@@ -292,8 +292,8 @@ class RunnerTest extends TestCase {
         $runner->start();
         $this->assertEquals([
             ">> Running in interactive mode.\n",
-            ">> Type commant name or 'exit' to close.\n",
-            ">>"
+            ">> Type command name or 'exit' to close.\n",
+            ">> "
         ], $runner->getOutput());
     }
     /**
@@ -316,15 +316,15 @@ class RunnerTest extends TestCase {
         $runner->start();
         $this->assertEquals([
             ">> Running in interactive mode.\n",
-            ">> Type commant name or 'exit' to close.\n",
-            ">>Usage:\n",
+            ">> Type command name or 'exit' to close.\n",
+            ">> Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
             "    super-hero:     A command to display hero's name.\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
-            ">>",
+            ">> ",
         ], $runner->getOutput());
     }
     /**
@@ -348,12 +348,12 @@ class RunnerTest extends TestCase {
         $runner->start();
         $this->assertEquals([
             ">> Running in interactive mode.\n",
-            ">> Type commant name or 'exit' to close.\n",
-            ">>    super-hero:     A command to display hero's name.\n",
+            ">> Type command name or 'exit' to close.\n",
+            ">>     super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            ">>Hello hero Ibrahim\n",
-            ">>"
+            ">> Hello hero Ibrahim\n",
+            ">> "
         ], $runner->getOutput());
     }
     /**
@@ -366,6 +366,7 @@ class RunnerTest extends TestCase {
         $runner->register(new WithExceptionCommand());
         $runner->setArgsVector([
             'entry.php',
+            '--ansi',
             '-i',
         ]);
         $runner->setInput([
@@ -375,15 +376,16 @@ class RunnerTest extends TestCase {
         ]);
         $runner->start();
         $this->assertEquals([
-            ">> Running in interactive mode.\n",
-            ">> Type commant name or 'exit' to close.\n",
-            ">>    super-hero:         A command to display hero's name.\n",
-            "    Supported Arguments:\n",
-            "                         name: The name of the hero\n",
-            ">>Error: An exception was thrown.\n",
-            "Exception Message: Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
-            "At : ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php Line 12.\n",
-            ">>"
+            "[1;34m>>[0m Running in interactive mode.\n",
+            "[1;34m>>[0m Type command name or 'exit' to close.\n",
+            "[1;34m>>[0m [1;33m    super-hero[0m:         A command to display hero's name.\n",
+            "[1;94m    Supported Arguments:[0m\n",
+            "[1;33m                         name:[0m The name of the hero\n",
+            "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
+            "[1;33mException Message:[0m Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
+            "[1;33mAt:[0m ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
+            "[1;33mLine:[0m 12\n",
+            "[1;34m>>[0m "
         ], $runner->getOutput());
     }
     /**
@@ -454,10 +456,31 @@ class RunnerTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             ">> Running in interactive mode.\n",
-            ">> Type commant name or 'exit' to close.\n",
-            ">>No input.\n",
-            ">>No input.\n",
-            ">>"
+            ">> Type command name or 'exit' to close.\n",
+            ">> No input.\n",
+            ">> No input.\n",
+            ">> "
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function runnerTest20() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setArgsVector([
+            'entry.php',
+            '--ansi',
+        ]);
+        $runner->setInput([
+
+        ]);
+        $runner->start();
+        //$this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "[1;34mInfo:[0m No command was specified to run.\n",
         ], $runner->getOutput());
     }
 }
