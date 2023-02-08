@@ -319,7 +319,7 @@ class RunnerTest extends TestCase {
             '-i',
         ]);
         $runner->setInput([
-            'help',
+            'help --ansi',
             'exit'
         ]);
         $runner->start();
@@ -351,7 +351,7 @@ class RunnerTest extends TestCase {
             '-i',
         ]);
         $runner->setInput([
-            'help --command-name=super-hero',
+            'help --ansi --command-name=super-hero',
             'super-hero name=Ibrahim',
             'exit'
         ]);
