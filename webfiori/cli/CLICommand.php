@@ -451,16 +451,15 @@ abstract class CLICommand {
      * value again.
      *
      * @return string|null The method will return the value which was taken from the
-     * user. Note that if the input has special characters or spaces at the
+     * user. If prompt string is empty, null will be returned. 
+     * Note that if the input has special characters or spaces at the
      * beginning or the end, they will be trimmed.
      *
      * @since 1.0
      */
     public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
         $trimmed = trim($prompt);
-        if (strlen($trimmed) == 0) {
-            $trimmed = 'Waiting for your input: ';
-        }
+
         if (strlen($trimmed) > 0) {
             do {
                 $this->prints($trimmed, [
