@@ -35,7 +35,7 @@ class KeysMap {
      * @param string $ch The control character such as '\n'.
      * 
      * @return string If the given character maps to a control character, its
-     * value is returned as string. For expmple, if the character is '\n',
+     * value is returned as string. For example, if the character is '\n',
      * the method will return the value "LF" which stands for "line feed". If the
      * character does not map to any control character, the same character is
      * returned. Possible return values are:
@@ -53,7 +53,7 @@ class KeysMap {
      * 
      * </ul>
      */
-    public static function map($ch) {
+    public static function map(string $ch) : string {
         $keyMap = self::KEY_MAP;
 
         if (isset($keyMap[$ch])) {
@@ -73,7 +73,7 @@ class KeysMap {
      * 
      * @since 1.0
      */
-    public static function read(InputStream $stream, $bytes = 1) {
+    public static function read(InputStream $stream, $bytes = 1) : string {
         $input = '';
         $len = strlen($input);
         while ($len < $bytes) {

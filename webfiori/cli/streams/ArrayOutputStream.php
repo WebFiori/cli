@@ -24,7 +24,7 @@ class ArrayOutputStream implements OutputStream {
      * @return array The array will have the output with selected formatting
      * options.
      */
-    public function getOutputArray() {
+    public function getOutputArray() : array {
         return $this->outputArr;
     }
     /**
@@ -68,11 +68,10 @@ class ArrayOutputStream implements OutputStream {
         if ($index >= 1) {
             if ($this->isLastPrintLn) {
                 $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
-                $this->isLastPrintLn = false;
             } else {
                 $this->outputArr[$index - 1] .= call_user_func_array('sprintf', $arrayToPass);
-                $this->isLastPrintLn = false;
             }
+            $this->isLastPrintLn = false;
         } else {
             $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
         }

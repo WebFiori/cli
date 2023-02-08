@@ -29,7 +29,7 @@ class ArrayInputStream implements InputStream {
      * @param int $bytes Number of bytes that the method will read from the
      * stream. Must be a positive number.
      * 
-     * @return string The will return a string which contains the bytes that
+     * @return string The method will return a string which contains the bytes that
      * the method fetched from the stream.
      */
     public function read(int $bytes = 1) : string {

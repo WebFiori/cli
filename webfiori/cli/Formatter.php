@@ -122,14 +122,14 @@ class Formatter {
 
         return $formatArr;
     }
-    private static function addManner($str, $code) {
+    private static function addManner($str, $code) : string {
         if (strlen($str) > 0) {
             return $str.';'.$code;
         }
 
         return $str.$code;
     }
-    private static function getCharsManner($options) {
+    private static function getCharsManner($options) : string {
         $mannerStr = '';
 
         if (isset($options['ansi']) && $options['ansi'] === false) {

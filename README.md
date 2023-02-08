@@ -21,16 +21,16 @@ A libray that can be used to write command line based applications using PHP.
 </p>
 
 ## Supported PHP Versions
-| Build Status |
-|:-----------:|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.0/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.1/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.2/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.3/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.4/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.0/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a><br>(dev)|
+|                                                                                      Build Status                                                                                       |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.0/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.1/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.2/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.3/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.4/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.0/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> |
 
 ## Features
 * Help in creating command line based applications.
