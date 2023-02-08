@@ -28,6 +28,13 @@ class Runner {
     private $argsV;
     private $isAnsi;
     /**
+     * An array that holds sub-arrays for callbacks that will be executed
+     * each time a command finish execution.
+     * 
+     * @var array
+     */
+    private $afterRunPool;
+    /**
      * An associative array that contains supported commands. 
      * 
      * @var array
@@ -70,6 +77,7 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commandExitVal = 0;
+        $this->afterRunPool = [];
 
         $this->addArg('--ansi', [
             'optional' => true,
@@ -81,6 +89,24 @@ class Runner {
             }
             $r->checkIsIntr();
         });
+    }
+    /**
+     * Add a function to execute after every command.
+     * 
+     * The method can be used to set multiple callbacks.
+     * 
+     * @param callable $func The function that will be executed after the
+     * completion of command execution. The first parameter of the method
+     * will always be an instance of 'Runner' (e.g. function (Runner $runner){}).
+     * 
+     * @param array $params Any additional parameters that will be passed to the
+     * callback.
+     */
+    public function setAfterExecution(callable $func, array $params = []) {
+        $this->afterRunPool[] = [
+            'func' => $func,
+            'params' => $params
+        ];
     }
     /**
      * Adds a global command argument.
@@ -397,11 +423,28 @@ class Runner {
         }
         $this->setArgV($args);
         $this->setActiveCommand($c);
-        $this->commandExitVal = $c->excCommand();
+        
+        try {
+            $this->commandExitVal = $c->excCommand();
+        } catch (Throwable $ex) {
+            $this->printMsg('An exception was thrown.', 'Error:', 'red');
+            $this->printMsg($ex->getMessage(), 'Exception Message:', 'yellow');
+            $this->printMsg($ex->getCode(), 'Code:', 'yellow');
+            $this->printMsg($ex->getFile(), 'At:', 'yellow');
+            $this->printMsg($ex->getLine(), 'Line:', 'yellow');
+            $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
+        }
+        
+        $this->invokeAfterExc();
         $this->setActiveCommand();
-
         return $this->commandExitVal;
     }
+    private function invokeAfterExc() {
+        foreach ($this->afterRunPool as $funcArr) {
+            call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
+        }
+    }
+
     /**
      * Sets the command which is currently in execution stage.
      * 
@@ -526,14 +569,7 @@ class Runner {
                 } else if ($args[0] == 'exit') {
                     return 0;
                 } else {
-                    try {
-                        $this->runCommand(null, $args, $this->isAnsi);
-                    } catch (Throwable $ex) {
-                        $this->printMsg('An exception was thrown.', 'Error:', 'red');
-                        $this->printMsg($ex->getMessage(), 'Exception Message:', 'yellow');
-                        $this->printMsg($ex->getFile(), 'At:', 'yellow');
-                        $this->printMsg($ex->getLine(), 'Line:', 'yellow');
-                    }
+                    $this->runCommand(null, $args, $this->isAnsi);
                 }
                 $this->printMsg('', '>>', 'blue');
             }
