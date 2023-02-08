@@ -39,7 +39,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest00() {
+    public function testRunner00() {
         $runner = new Runner();
         $this->assertEquals([], $runner->getOutput());
         $this->assertEquals([], $runner->getCommands());
@@ -74,8 +74,9 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest01() {
+    public function testRunner01() {
         $runner = new Runner();
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $runner->setDefaultCommand('super-hero');
         $this->assertNull($runner->getDefaultCommand());
         $runner->setInput([]);
@@ -83,6 +84,7 @@ class RunnerTest extends TestCase {
             'do-it',
             '--ansi'
         ]));
+        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "Error: The command 'do-it' is not supported.\n"
         ], $runner->getOutput());
@@ -90,12 +92,13 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest02() {
+    public function testRunner02() {
         $runner = new Runner();
         $runner->setDefaultCommand('super-hero');
         $this->assertNull($runner->getDefaultCommand());
         $runner->setInput([]);
         $this->assertEquals(0, $runner->runCommand());
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "Info: No command was specified to run.\n"
         ], $runner->getOutput());
@@ -103,7 +106,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest03() {
+    public function testRunner03() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setInput([]);
@@ -111,6 +114,7 @@ class RunnerTest extends TestCase {
             'super-hero',
             'name' => 'Ok'
         ]));
+        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "Error: The following argument(s) have invalid values: 'name'\n",
             "Info: Allowed values for the argument 'name':\n",
@@ -121,7 +125,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest04() {
+    public function testRunner04() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setInput([]);
@@ -130,6 +134,7 @@ class RunnerTest extends TestCase {
             'name' => 'Ok',
             '--ansi'
         ]));
+        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "\e[1;91mError: \e[0mThe following argument(s) have invalid values: 'name'\n",
             "\e[1;34mInfo: \e[0mAllowed values for the argument 'name':\n",
@@ -140,7 +145,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest05() {
+    public function testRunner05() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
@@ -148,6 +153,7 @@ class RunnerTest extends TestCase {
         $runner->setDefaultCommand('help');
         $runner->setInput([]);
         $this->assertEquals(0, $runner->runCommand(null, []));
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
@@ -159,7 +165,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest06() {
+    public function testRunner06() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setDefaultCommand('help');
@@ -177,7 +183,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest07() {
+    public function testRunner07() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setDefaultCommand('help');
@@ -185,6 +191,7 @@ class RunnerTest extends TestCase {
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), [
             '--ansi'
         ]));
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "\e[1;93mUsage:\e[0m\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
@@ -197,7 +204,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest08() {
+    public function testRunner08() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setInput([]);
@@ -214,7 +221,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest09() {
+    public function testRunner09() {
         $_SERVER['argv'] = [];
         $runner = new Runner();
         $runner->removeArgument('--ansi');
@@ -230,11 +237,12 @@ class RunnerTest extends TestCase {
             "    super-hero:     A command to display hero's name.\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
         ], $runner->getOutput());
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
     /**
      * @test
      */
-    public function runnerTest10() {
+    public function testRunner10() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
@@ -254,7 +262,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest11() {
+    public function testRunner11() {
         $runner = new Runner();
         $runner->setBeforeStart(function (Runner $r) {
             $r->setArgsVector([
@@ -275,7 +283,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest12() {
+    public function testRunner12() {
         
         $runner = new Runner();
         
@@ -295,11 +303,12 @@ class RunnerTest extends TestCase {
             ">> Type command name or 'exit' to close.\n",
             ">> "
         ], $runner->getOutput());
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
     /**
      * @test
      */
-    public function runnerTest13() {
+    public function testRunner13() {
         
         $runner = new Runner();
         $runner->register(new Command00());
@@ -326,11 +335,12 @@ class RunnerTest extends TestCase {
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
             ">> ",
         ], $runner->getOutput());
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
     /**
      * @test
      */
-    public function runnerTest14() {
+    public function testRunner14() {
         $runner = new Runner();
         
         $runner->register(new Command00());
@@ -359,7 +369,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest15() {
+    public function testRunner15() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
@@ -391,7 +401,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest16() {
+    public function testRunner16() {
         $runner = new Runner();
         $runner->register(new Command01());
         $runner->setInput([]);
@@ -405,7 +415,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest17() {
+    public function testRunner17() {
         $runner = new Runner();
         $runner->register(new Command01());
         $runner->setInput([]);
@@ -420,7 +430,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest18() {
+    public function testRunner18() {
         $runner = new Runner();
         $runner->register(new Command01());
         $runner->setInput([]);
@@ -439,7 +449,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest19() {
+    public function testRunner19() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
@@ -465,7 +475,7 @@ class RunnerTest extends TestCase {
     /**
      * @test
      */
-    public function runnerTest20() {
+    public function testRunner20() {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
