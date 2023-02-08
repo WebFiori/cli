@@ -1,6 +1,6 @@
 {
     "name": "webfiori/cli",
-    "description": "Command line component of WebFiori framework",
+    "description": "Command line component of WebFiori framework.",
     "authors": [
         {
             "name": "Ibrahim",
