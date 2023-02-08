@@ -156,7 +156,6 @@ abstract class CLICommand {
         $this->commandArgs = [];
 
         foreach ($arr as $optionName => $options) {
-            
             if ($options instanceof CommandArgument) {
                 $this->addArgument($options);
             } else {
@@ -761,6 +760,34 @@ abstract class CLICommand {
     public function read(int $bytes = 1) : string {
         return $this->getInputStream()->read($bytes);
     }
+    /**
+     * Reads and validates class name.
+     * 
+     * @param string|null $suffix An optional string to append to class name.
+     * 
+     * @param string $prompt The text that will be shown to the user as prompt for
+     * class name.
+     * 
+     * @param string $errMsg A string to show in case provided class name is
+     * not valid.
+     * 
+     * @return string A string that represents a valid class name. If suffix is
+     * not null, the method will return the name with the suffix included.
+     */
+    public function readClassName(string $prompt, string $suffix = null, string $errMsg = 'Invalid class name is given.') {
+        return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix)
+        {
+            if ($suffix !== null) {
+                $subSuffix = substr($className, strlen($className) - strlen($suffix));
+
+                if ($subSuffix != $suffix) {
+                    $className .= $suffix;
+                }
+            }
+
+            return InputValidator::isValidClassName($className);
+        }, $errMsg, [$suffix]));
+    }
 
     /**
      * Reads a value as float.
@@ -781,6 +808,31 @@ abstract class CLICommand {
         }, 'Provided value is not a floating number!'));
     }
     /**
+     * Reads the namespace of class and return an instance of it.
+     * 
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     *  
+     * @param string $errMsg A string to show in case provided namespace is
+     * invalid or an instance of the class cannot be created.
+     * 
+     * @return object The method will return an instance of the class.
+     */
+    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
+        $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input)
+        {
+            if (InputValidator::isClass($input)) {
+                return true;
+            }
+
+            return false;
+        }, $errMsg));
+
+        $reflection = new \ReflectionClass($clazzNs);
+
+        return $reflection->newInstanceArgs($constructorArgs);
+    }
+    /**
      * Reads a value as an integer.
      * 
      * @param string $prompt The string that will be shown to the user. The 
@@ -799,54 +851,18 @@ abstract class CLICommand {
         }, 'Provided value is not an integer!'));
     }
     /**
-     * Reads the namespace of class and return an instance of it.
+     * Reads one line from input stream.
      * 
-     * @param string $prompt The string that will be shown to the user. The 
-     * string must be non-empty.
-     *  
-     * @param string $errMsg A string to show in case provided namespace is
-     * invalid or an instance of the class cannot be created.
+     * The method will continue to read from input stream till it finds end of 
+     * line character "\n".
      * 
-     * @return object The method will return an instance of the class.
+     * @return string The method will return the string which was taken from 
+     * input stream without the end of line character.
+     * 
+     * @since 1.0
      */
-    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
-        $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input) {
-            
-            if (InputValidator::isClass($input)) {
-                return true;
-            }
-            return false;
-        }, $errMsg));
-
-        $reflection = new \ReflectionClass($clazzNs);
-        return $reflection->newInstanceArgs($constructorArgs);
-    }
-    /**
-     * Reads and validates class name.
-     * 
-     * @param string|null $suffix An optional string to append to class name.
-     * 
-     * @param string $prompt The text that will be shown to the user as prompt for
-     * class name.
-     * 
-     * @param string $errMsg A string to show in case provided class name is
-     * not valid.
-     * 
-     * @return string A string that represents a valid class name. If suffix is
-     * not null, the method will return the name with the suffix included.
-     */
-    public function readClassName(string $prompt, string $suffix = null, string $errMsg = 'Invalid class name is given.') {
-        return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix) {
-            if ($suffix !== null) {
-                $subSuffix = substr($className, strlen($className) - strlen($suffix));
-
-                if ($subSuffix != $suffix) {
-                    $className .= $suffix;
-                }
-            }
-            
-            return InputValidator::isValidClassName($className);
-        }, $errMsg, [$suffix]));
+    public function readln() : string {
+        return $this->getInputStream()->readLine();
     }
 
     /**
@@ -870,28 +886,15 @@ abstract class CLICommand {
         if ($defaultNs !== null && !InputValidator::isValidNamespace($defaultNs)) {
             throw new IOException('Provided default namespace is not valid.');
         }
-        return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input) {
-            
+
+        return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input)
+        {
             if (InputValidator::isValidNamespace($input)) {
                 return true;
             }
+
             return false;
         }, $errMsg));
-        
-    }
-    /**
-     * Reads one line from input stream.
-     * 
-     * The method will continue to read from input stream till it finds end of 
-     * line character "\n".
-     * 
-     * @return string The method will return the string which was taken from 
-     * input stream without the end of line character.
-     * 
-     * @since 1.0
-     */
-    public function readln() : string {
-        return $this->getInputStream()->readLine();
     }
     /**
      * Removes an argument from the command given its name.
@@ -1046,16 +1049,6 @@ abstract class CLICommand {
         return false;
     }
     /**
-     * Sets the runner that owns the command.
-     * 
-     * The runner is the instance that will execute the command.
-     * 
-     * @param Runner $owner
-     */
-    public function setOwner(Runner $owner = null) {
-        $this->owner = $owner;
-    }
-    /**
      * Sets the stream at which the command will send output to.
      * 
      * @param OutputStream $stream An instance that implements output stream.
@@ -1064,6 +1057,16 @@ abstract class CLICommand {
      */
     public function setOutputStream(OutputStream $stream) {
         $this->outputStream = $stream;
+    }
+    /**
+     * Sets the runner that owns the command.
+     * 
+     * The runner is the instance that will execute the command.
+     * 
+     * @param Runner $owner
+     */
+    public function setOwner(Runner $owner = null) {
+        $this->owner = $owner;
     }
     /**
      * Display a message that represents a success status.
@@ -1136,7 +1139,7 @@ abstract class CLICommand {
             //Selected option is an index. Search for it and return its value.
             $retVal = $this->_getChoiceAtIndex($choices, $input);
         }
- 
+
         if ($retVal === null) {
             $this->error('Invalid answer.');
         }
@@ -1252,6 +1255,7 @@ abstract class CLICommand {
             }
         }
         $retVal['value'] = $input;
+
         return $retVal;
     }
     private function printMsg(string $msg, string $prefix, string $color) {

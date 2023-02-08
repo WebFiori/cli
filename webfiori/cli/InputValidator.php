@@ -65,73 +65,11 @@ class InputValidator {
             if (class_exists($classNs)) {
                 $reflection = new \ReflectionClass($classNs);
                 $clazz = $reflection->newInstanceArgs($args);
+
                 return gettype($clazz) == 'object';
             }
         } catch (Throwable $ex) {
             return false;
-        }
-        return false;
-    }
-    /**
-     * Checks if provided string represents a valid namespace or not.
-     * 
-     * @param string $ns A string to be validated.
-     * 
-     * @return bool If the provided string represents a valid namespace, the
-     * method will return true. False if it does not represent a valid namespace.
-     */
-    public static function isValidNamespace(string $ns) : bool {
-        if ($ns == '\\') {
-            return true;
-        }
-        if (strlen($ns) == 0) {
-            return false;
-        }
-        $split = explode('\\', $ns);
-
-        foreach ($split as $subNs) {
-            $len = strlen($subNs);
-
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $subNs[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-    /**
-     * Checks if a given string represents a valid class name or not.
-     * 
-     * @param string $name A string to check such as 'My_Super_Class'.
-     * 
-     * @return bool If the given string is a valid class name, the method
-     * will return true. False otherwise.
-     */
-    public static function isValidClassName(string $name) : bool {
-        $len = strlen($name);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $name[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         return false;
@@ -207,5 +145,70 @@ class InputValidator {
      */
     public function isValid(string &$input) : bool {
         return call_user_func_array($this->callback, array_merge([&$input], $this->params));
+    }
+    /**
+     * Checks if a given string represents a valid class name or not.
+     * 
+     * @param string $name A string to check such as 'My_Super_Class'.
+     * 
+     * @return bool If the given string is a valid class name, the method
+     * will return true. False otherwise.
+     */
+    public static function isValidClassName(string $name) : bool {
+        $len = strlen($name);
+
+        if ($len > 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $name[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     * 
+     * @param string $ns A string to be validated.
+     * 
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) : bool {
+        if ($ns == '\\') {
+            return true;
+        }
+
+        if (strlen($ns) == 0) {
+            return false;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
