@@ -374,6 +374,9 @@ class RunnerTest extends TestCase {
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->register(new WithExceptionCommand());
+        $runner->setAfterExecution(function (Runner $r) {
+            $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
+        });
         $runner->setArgsVector([
             'entry.php',
             '--ansi',
@@ -391,11 +394,14 @@ class RunnerTest extends TestCase {
             "[1;34m>>[0m [1;33m    super-hero[0m:         A command to display hero's name.\n",
             "[1;94m    Supported Arguments:[0m\n",
             "[1;33m                         name:[0m The name of the hero\n",
+            "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
+            "[1;33mCode:[0m 0\n",
             "[1;33mAt:[0m ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 12\n",
-            "[1;34m>>[0m "
+            "Command Exit Status: -1\n",
+            "[1;34m>>[0m ",
         ], $runner->getOutput());
     }
     /**
@@ -434,6 +440,9 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command01());
         $runner->setInput([]);
+        $runner->setAfterExecution(function (Runner $r) {
+            $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
+        });
         $this->assertEquals(0, $runner->runCommand(null, [
             'show-v',
             'arg-1' => 'Super Cool Arg',
@@ -443,7 +452,8 @@ class RunnerTest extends TestCase {
             "System version: 1.0.0\n",
             "Super Cool Arg\n",
             "First One is Coller\n",
-            "Hello\n"
+            "Hello\n",
+            "Command Exit Status: 0\n"
         ], $runner->getOutput());
     }
     /**
@@ -491,6 +501,34 @@ class RunnerTest extends TestCase {
         //$this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "[1;34mInfo:[0m No command was specified to run.\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testRunner21() {
+        $runner = new Runner();
+        
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->register(new WithExceptionCommand());
+        $runner->setAfterExecution(function (Runner $r) {
+            $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
+        });
+
+        $runner->setArgsVector([
+            'entry.php',
+            'with-exception',
+        ]);
+        $runner->setInput([]);
+        $runner->start();
+        $this->assertEquals([
+            "Error: An exception was thrown.\n",
+            "Exception Message: Call to undefined method webfiori\\tests\cli\\testCommands\WithExceptionCommand::notExist()\n",
+            "Code: 0\n",
+            "At: ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
+            "Line: 12\n",
+            "Command Exit Status: -1\n"
         ], $runner->getOutput());
     }
 }
