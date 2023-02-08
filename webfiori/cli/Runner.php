@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\cli;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
@@ -9,7 +8,6 @@ use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 use webfiori\cli\streams\StdIn;
 use webfiori\cli\streams\StdOut;
-use webfiori\tests\cli\OutputFormatterTest;
 
 /**
  * The core class which is used to manage command line related operations.
@@ -23,10 +21,6 @@ class Runner {
      * @var CLICommand|null
      */
     private $activeCommand;
-    private $beforeStartPool;
-    private $commandExitVal;
-    private $argsV;
-    private $isAnsi;
     /**
      * An array that holds sub-arrays for callbacks that will be executed
      * each time a command finish execution.
@@ -34,6 +28,9 @@ class Runner {
      * @var array
      */
     private $afterRunPool;
+    private $argsV;
+    private $beforeStartPool;
+    private $commandExitVal;
     /**
      * An associative array that contains supported commands. 
      * 
@@ -53,6 +50,7 @@ class Runner {
      * 
      */
     private $inputStream;
+    private $isAnsi;
     /**
      * An attribute which is set to true if CLI is running in interactive mode 
      * or not.
@@ -83,30 +81,13 @@ class Runner {
             'optional' => true,
             'description' => 'Force the use of ANSI output.'
         ]);
-        $this->setBeforeStart(function (Runner $r) {
+        $this->setBeforeStart(function (Runner $r)
+        {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
             $r->checkIsIntr();
         });
-    }
-    /**
-     * Add a function to execute after every command.
-     * 
-     * The method can be used to set multiple callbacks.
-     * 
-     * @param callable $func The function that will be executed after the
-     * completion of command execution. The first parameter of the method
-     * will always be an instance of 'Runner' (e.g. function (Runner $runner){}).
-     * 
-     * @param array $params Any additional parameters that will be passed to the
-     * callback.
-     */
-    public function setAfterExecution(callable $func, array $params = []) {
-        $this->afterRunPool[] = [
-            'func' => $func,
-            'params' => $params
-        ];
     }
     /**
      * Adds a global command argument.
@@ -239,6 +220,16 @@ class Runner {
     public function getInputStream() : InputStream {
         return $this->inputStream;
     }
+
+    /**
+     * Returns exit status code of last executed command.
+     *
+     * @return int For success run, the method should return 0. Other than that,
+     * it means the command was executed with an error.
+     */
+    public function getLastCommandExitStatus() : int {
+        return $this->commandExitVal;
+    }
     /**
      * Returns an array that contain all generated output by executing a command.
      * 
@@ -348,29 +339,6 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commands = [];
     }
-
-    /**
-     * Returns exit status code of last executed command.
-     *
-     * @return int For success run, the method should return 0. Other than that,
-     * it means the command was executed with an error.
-     */
-    public function getLastCommandExitStatus() : int {
-        return $this->commandExitVal;
-    }
-    private function printMsg(string $msg, string $prefix = null, string $color = null) {
-        if ($prefix !== null) {
-            $prefix = Formatter::format($prefix, [
-                'color' => $color,
-                'bold' => true,
-                'ansi' => $this->isAnsi
-            ]);
-            $this->getOutputStream()->prints("$prefix ");
-        }
-        if (strlen($msg) != 0) {
-            $this->getOutputStream()->println($msg);
-        }
-    }
     /**
      * Executes a command given as object.
      * 
@@ -398,7 +366,7 @@ class Runner {
             } else {
                 if (isset($args[0])) {
                     $commandName = filter_var($args[0], FILTER_DEFAULT);
-                    
+
                     $c = $this->getCommandByName($commandName);
                 } else {
                     $c = $this->getDefaultCommand();
@@ -407,23 +375,24 @@ class Runner {
 
             if ($c === null) {
                 if ($commandName == null) {
-
                     $this->printMsg("No command was specified to run.", 'Info:', 'blue');
+
                     return 0;
                 } else {
                     $this->printMsg("The command '".$commandName."' is not supported.", 'Error:', 'red');
                     $this->commandExitVal = -1;
+
                     return -1;
                 }
-
             }
         }
+
         if ($ansi) {
             $args[] = '--ansi';
         }
         $this->setArgV($args);
         $this->setActiveCommand($c);
-        
+
         try {
             $this->commandExitVal = $c->excCommand();
         } catch (Throwable $ex) {
@@ -434,15 +403,11 @@ class Runner {
             $this->printMsg($ex->getLine(), 'Line:', 'yellow');
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
         }
-        
+
         $this->invokeAfterExc();
         $this->setActiveCommand();
+
         return $this->commandExitVal;
-    }
-    private function invokeAfterExc() {
-        foreach ($this->afterRunPool as $funcArr) {
-            call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
-        }
     }
 
     /**
@@ -464,6 +429,24 @@ class Runner {
             $this->getActiveCommand()->setInputStream($this->getInputStream());
             $this->getActiveCommand()->setOwner($this);
         }
+    }
+    /**
+     * Add a function to execute after every command.
+     * 
+     * The method can be used to set multiple callbacks.
+     * 
+     * @param callable $func The function that will be executed after the
+     * completion of command execution. The first parameter of the method
+     * will always be an instance of 'Runner' (e.g. function (Runner $runner){}).
+     * 
+     * @param array $params Any additional parameters that will be passed to the
+     * callback.
+     */
+    public function setAfterExecution(callable $func, array $params = []) {
+        $this->afterRunPool[] = [
+            'func' => $func,
+            'params' => $params
+        ];
     }
     /**
      * Sets arguments vector to have specific value.
@@ -553,6 +536,7 @@ class Runner {
         foreach ($this->beforeStartPool as $func) {
             call_user_func_array($func, [$this]);
         }
+
         if ($this->isInteractive()) {
             $this->isAnsi = in_array('--ansi', $this->getArgsVector());
             $this->printMsg('Running in interactive mode.', '>>', 'blue');
@@ -566,10 +550,12 @@ class Runner {
 
                 if ($argsCount == 0) {
                     $this->getOutputStream()->println('No input.');
-                } else if ($args[0] == 'exit') {
-                    return 0;
                 } else {
-                    $this->runCommand(null, $args, $this->isAnsi);
+                    if ($args[0] == 'exit') {
+                        return 0;
+                    } else {
+                        $this->runCommand(null, $args, $this->isAnsi);
+                    }
                 }
                 $this->printMsg('', '>>', 'blue');
             }
@@ -582,14 +568,35 @@ class Runner {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
+    private function invokeAfterExc() {
+        foreach ($this->afterRunPool as $funcArr) {
+            call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
+        }
+    }
+    private function printMsg(string $msg, string $prefix = null, string $color = null) {
+        if ($prefix !== null) {
+            $prefix = Formatter::format($prefix, [
+                'color' => $color,
+                'bold' => true,
+                'ansi' => $this->isAnsi
+            ]);
+            $this->getOutputStream()->prints("$prefix ");
+        }
+
+        if (strlen($msg) != 0) {
+            $this->getOutputStream()->println($msg);
+        }
+    }
 
     private function readInteractive() {
         $input = trim($this->getInputStream()->readLine());
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
+
         if (in_array('--ansi', $argsArr)) {
             return array_diff($argsArr, ['--ansi']);
         }
+
         return $argsArr;
     }
     /**
@@ -615,8 +622,10 @@ class Runner {
             }
             $argsArr = $tempArgs;
         }
+
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
+
             return $this->runCommand($command, [], $this->isAnsi);
         }
 

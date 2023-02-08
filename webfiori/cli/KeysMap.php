@@ -76,6 +76,7 @@ class KeysMap {
     public static function read(InputStream $stream, $bytes = 1) : string {
         $input = '';
         $len = strlen($input);
+
         while ($len < $bytes) {
             $char = self::readAndTranslate($stream);
             self::appendChar($char, $input);

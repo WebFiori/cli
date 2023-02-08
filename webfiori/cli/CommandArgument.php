@@ -114,12 +114,13 @@ class CommandArgument {
      */
     public static function extractValue(string $argName, Runner $runner = null) {
         $trimmedOptName = trim($argName);
-        
+
         if ($runner !== null) {
             $argsV = $runner->getArgsVector();
         } else {
             $argsV = $_SERVER['argv'];
         }
+
         foreach ($argsV as $option) {
             $optionClean = filter_var($option, FILTER_DEFAULT);
             $optExpl = explode('=', $optionClean);
