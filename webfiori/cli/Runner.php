@@ -69,6 +69,7 @@ class Runner {
         $this->isAnsi = false;
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
+        $this->commandExitVal = 0;
 
         $this->addArg('--ansi', [
             'optional' => true,
@@ -385,6 +386,7 @@ class Runner {
                     return 0;
                 } else {
                     $this->printMsg("The command '".$commandName."' is not supported.", 'Error:', 'red');
+                    $this->commandExitVal = -1;
                     return -1;
                 }
 
