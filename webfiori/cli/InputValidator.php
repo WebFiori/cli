@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\cli;
 
+use ReflectionClass;
 use Throwable;
 
 /**
@@ -63,7 +64,7 @@ class InputValidator {
     public static function isClass(string $classNs, array $args = []) : bool {
         try {
             if (class_exists($classNs)) {
-                $reflection = new \ReflectionClass($classNs);
+                $reflection = new ReflectionClass($classNs);
                 $clazz = $reflection->newInstanceArgs($args);
 
                 return gettype($clazz) == 'object';
@@ -139,7 +140,7 @@ class InputValidator {
      * the value of the input is changed on the validation callback, it will
      * affect original variable as the passed value is a reference.
      * 
-     * @return bool The return value of this method will depends on the implementation
+     * @return bool The return value of this method will depend on the implementation
      * of the validation callback. If it returns true, the method will
      * return true. If it returns false, the method will return false.
      */
@@ -158,22 +159,25 @@ class InputValidator {
         $len = strlen($name);
 
         if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $name[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-
-            return true;
+            return self::validateNsOrClassName($len, $name);
         }
 
         return false;
+    }
+    private static function validateNsOrClassName(int $len, string $name) : bool {
+        for ($x = 0 ; $x < $len ; $x++) {
+            $char = $name[$x];
+
+            if ($x == 0 && $char >= '0' && $char <= '9') {
+                return false;
+            }
+
+            if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                return false;
+            }
+        }
+
+        return true;
     }
     /**
      * Checks if provided string represents a valid namespace or not.
@@ -196,16 +200,8 @@ class InputValidator {
         foreach ($split as $subNs) {
             $len = strlen($subNs);
 
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $subNs[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
+            if (!self::validateNsOrClassName($len, $subNs)) {
+                return false;
             }
         }
 
