@@ -7,7 +7,7 @@ namespace webfiori\cli;
  * @author Ibrahim
  */
 class CommandArgument {
-    private $allowedVals;
+    private $allowedValues;
     private $default;
     private $description;
     private $isOptional;
@@ -29,7 +29,7 @@ class CommandArgument {
             $this->name = 'arg';
         }
         $this->isOptional = $optional;
-        $this->allowedVals = [];
+        $this->allowedValues = [];
         $this->default = '';
         $this->description = $description;
     }
@@ -42,7 +42,7 @@ class CommandArgument {
         $trim = trim($val);
 
         if (!in_array($trim, $this->getAllowedValues())) {
-            $this->allowedVals[] = $trim;
+            $this->allowedValues[] = $trim;
         }
     }
     /**
@@ -89,9 +89,9 @@ class CommandArgument {
         } else {
             $arg->setDescription('<NO DESCRIPTION>');
         }
-        $allowedVals = isset($options['values']) ? $options['values'] : [];
+        $allowedValues = $options['values'] ?? [];
 
-        foreach ($allowedVals as $val) {
+        foreach ($allowedValues as $val) {
             $arg->addAllowedValue($val);
         }
 
@@ -122,7 +122,7 @@ class CommandArgument {
         }
 
         foreach ($argsV as $option) {
-            $optionClean = filter_var($option, FILTER_DEFAULT);
+            $optionClean = filter_var($option);
             $optExpl = explode('=', $optionClean);
             $optionNameFromCLI = $optExpl[0];
 
@@ -135,6 +135,8 @@ class CommandArgument {
                 }
             }
         }
+
+        return null;
     }
     /**
      * Returns an array that contains all allowed argument values.
@@ -142,7 +144,7 @@ class CommandArgument {
      * @return array An array that contains all allowed argument values.
      */
     public function getAllowedValues() : array {
-        return $this->allowedVals;
+        return $this->allowedValues;
     }
     /**
      * Returns the default value of the argument.
