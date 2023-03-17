@@ -75,12 +75,12 @@ class Formatter {
      * 
      * @since 1.0
      */
-    public static function format(string $string, array $formatOptions = []) {
-        $validatedOptions = self::_validateOutputOptions($formatOptions);
+    public static function format(string $string, array $formatOptions = []) : string {
+        $validatedOptions = self::validateOutputOptions($formatOptions);
 
-        return self::_getFormattedOutput($string, $validatedOptions);
+        return self::getFormattedOutput($string, $validatedOptions);
     }
-    private static function _getFormattedOutput($outputString, $formatOptions) {
+    private static function getFormattedOutput($outputString, $formatOptions) {
         $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
@@ -89,7 +89,7 @@ class Formatter {
 
         return $outputString;
     }
-    private static function _validateOutputOptions($formatArr) {
+    private static function validateOutputOptions($formatArr) {
         $noColor = 'NO_COLOR';
 
         if (!isset($formatArr['bold'])) {
