@@ -1,6 +1,8 @@
 <?php
 namespace webfiori\cli;
 
+use ReflectionClass;
+use ReflectionException;
 use webfiori\cli\exceptions\IOException;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
@@ -244,24 +246,24 @@ abstract class CLICommand {
      * 
      * This method will display the question and wait for the user to confirm the 
      * action by entering 'y' or 'n' in the terminal. If the user give something 
-     * other than 'Y' or 'n', it will shows an error and ask him to confirm 
+     * other than 'Y' or 'n', it will show an error and ask him to confirm
      * again. If a default answer is provided, it will appear in upper case in the 
      * terminal. For example, if default is set to true, at the end of the prompt, 
      * the string that shows the options would be like '(Y/n)'.
      * 
-     * @param string $confirmTxt The text of the question which will be asked. 
-     * 
-     * @return bool If the user choose 'y', the method will return true. If
-     * he choose 'n', the method will return false. 
+     * @param string $confirmTxt The text of the question of which will be asked.
      * 
      * @param bool|null $default Default answer to use if empty input is given.
      * It can be true for 'y' and false for 'n'. Default value is null which 
      * means no default will be used.
-     * 
+     *
+     * @return bool If the user choose 'y', the method will return true. If
+     * he chooses 'n', the method will return false.
+     *
      * @since 1.0
      * 
      */
-    public function confirm(string $confirmTxt, $default = null) {
+    public function confirm(string $confirmTxt, bool $default = null) : bool {
         $answer = null;
 
         do {
@@ -314,8 +316,8 @@ abstract class CLICommand {
      * 
      * This method should not be called manually by the developer.
      * 
-     * @return int If the command is executed, the method will return 0. Other 
-     * than that, it will return a number which depends on the return value of 
+     * @return int If the command is executed, the method will return 0.
+     * Other than that, it will return a number which depends on the return value of
      * the method 'CLICommand::exec()'.
      * 
      * @since 1.0
@@ -327,7 +329,7 @@ abstract class CLICommand {
             $this->addArgument($arg);
         }
 
-        if ($this->_parseArgs() && $this->_checkIsArgsSet()) {
+        if ($this->parseArgsHelper() && $this->checkIsArgsSetHelper()) {
             $retVal = $this->exec();
         }
 
@@ -365,6 +367,8 @@ abstract class CLICommand {
                 return $arg;
             }
         }
+
+        return null;
     }
     /**
      * Returns an associative array that contains command args.
@@ -416,6 +420,8 @@ abstract class CLICommand {
 
             return CommandArgument::extractValue($trimmedOptName, $this->getOwner());
         }
+
+        return null;
     }
     /**
      * Returns the description of the command.
@@ -481,6 +487,8 @@ abstract class CLICommand {
                 }
             } while (true);
         }
+
+        return null;
     }
     /**
      * Returns the stream at which the command is sing to read inputs.
@@ -807,16 +815,19 @@ abstract class CLICommand {
             return InputValidator::isFloat($val);
         }, 'Provided value is not a floating number!'));
     }
+
     /**
      * Reads the namespace of class and return an instance of it.
-     * 
-     * @param string $prompt The string that will be shown to the user. The 
+     *
+     * @param string $prompt The string that will be shown to the user. The
      * string must be non-empty.
-     *  
+     *
      * @param string $errMsg A string to show in case provided namespace is
      * invalid or an instance of the class cannot be created.
-     * 
+     *
      * @return object The method will return an instance of the class.
+     *
+     * @throws ReflectionException If the method was not able to initiate class instance.
      */
     public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
         $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input)
@@ -828,7 +839,7 @@ abstract class CLICommand {
             return false;
         }, $errMsg));
 
-        $reflection = new \ReflectionClass($clazzNs);
+        $reflection = new ReflectionClass($clazzNs);
 
         return $reflection->newInstanceArgs($constructorArgs);
     }
@@ -942,14 +953,14 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function select(string $prompt, array $choices, int $defaultIndex = -1) {
-        if (gettype($choices) == 'array' && count($choices) != 0) {
+        if (count($choices) != 0) {
             do {
                 $this->println($prompt, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
 
-                $this->_printChoices($choices, $defaultIndex);
+                $this->printChoices($choices, $defaultIndex);
                 $input = trim($this->readln());
 
                 $check = $this->_checkSelectedChoice($choices, $defaultIndex, $input);
@@ -959,6 +970,8 @@ abstract class CLICommand {
                 }
             } while (true);
         }
+
+        return null;
     }
     /**
      * Sets the value of an argument.
@@ -1097,7 +1110,7 @@ abstract class CLICommand {
         ]);
         $this->println($message);
     }
-    private function _checkIsArgsSet() {
+    private function checkIsArgsSetHelper() {
         $missingMandatory = [];
 
         foreach ($this->commandArgs as $argObj) {
@@ -1134,10 +1147,10 @@ abstract class CLICommand {
         } else if (strlen($input) == 0 && $defaultIndex !== null) {
             //Given input is empty string (enter hit). 
             //Return default if specified.
-            $retVal = $this->_getDefault($choices, $defaultIndex);
+            $retVal = $this->getDefaultChoiceHelper($choices, $defaultIndex);
         } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
-            $retVal = $this->_getChoiceAtIndex($choices, $input);
+            $retVal = $this->getChoiceAtIndex($choices, $input);
         }
 
         if ($retVal === null) {
@@ -1159,7 +1172,7 @@ abstract class CLICommand {
 
         return $retVal;
     }
-    private function _getChoiceAtIndex(array $choices, $input) {
+    private function getChoiceAtIndex(array $choices, int $input) {
         $index = 0;
 
         foreach ($choices as $choice) {
@@ -1168,8 +1181,10 @@ abstract class CLICommand {
             }
             $index++;
         }
+
+        return null;
     }
-    private function _getDefault(array $choices, $defaultIndex) {
+    private function getDefaultChoiceHelper(array $choices, int $defaultIndex) {
         $index = 0;
 
         foreach ($choices as $choice) {
@@ -1178,8 +1193,10 @@ abstract class CLICommand {
             }
             $index++;
         }
+
+        return null;
     }
-    private function _parseArgs() : bool {
+    private function parseArgsHelper() : bool {
         $options = $this->getArgs();
         $invalidArgsVals = [];
 
@@ -1214,7 +1231,7 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _printChoices($choices, $default) {
+    private function printChoices($choices, $default) {
         $index = 0;
 
         foreach ($choices as $choiceTxt) {
@@ -1233,14 +1250,14 @@ abstract class CLICommand {
 
     /**
      * Validate user input and show error message if user input is invalid.
-     * @param type $input
+     * @param string $input
      * @param InputValidator|null $validator
      * @param string|null $default
      * @return array The method will return an array with two indices, 'valid' and
      * 'value'. The 'valid' index contains a boolean that is set to true if the
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper(&$input, InputValidator $validator = null, string $default = null) : array {
+    private function getInputHelper(string &$input, InputValidator $validator = null, string $default = null) : array {
         $retVal = [
             'valid' => true
         ];
