@@ -10,13 +10,16 @@ use webfiori\file\File;
  */
 class FileOutputStream implements OutputStream {
     private $file;
+
     /**
      * Creates new instance of the class.
-     * 
+     *
      * Note that the method will attempt to remove the file and re-create it.
-     * 
+     *
      * @param string $path The absolute path to the file that CLI engine
      * will send outputs to.
+     *
+     * @throws FileException If the class was not able to initiate output file.
      */
     public function __construct(string $path) {
         $this->file = new File($path);
@@ -27,7 +30,7 @@ class FileOutputStream implements OutputStream {
      * 
      * @param string $str The string that will be sent.
      * 
-     * @param type $_ Any extra arguments to supply to the output.
+     * @param array $_ Any extra arguments to supply to the output.
      */
     public function println(string $str, ...$_) {
         $toPass = [
@@ -48,8 +51,9 @@ class FileOutputStream implements OutputStream {
      *
      * @param string $str The string that will be sent.
      *
-     * @param type $_ Any extra arguments to supply to the output.
-     * @throws FileException
+     * @param array $_ Any extra arguments to supply to the output.
+     *
+     * @throws FileException If the method was not able to send output.
      */
     public function prints(string $str, ...$_) {
         $arrayToPass = [
