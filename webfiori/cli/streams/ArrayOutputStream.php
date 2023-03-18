@@ -51,7 +51,7 @@ class ArrayOutputStream implements OutputStream {
      * 
      * @param string $str The string that will be printed.
      * 
-     * @param type $_ Any extra parameters that the string needs.
+     * @param array $_ Any extra parameters that the string needs.
      */
     public function prints(string $str, ...$_) {
         $arrayToPass = [$str];
