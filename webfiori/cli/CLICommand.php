@@ -963,7 +963,7 @@ abstract class CLICommand {
                 $this->printChoices($choices, $defaultIndex);
                 $input = trim($this->readln());
 
-                $check = $this->_checkSelectedChoice($choices, $defaultIndex, $input);
+                $check = $this->checkSelectedChoice($choices, $defaultIndex, $input);
 
                 if ($check !== null) {
                     return $check;
@@ -1138,7 +1138,7 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _checkSelectedChoice($choices, $defaultIndex, $input) {
+    private function checkSelectedChoice($choices, $defaultIndex, $input) {
         $retVal = null;
 
         if (in_array($input, $choices)) {
