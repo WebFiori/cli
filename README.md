@@ -176,7 +176,7 @@ Available Commands:
 
 ```
 
->> Note: Depending on registered commands, output may differ.
+> Note: Depending on registered commands, output may differ.
 
 #### Command-Specific Help
 
