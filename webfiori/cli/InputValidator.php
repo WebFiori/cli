@@ -164,21 +164,6 @@ class InputValidator {
 
         return false;
     }
-    private static function validateNsOrClassName(int $len, string $name) : bool {
-        for ($x = 0 ; $x < $len ; $x++) {
-            $char = $name[$x];
-
-            if ($x == 0 && $char >= '0' && $char <= '9') {
-                return false;
-            }
-
-            if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                return false;
-            }
-        }
-
-        return true;
-    }
     /**
      * Checks if provided string represents a valid namespace or not.
      * 
@@ -201,6 +186,21 @@ class InputValidator {
             $len = strlen($subNs);
 
             if (!self::validateNsOrClassName($len, $subNs)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    private static function validateNsOrClassName(int $len, string $name) : bool {
+        for ($x = 0 ; $x < $len ; $x++) {
+            $char = $name[$x];
+
+            if ($x == 0 && $char >= '0' && $char <= '9') {
+                return false;
+            }
+
+            if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
                 return false;
             }
         }

@@ -80,48 +80,6 @@ class Formatter {
 
         return self::getFormattedOutput($string, $validatedOptions);
     }
-    private static function getFormattedOutput($outputString, $formatOptions) {
-        $outputManner = self::getCharsManner($formatOptions);
-
-        if (strlen($outputManner) != 0) {
-            return "\e[".$outputManner."m$outputString\e[0m";
-        }
-
-        return $outputString;
-    }
-    private static function validateOutputOptions($formatArr) {
-        $noColor = 'NO_COLOR';
-
-        if (!isset($formatArr['bold'])) {
-            $formatArr['bold'] = false;
-        }
-
-        if (!isset($formatArr['underline'])) {
-            $formatArr['underline'] = false;
-        }
-
-        if (!isset($formatArr['blink'])) {
-            $formatArr['blink'] = false;
-        }
-
-        if (!isset($formatArr['reverse'])) {
-            $formatArr['reverse'] = false;
-        }
-
-        if (!isset($formatArr['color'])) {
-            $formatArr['color'] = $noColor;
-        }
-
-        if (!isset($formatArr['bg-color'])) {
-            $formatArr['bg-color'] = $noColor;
-        }
-
-        if (!isset($formatArr['ansi'])) {
-            $formatArr['ansi'] = false;
-        }
-
-        return $formatArr;
-    }
     private static function addManner($str, $code) : string {
         if (strlen($str) > 0) {
             return $str.';'.$code;
@@ -167,5 +125,47 @@ class Formatter {
         }
 
         return $mannerStr;
+    }
+    private static function getFormattedOutput($outputString, $formatOptions) {
+        $outputManner = self::getCharsManner($formatOptions);
+
+        if (strlen($outputManner) != 0) {
+            return "\e[".$outputManner."m$outputString\e[0m";
+        }
+
+        return $outputString;
+    }
+    private static function validateOutputOptions($formatArr) {
+        $noColor = 'NO_COLOR';
+
+        if (!isset($formatArr['bold'])) {
+            $formatArr['bold'] = false;
+        }
+
+        if (!isset($formatArr['underline'])) {
+            $formatArr['underline'] = false;
+        }
+
+        if (!isset($formatArr['blink'])) {
+            $formatArr['blink'] = false;
+        }
+
+        if (!isset($formatArr['reverse'])) {
+            $formatArr['reverse'] = false;
+        }
+
+        if (!isset($formatArr['color'])) {
+            $formatArr['color'] = $noColor;
+        }
+
+        if (!isset($formatArr['bg-color'])) {
+            $formatArr['bg-color'] = $noColor;
+        }
+
+        if (!isset($formatArr['ansi'])) {
+            $formatArr['ansi'] = false;
+        }
+
+        return $formatArr;
     }
 }

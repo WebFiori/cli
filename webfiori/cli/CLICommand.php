@@ -1110,6 +1110,19 @@ abstract class CLICommand {
         ]);
         $this->println($message);
     }
+
+
+    private function _createPassArray($string, array $args) : array {
+        $retVal = [$string];
+
+        foreach ($args as $arg) {
+            if (gettype($arg) != 'array') {
+                $retVal[] = $arg;
+            }
+        }
+
+        return $retVal;
+    }
     private function checkIsArgsSetHelper() {
         $missingMandatory = [];
 
@@ -1159,19 +1172,6 @@ abstract class CLICommand {
 
         return $retVal;
     }
-
-
-    private function _createPassArray($string, array $args) : array {
-        $retVal = [$string];
-
-        foreach ($args as $arg) {
-            if (gettype($arg) != 'array') {
-                $retVal[] = $arg;
-            }
-        }
-
-        return $retVal;
-    }
     private function getChoiceAtIndex(array $choices, int $input) {
         $index = 0;
 
@@ -1195,6 +1195,34 @@ abstract class CLICommand {
         }
 
         return null;
+    }
+
+    /**
+     * Validate user input and show error message if user input is invalid.
+     * @param string $input
+     * @param InputValidator|null $validator
+     * @param string|null $default
+     * @return array The method will return an array with two indices, 'valid' and
+     * 'value'. The 'valid' index contains a boolean that is set to true if the
+     * value is valid. The index 'value' will contain the passed value.
+     */
+    private function getInputHelper(string &$input, InputValidator $validator = null, string $default = null) : array {
+        $retVal = [
+            'valid' => true
+        ];
+
+        if (strlen($input) == 0 && $default !== null) {
+            $input = $default;
+        } else if ($validator !== null) {
+            $retVal['valid'] = $validator->isValid($input);
+
+            if (!($retVal['valid'] === true)) {
+                $this->error($validator->getErrPrompt());
+            }
+        }
+        $retVal['value'] = $input;
+
+        return $retVal;
     }
     private function parseArgsHelper() : bool {
         $options = $this->getArgs();
@@ -1246,34 +1274,6 @@ abstract class CLICommand {
             }
             $index++;
         }
-    }
-
-    /**
-     * Validate user input and show error message if user input is invalid.
-     * @param string $input
-     * @param InputValidator|null $validator
-     * @param string|null $default
-     * @return array The method will return an array with two indices, 'valid' and
-     * 'value'. The 'valid' index contains a boolean that is set to true if the
-     * value is valid. The index 'value' will contain the passed value.
-     */
-    private function getInputHelper(string &$input, InputValidator $validator = null, string $default = null) : array {
-        $retVal = [
-            'valid' => true
-        ];
-
-        if (strlen($input) == 0 && $default !== null) {
-            $input = $default;
-        } else if ($validator !== null) {
-            $retVal['valid'] = $validator->isValid($input);
-
-            if (!($retVal['valid'] === true)) {
-                $this->error($validator->getErrPrompt());
-            }
-        }
-        $retVal['value'] = $input;
-
-        return $retVal;
     }
     private function printMsg(string $msg, string $prefix, string $color) {
         $this->prints("$prefix: ", [
