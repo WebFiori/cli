@@ -1,5 +1,5 @@
 # CLI
-A libray that can be used to write command line based applications using PHP.
+Class library that can help in writing command line based applications using PHP.
 
 
 <p align="center">
