@@ -1193,8 +1193,6 @@ abstract class CLICommand {
             }
             $index++;
         }
-
-        return null;
     }
 
     /**
