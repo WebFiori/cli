@@ -96,3 +96,101 @@ php app.php say-hi
 
 The output will be the string `Hi People!`.
 
+## Interactive Mode
+
+Interactive mode is a way that can be used to keep your application running and execute more than one command using same PHP process. To start the application in interactive mode, add the argument `-i` when starting the application as follows:
+
+``` bash
+php app.php -i
+```
+
+This will show following output in terminal:
+
+``` bash
+>> Running in interactive mode.
+>> Type command name or 'exit' to close.
+>>
+```
+
+## The `help` Command
+One of the commands which comes by default is the `help` command. It can be used to display help instructions for all registered commands. 
+
+### Setting Help Instructions
+
+Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `CLICommand` as a description. The description can be set for the command and its arguments.
+
+``` php
+<?php
+//File 'src/SampleCommand.php'
+use webfiori\cli\CLICommand;
+
+class GreetingsCommand extends CLICommand {
+
+    public function __construct() {
+        parent::__construct('hello', [
+            '--person-name' => [
+                'description' => 'Name of someone to greet.',
+                'optional' => true
+            ]
+        ], 'A command to show greetings.');
+    }
+
+    public function exec(): int {
+        $name = $this->getArgValue('--person-name');
+
+        if ($name === null) {
+            $this->println("Hello World!");
+        } else {
+            $this->println("Hello %s!", $name);
+        }
+
+        return 0;
+    }
+}
+
+```
+
+### Running `help` Command
+
+#### General Help
+
+To show general help of the application, following command can be executed.
+
+``` bash
+//File 'src/app.php'
+php app.php help 
+```
+
+Output of this command will be as follows:
+
+```
+Usage:
+    command [arg1 arg2="val" arg3...]
+
+Global Arguments:[0m[k
+    --ansi:[Optional] Force the use of ANSI output.
+Available Commands:
+    help:          Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.
+    hello:         A command to show greetings.
+    open-file:     Reads a text file and display its content.
+
+```
+
+>> Note: Depending on registered commands, output may differ.
+
+#### Command-Specific Help
+
+To show help instructions for a specific command, the name of the command can be included using the argument `--command-name` as follows:
+
+``` bash
+//File 'src/app.php'
+php app.php help --command-name=hello
+```
+
+Output of this command will be as follows:
+
+```
+hello:         A command to show greetings.
+    Supported Arguments:
+                --person-name:[Optional] Name of someone to greet.
+```
