@@ -315,6 +315,23 @@ class CLICommandTest extends TestCase {
     /**
      * @test
      */
+    public function testSelect07() {
+        $command = new TestCommand('cool');
+        $command->setOutputStream(new ArrayOutputStream());
+        $command->setInputStream(new ArrayInputStream([
+            '1'
+        ]));
+        $answer = $command->select('Select a value:', [
+            
+        ], 2);
+        $this->assertNull($answer);
+        $this->assertEquals([
+
+        ], $command->getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testMoveCursorTo() {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
