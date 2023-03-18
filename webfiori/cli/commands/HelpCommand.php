@@ -62,7 +62,7 @@ class HelpCommand extends CLICommand {
 
         return 0;
     }
-    private function getMaxCommandNameLen() {
+    private function getMaxCommandNameLen() : int {
         $len = 0;
 
         foreach ($this->getOwner()->getCommands() as $c) {
@@ -91,11 +91,17 @@ class HelpCommand extends CLICommand {
         }
         $this->println(" %s", $argObj->getDescription());
     }
+
     /**
-     * 
+     * Prints meta information of a specific command.
+     *
      * @param CLICommand $cliCommand
+     *
+     * @param int $len
+     *
+     * @param bool $withArgs
      */
-    private function printCommandInfo(CLICommand $cliCommand, $len, bool $withArgs = false) {
+    private function printCommandInfo(CLICommand $cliCommand, int $len, bool $withArgs = false) {
         $this->prints("    %s", $cliCommand->getName(), [
             'color' => 'yellow',
             'bold' => true
