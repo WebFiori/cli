@@ -3,8 +3,8 @@ Class library that can help in writing command line based applications using PHP
 
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml">
-    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml">
+    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -193,4 +193,62 @@ Output of this command will be as follows:
 hello:         A command to show greetings.
     Supported Arguments:
                 --person-name:[Optional] Name of someone to greet.
+```
+
+## Testing Commands
+
+In order to test the output of any command with specific inputs, the developer must first set the inputs at which the runner which is used to execute the command will use.
+
+Assuming that PHPUnit is used to test the command `help`, a test case would be similar to the following:
+
+``` php
+namespace tests\cli;
+
+use PHPUnit\Framework\TestCase;
+use webfiori\cli\streams\ArrayInputStream;
+use webfiori\cli\streams\ArrayOutputStream;
+use webfiori\cli\Runner;
+
+class HelpCommandTest extends TestCase {
+    public function test00() {
+        $runner = new Runner();
+        $runner->setInput([
+        
+        ]);
+        $runner->setArgsVector([
+
+        ]);
+        $this->assertEquals([
+
+        ], $runner->getOutput());
+    }
+}
+
+```
+
+### Testing With Custom Arguments
+
+``` php
+namespace tests\cli;
+
+use PHPUnit\Framework\TestCase;
+use webfiori\cli\streams\ArrayInputStream;
+use webfiori\cli\streams\ArrayOutputStream;
+use webfiori\cli\Runner;
+
+class HelpCommandTest extends TestCase {
+    public function test00() {
+        $runner = new Runner();
+        $runner->setInput([
+        
+        ]);
+        $runner->setArgsVector([
+
+        ]);
+        $this->assertEquals([
+
+        ], $runner->getOutput());
+    }
+}
+
 ```
