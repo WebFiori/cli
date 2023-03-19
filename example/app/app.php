@@ -1,6 +1,6 @@
 <?php
 
-require_once '../vendor/autoload.php';
+require_once '../../vendor/autoload.php';
 require_once './HelloWorldCommand.php';
 require_once './OpenFileCommand.php';
 
