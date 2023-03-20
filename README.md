@@ -62,7 +62,7 @@ Class library that can help in writing command line based applications using PHP
 
 ## Sample Application
 
-A sample application can be found here: https://github.com/webfiori/cli/main/example
+A sample application can be found here: https://github.com/WebFiori/cli/tree/main/example
 
 ## Installation
 
@@ -348,6 +348,6 @@ class HelloCommandTest extends TestCase {
 
 ```
 
-A sample of tests can be found [here](https://github.com/webfiori/cli/main/example/tests/HelloCommandTest.php)
+A sample of tests can be found [here](https://github.com/WebFiori/cli/tree/main/example/tests/HelloCommandTest.php)
 
 
