@@ -86,7 +86,7 @@ class Runner {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
-            $r->checkIsIntr();
+            $r->checkIsInteractive();
         });
     }
     /**
@@ -190,12 +190,14 @@ class Runner {
         if (isset($this->getCommands()[$name])) {
             return $this->getCommands()[$name];
         }
+
+        return null;
     }
     /**
      * Returns an associative array of registered commands.
      * 
-     * @return array The method will return an associative array. The keys of 
-     * the array are the names of the commands and the value of the key is 
+     * @return array The method will return an associative array.
+     * The keys of the array are the names of the commands and the value of the key is
      * an object that holds command information.
      * 
      */
@@ -206,8 +208,8 @@ class Runner {
      * Return the command which will get executed in case no command name
      * was provided as argument.
      * 
-     * @return CLICommand|null If set, it will be returned as object. Other
-     * than that, null is returned.
+     * @return CLICommand|null If set, it will be returned as object.
+     * Other than that, null is returned.
      */
     public function getDefaultCommand() {
         return $this->defaultCommand;
@@ -365,7 +367,7 @@ class Runner {
                 $c = $this->getDefaultCommand();
             } else {
                 if (isset($args[0])) {
-                    $commandName = filter_var($args[0], FILTER_DEFAULT);
+                    $commandName = filter_var($args[0]);
 
                     $c = $this->getCommandByName($commandName);
                 } else {
@@ -452,7 +454,7 @@ class Runner {
      * Sets arguments vector to have specific value.
      * 
      * This method is mainly used to simulate running the class using an
-     * actual terminal. Also, it can be used to setup the test run parameters
+     * actual terminal. Also, it can be used to set up the test run parameters
      * for testing a command.
      * 
      * @param array $argsVector An array that contains arguments vector. Usually,
@@ -467,7 +469,7 @@ class Runner {
     /**
      * Sets a callable to call before start running CLI engine.
      * 
-     * This can be used to register custom made commands before running
+     * This can be used to register custom-made commands before running
      * the engine.
      * 
      * @param callable $func An executable function. The function will have
@@ -477,7 +479,7 @@ class Runner {
         $this->beforeStartPool[] = $func;
     }
     /**
-     * Sets the default command that will be get executed in case no command
+     * Sets the default command that will be executed in case no command
      * name was provided as argument.
      * 
      * @param string $commandName The name of the command that will be set as
@@ -504,7 +506,7 @@ class Runner {
      * 
      * @param array $inputs An array that contain lines of inputs.
      */
-    public function setInput(array $inputs = []) {
+    public function setInputs(array $inputs = []) {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
     }
@@ -512,7 +514,7 @@ class Runner {
     /**
      * Sets the stream at which the runner will be using to read inputs from.
      * 
-     * @param InputStream $stream The new stream that will holds inputs.
+     * @param InputStream $stream The new stream that will hold inputs.
      */
     public function setInputStream(InputStream $stream) {
         $this->inputStream = $stream;
@@ -520,7 +522,7 @@ class Runner {
     /**
      * Sets the stream at which the runner will be using to send outputs to.
      * 
-     * @param OutputStream $stream The new stream that will holds inputs.
+     * @param OutputStream $stream The new stream that will hold inputs.
      */
     public function setOutputStream(OutputStream $stream) {
         $this->outputStream = $stream;
@@ -563,7 +565,7 @@ class Runner {
             return $this->run();
         }
     }
-    private function checkIsIntr() {
+    private function checkIsInteractive() {
         foreach ($this->getArgsVector() as $arg) {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
@@ -602,9 +604,9 @@ class Runner {
     /**
      * Run the command line as single run.
      *
-     * @return type
+     * @return int
      */
-    private function run() {
+    private function run() : int {
         $argsArr = array_slice($this->getArgsVector(), 1);
 
         if (in_array('--ansi', $argsArr)) {

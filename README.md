@@ -1,10 +1,10 @@
-# CLI
-A libray that can be used to write command line based applications using PHP.
+# WebFiori CLI
+Class library that can help in writing command line based applications using PHP.
 
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml">
-    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml">
+    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -20,6 +20,25 @@ A libray that can be used to write command line based applications using PHP.
   </a>
 </p>
 
+## Content
+* [Supported PHP Versions](#supported-php-versions)
+* [Features](#features)
+* [Sample Application](#sample-application)
+* [Installation](#installation)
+* [Creating and Running Commands](#creating-and-running-commands)
+  * [Creating a Command](#creating-a-command)
+  * [Running a Command](#running-a-command)
+  * [Arguments](#arguments)
+    * [Adding Arguments to Commands](#adding-arguments-to-commands)
+    * [Accessing Argument Value](#accessing-argument-value)
+* [Interactive Mode](#interactive-mode)
+* [The `help` Command](#the-help-command)
+  * [Setting Help Instructions](#setting-help-instructions)
+  * [Running `help` Command](#running-help-command)
+    * [General Help](#general-help)
+    * [Command-Specific Help](#command-specific-help)
+* [Unit-Testing Commands](#unit-testing-commands)
+
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
@@ -32,6 +51,8 @@ A libray that can be used to write command line based applications using PHP.
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> |
 
+
+
 ## Features
 * Help in creating command line based applications.
 * Support for interactive mode.
@@ -39,16 +60,20 @@ A libray that can be used to write command line based applications using PHP.
 * Support for implementing custom input and output streams.
 * Ability to write tests for commands and test them using test automation tools.
 
+## Sample Application
+
+A sample application can be found here: https://github.com/webfiori/cli/main/example
+
 ## Installation
 
-To install the library, simply include it in your `composer.json`'s `requre` section: `webfiori\cli`.
+To install the library, simply include it in your `composer.json`'s `require` section: `"webfiori\cli":"*"`.
 
-## Creating and Running a Command
+## Creating and Running Commands
 
 ### Creating a Command
 
 
-First step in creating new command is to create a new class that extends the class `CLICommand`. The class `CLICommand` is a utility class which has methods which can be used to read inputs and send outputs.
+First step in creating new command is to create a new class that extends the class `CLICommand`. The class `CLICommand` is a utility class which has methods which can be used to read inputs, send outputs and use command line arguments.
 
 The class has one abstract method that must be implemented. The code that will exist in the body of the method will represent the logic of the command.
 
@@ -71,13 +96,15 @@ class SampleCommand extends CLICommand {
 
 ```
 
-### Running the Command
+### Running a Command
 
-The class `Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command.
+The class `Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command and start running the application.
+
+To register a command, the method `Runner::register()` is used. To start the application, the method `Runner::start()` is used.
 
 ``` php
 // File src/app.php
-require_once './vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
 use webfiori\cli\Runner;
 use SampleCommand;
@@ -95,4 +122,232 @@ php app.php say-hi
 ```
 
 The output will be the string `Hi People!`.
+
+### Arguments
+
+Arguments is a way that can be used to pass values from the terminal to PHP process. They can be used to configure execution of the command. For example, a command might require some kind of file as input. 
+
+#### Adding Arguments to Commands
+
+Arguments can be added in the constructor of the class as follows:
+
+``` php
+<?php
+//File 'src/SampleCommand.php'
+use webfiori\cli\CLICommand;
+
+class SampleCommand extends CLICommand {
+
+    public function __construct(){
+        parent::__construct('say-hi', [
+            '--person-name' => [
+                'optional' => true
+            ]
+        ]);
+    }
+
+    public function exec(): int {
+        $this->println("Hi People!");
+    }
+
+}
+
+```
+
+Arguments provided as an associative array. Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
+* `optional`: A boolean. if set to true, it means that the argument is optional. Default is false.
+* `default`: An optional default value for the argument to use if it is not provided.
+* `description`: A description of the argument which will be shown if the command `help` is executed.
+* `values`: A set of values that the argument can have. If provided, only the values on the list will be allowed.
+
+#### Accessing Argument Value
+
+Accessing the value of an argument is performed using the method `CLICommand::getArgValue(string $argName)`. If argument is provided, the method will return its value as `string`. If not provided, `null` is returned.
+
+``` php
+<?php
+//File 'src/SampleCommand.php'
+use webfiori\cli\CLICommand;
+
+class SampleCommand extends CLICommand {
+
+    public function __construct(){
+        parent::__construct('say-hi', [
+            '--person-name' => [
+                'optional' => true
+            ]
+        ]);
+    }
+
+    public function exec(): int {
+        $personName = $this->getArgValue('--person-name');
+        
+        if ($personName !== null) {
+            $this->println("Hi %s!", $personName);
+        } else {
+            $this->println("Hi People!");
+        }
+        
+    }
+
+}
+
+```
+
+## Interactive Mode
+
+Interactive mode is a way that can be used to keep your application running and execute more than one command using same PHP process. To start the application in interactive mode, add the argument `-i` when starting the application as follows:
+
+``` bash
+php app.php -i
+```
+
+This will show following output in terminal:
+
+``` bash
+>> Running in interactive mode.
+>> Type command name or 'exit' to close.
+>>
+```
+
+## `help` Command
+One of the commands which comes by default with the library is the `help` command. It can be used to display help instructions for all registered commands. 
+
+> Note: In order to use this command, it must be registered using the method `Runner::register()`. 
+
+### Setting Help Instructions
+
+Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `CLICommand` as a description. The description can be set for the command and its arguments.
+
+``` php
+<?php
+//File 'src/SampleCommand.php'
+use webfiori\cli\CLICommand;
+
+class GreetingsCommand extends CLICommand {
+
+    public function __construct() {
+        parent::__construct('hello', [
+            '--person-name' => [
+                'description' => 'Name of someone to greet.',
+                'optional' => true
+            ]
+        ], 'A command to show greetings.');
+    }
+
+    public function exec(): int {
+        $name = $this->getArgValue('--person-name');
+
+        if ($name === null) {
+            $this->println("Hello World!");
+        } else {
+            $this->println("Hello %s!", $name);
+        }
+
+        return 0;
+    }
+}
+
+```
+
+### Running `help` Command
+
+Help command can be used in two ways, one way is to display a general help for the application and another one for specific command.
+
+#### General Help
+
+To show general help of the application, following command can be executed.
+
+``` bash
+//File 'src/app.php'
+php app.php help 
+```
+
+Output of this command will be as follows:
+
+```
+Usage:
+    command [arg1 arg2="val" arg3...]
+
+Global Arguments:[0m[k
+    --ansi:[Optional] Force the use of ANSI output.
+Available Commands:
+    help:          Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.
+    hello:         A command to show greetings.
+    open-file:     Reads a text file and display its content.
+
+```
+
+> Note: Depending on registered commands, output may differ.
+
+#### Command-Specific Help
+
+To show help instructions for a specific command, the name of the command can be included using the argument `--command-name` as follows:
+
+``` bash
+//File 'src/app.php'
+php app.php help --command-name=hello
+```
+
+Output of this command will be as follows:
+
+```
+hello:         A command to show greetings.
+    Supported Arguments:
+                --person-name:[Optional] Name of someone to greet.
+```
+
+## Unit-Testing Commands
+
+Testing commands using the library is very simple. In any test case, developer must follow following steps to prepare a test case:
+* Create new instance of the class `Runner`.
+* Register the command that will be tested using the method `Runner::register()`.
+* Set arguments vector using the method `Runner::setArgsVector()`.
+* Set user inputs using the method `Runner::setInputs()`.
+* Start the command using the method `Runner::start()`.
+* Get the output of command execution using the method `Runner::getOutput()` and compare it to expected output.
+
+Assuming that PHPUnit is used to test a command, a test case would be similar to the following:
+
+``` php
+namespace tests\cli;
+
+use webfiori\cli\Runner;
+use PHPUnit\Framework\TestCase;
+
+class HelloCommandTest extends TestCase {
+    /**
+     * @test
+     */
+    public function test00() {
+        $runner = new Runner();
+        
+        //Register the command that will be tested.
+        $runner->register(new HelloWorldCommand());
+        
+        //Set arguments vector
+        $runner->setArgsVector([
+            'app.php',//First argument is always name of entry point. This Can be set to anything since its testing env.
+            'hello'
+        ]);
+        
+        //Set user inputs.
+        //Must be called to use Array as input and output stream even if there are no inputs.
+        $runner->setInput([]);
+        
+        //Start the process
+        $exitStatus = $runner->start();
+        
+        //Verify test results
+        $this->assertEquals(0, $exitStatus);
+        $this->assertEquals([
+            "Hello World!\n"
+        ], $runner->getOutput());
+    }
+}
+
+```
+
+A sample of tests can be found [here](https://github.com/webfiori/cli/main/example/tests/HelloCommandTest.php)
+
 

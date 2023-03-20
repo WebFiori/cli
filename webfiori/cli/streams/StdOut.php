@@ -38,7 +38,7 @@ class StdOut implements OutputStream {
         call_user_func_array('fprintf', $arrayToPass);
     }
 
-    private function asString($var) {
+    private function asString($var): string {
         $type = gettype($var);
 
         if ($type == 'boolean') {

@@ -95,9 +95,9 @@ class KeysMap {
      * 
      * @return string If the character maps to control character, a value from
      * the array InputTranslator::KEY_MAP is returned. Other than that,
-     * the character it self will be returned.
+     * the character itself will be returned.
      */
-    public static function readAndTranslate(InputStream $stream) {
+    public static function readAndTranslate(InputStream $stream) : string {
         $keypress = $stream->read();
 
         return self::map($keypress);
@@ -116,7 +116,7 @@ class KeysMap {
      * 
      * @since 1.0
      */
-    public static function readLine(InputStream $stream) {
+    public static function readLine(InputStream $stream) : string {
         $input = '';
         $char = '';
 
