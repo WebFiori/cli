@@ -117,7 +117,7 @@ The output will be the string `Hi People!`.
 
 ### Arguments
 
-Arguments is a way that can be used to pass values from the terminal to PHP process. They can be used to configure execution of the command. For example, a command might requre some kind of file as input. 
+Arguments is a way that can be used to pass values from the terminal to PHP process. They can be used to configure execution of the command. For example, a command might require some kind of file as input. 
 
 #### Adding Arguments to Commands
 
@@ -146,7 +146,7 @@ class SampleCommand extends CLICommand {
 
 ```
 
-Arguments provided as an associative array. Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have following options:
+Arguments provided as an associative array. Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
 * `optional`: A boolean. if set to true, it means that the argument is optional. Default is false.
 * `default`: An optional default value for the argument to use if it is not provided.
 * `description`: A description of the argument which will be shown if the command `help` is executed.
