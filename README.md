@@ -20,6 +20,25 @@ Class library that can help in writing command line based applications using PHP
   </a>
 </p>
 
+## Content
+* [Supported PHP Versions](#supported-php-versions)
+* [Features](#features)
+* [Sample Application](#sample-application)
+* [Installation](#installation)
+* [Creating and Running Commands](#creating-and-running-commands)
+  * [Creating a Command](#creating-a-command)
+  * [Running a Command](#running-a-command)
+  * [Arguments](#arguments)
+    * [Adding Arguments to Commands](#adding-arguments-to-commands)
+    * [Accessing Argument Value](#accessing-argument-value)
+* [Interactive Mode](#interactive-mode)
+* [The `help` Command](#the-help-command)
+  * [Setting Help Instructions](#setting-help-instructions)
+  * [Running `help` Command](#running-help-command)
+    * [General Help](#general-help)
+    * [Command-Specific Help](#command-specific-help)
+* [Unit-Testing Commands](#unit-testing-commands)
+
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
@@ -32,22 +51,7 @@ Class library that can help in writing command line based applications using PHP
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> |
 
-## Content
-* [Features](#features)
-* [Installation](#installation)
-* [Creating and Running Commands](#creating-and-running-commands)
-  * [Creating a Command](#creating-a-command)
-  * [Running a Command](#running-a-command)
-  * [Arguments](#arguments)
-    * [Adding Arguments to Commands](#adding-arguments-to-commands) 
-    * [Accessing Argument Value](#accessing-argument-value)
-* [Interactive Mode](#interactive-mode)
-* [The `help` Command](#the-help-command)
-  * [Setting Help Instructions](#setting-help-instructions) 
-  * [Running `help` Command](#running-help-command)
-    * [General Help](#general-help)
-    * [Command-Specific Help](#command-specific-help)
-* [Unit-Testing Commands](#unit-testing-commands)
+
 
 ## Features
 * Help in creating command line based applications.
@@ -56,9 +60,13 @@ Class library that can help in writing command line based applications using PHP
 * Support for implementing custom input and output streams.
 * Ability to write tests for commands and test them using test automation tools.
 
+## Sample Application
+
+A sample application can be found here: https://github.com/webfiori/cli/main/example
+
 ## Installation
 
-To install the library, simply include it in your `composer.json`'s `requre` section: `webfiori\cli`.
+To install the library, simply include it in your `composer.json`'s `require` section: `"webfiori\cli":"*"`.
 
 ## Creating and Running Commands
 
