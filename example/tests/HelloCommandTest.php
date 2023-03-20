@@ -7,6 +7,7 @@ require_once(realpath(dirname(__FILE__).'\\..\\app\\HelloWorldCommand.php'));
 
 use webfiori\cli\Runner;
 use PHPUnit\Framework\TestCase;
+use webfiori\cli\commands\HelpCommand;
 
 class HelloCommandTest  extends TestCase {
     /**
@@ -27,7 +28,7 @@ class HelloCommandTest  extends TestCase {
         
         //Set user inputs.
         //Must be called to use Array as input and output stream even if there are no inputs.
-        $runner->setInput();
+        $runner->setInputs();
         
         //Start the process
         $exitStatus = $runner->start();
@@ -50,11 +51,35 @@ class HelloCommandTest  extends TestCase {
             'hello',
             '--person-name' => 'Ibrahim BinAlshikh'
         ]);
-        $runner->setInput();
+        $runner->setInputs();
         $exitStatus = $runner->start();
         $this->assertEquals(0, $exitStatus);
         $this->assertEquals([
             "Hello Ibrahim BinAlshikh!\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test03() {
+        $runner = new Runner();
+        $runner->register(new HelpCommand());
+        $runner->register(new HelloWorldCommand());
+        $runner->setDefaultCommand('help');
+        $runner->setArgsVector([
+            'app.php',
+        ]);
+        $runner->setInputs();
+        $exitStatus = $runner->start();
+        $this->assertEquals(0, $exitStatus);
+        $this->assertEquals([
+            "Usage:\n",
+            "    command [arg1 arg2=\"val\" arg3...]\n\n",
+            "Global Arguments:\n",
+            "    --ansi:[Optional] Force the use of ANSI output.\n",
+            "Available Commands:\n",
+            "    help:      Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    hello:     A command to show greetings.\n"
         ], $runner->getOutput());
     }
 }
