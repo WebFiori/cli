@@ -506,7 +506,7 @@ class Runner {
      * 
      * @param array $inputs An array that contain lines of inputs.
      */
-    public function setInput(array $inputs = []) {
+    public function setInputs(array $inputs = []) {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
     }
