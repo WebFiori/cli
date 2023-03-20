@@ -16,7 +16,7 @@ In addition to given sources, the folder `tests` contain one file which shows ho
 
 ## Running The Application
 
-The first step in running the application is to install any dependecies that are needed. 
+The first step in running the application is to install any dependencies that are needed. 
 
 To install them, run the command `php composer install` while begin in the root directory of the library. 
-After that, navigate to the folder that has the sample application and run `php app.php -i` to start the application in intractive mode.
+After that, navigate to the folder that has the sample application and run `php app.php -i` to start the application in interactive mode.
