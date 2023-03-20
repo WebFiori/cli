@@ -63,7 +63,7 @@ class RunnerTest extends TestCase {
         $runner->register(new Command00());
         $this->assertEquals(1, count($runner->getCommands()));
         $runner->setDefaultCommand('super-hero');
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(null, [
             'name' => 'Ibrahim'
         ]));
@@ -79,7 +79,7 @@ class RunnerTest extends TestCase {
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $runner->setDefaultCommand('super-hero');
         $this->assertNull($runner->getDefaultCommand());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'do-it',
             '--ansi'
@@ -96,7 +96,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->setDefaultCommand('super-hero');
         $this->assertNull($runner->getDefaultCommand());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $this->assertEquals([
@@ -109,7 +109,7 @@ class RunnerTest extends TestCase {
     public function testRunner03() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'super-hero',
             'name' => 'Ok'
@@ -128,7 +128,7 @@ class RunnerTest extends TestCase {
     public function testRunner04() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'super-hero',
             'name' => 'Ok',
@@ -151,7 +151,7 @@ class RunnerTest extends TestCase {
         $runner->register(new HelpCommand());
         $runner->removeArgument('--ansi');
         $runner->setDefaultCommand('help');
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(null, []));
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $this->assertEquals([
@@ -169,7 +169,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setDefaultCommand('help');
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), []));
         $this->assertEquals([
             "Usage:\n",
@@ -187,7 +187,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->setDefaultCommand('help');
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), [
             '--ansi'
         ]));
@@ -207,7 +207,7 @@ class RunnerTest extends TestCase {
     public function testRunner08() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), [
             '--ansi',
             '--command-name' => 'super-hero'
@@ -228,7 +228,7 @@ class RunnerTest extends TestCase {
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->setDefaultCommand('help');
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $runner->start();
         $this->assertEquals([
             "Usage:\n",
@@ -246,7 +246,7 @@ class RunnerTest extends TestCase {
         $runner = new Runner();
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $runner->setArgsVector([
             'entry.php',
             'help',
@@ -273,7 +273,7 @@ class RunnerTest extends TestCase {
             ]);
             $r->register(new Command00());
             $r->register(new HelpCommand());
-            $r->setInput([]);
+            $r->setInputs([]);
         });
         $runner->start();
         $this->assertEquals([
@@ -294,7 +294,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             '-i',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'exit'
         ]);
         $runner->start();
@@ -318,7 +318,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             '-i',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'help --ansi',
             'exit'
         ]);
@@ -350,7 +350,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             '-i',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'help --ansi --command-name=super-hero',
             'super-hero name=Ibrahim',
             'exit'
@@ -382,7 +382,7 @@ class RunnerTest extends TestCase {
             '--ansi',
             '-i',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'help --command-name=super-hero',
             'with-exception',
             'exit'
@@ -410,7 +410,7 @@ class RunnerTest extends TestCase {
     public function testRunner16() {
         $runner = new Runner();
         $runner->register(new Command01());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'show-v'
         ]));
@@ -424,7 +424,7 @@ class RunnerTest extends TestCase {
     public function testRunner17() {
         $runner = new Runner();
         $runner->register(new Command01());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'show-v',
             '--ansi'
@@ -439,7 +439,7 @@ class RunnerTest extends TestCase {
     public function testRunner18() {
         $runner = new Runner();
         $runner->register(new Command01());
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $runner->setAfterExecution(function (Runner $r) {
             $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
         });
@@ -468,7 +468,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             '-i',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '',
             '',
             'exit'
@@ -494,7 +494,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             '--ansi',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
 
         ]);
         $runner->start();
@@ -508,7 +508,17 @@ class RunnerTest extends TestCase {
      */
     public function testRunner21() {
         $runner = new Runner();
-        
+        $runner->setArgsVector([
+
+        ]);
+        $runner->setInputStream(new ArrayInputStream([
+
+        ]));
+        $runner->setOutputStream(new ArrayOutputStream());
+
+        $this->assertEquals([
+
+        ], $runner->getOutput());
         $runner->register(new Command00());
         $runner->register(new HelpCommand());
         $runner->register(new WithExceptionCommand());
@@ -520,7 +530,7 @@ class RunnerTest extends TestCase {
             'entry.php',
             'with-exception',
         ]);
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $runner->start();
         $this->assertEquals([
             "Error: An exception was thrown.\n",
@@ -529,6 +539,19 @@ class RunnerTest extends TestCase {
             "At: ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
             "Line: 12\n",
             "Command Exit Status: -1\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test00() {
+        $runner = new Runner();
+        $runner->setInputs([]);
+        $runner->setArgsVector([
+
+        ]);
+        $this->assertEquals([
+
         ], $runner->getOutput());
     }
 }
