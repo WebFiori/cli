@@ -322,7 +322,7 @@ class CLICommandTest extends TestCase {
             '1'
         ]));
         $answer = $command->select('Select a value:', [
-            
+
         ], 2);
         $this->assertNull($answer);
         $this->assertEquals([
@@ -1047,7 +1047,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear00() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1068,7 +1068,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear01() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1089,7 +1089,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear02() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1110,7 +1110,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear03() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1131,7 +1131,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear05() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1152,7 +1152,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear06() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1173,7 +1173,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove00() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1197,7 +1197,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove01() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
                 
@@ -1221,7 +1221,7 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList00() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command);
         $command->printList([
@@ -1242,7 +1242,7 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList01() {
         $runner = new Runner();
-        $runner->setInput([]);
+        $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command, [
             '--ansi'
