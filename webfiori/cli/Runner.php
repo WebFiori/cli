@@ -305,9 +305,14 @@ class Runner {
      * 
      * @param CLICommand $cliCommand The command that will be registered.
      * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
+     * 
      */
-    public function register(CLICommand $cliCommand) {
+    public function register(CLICommand $cliCommand) : Runner {
         $this->commands[$cliCommand->getName()] = $cliCommand;
+        
+        return $this;
     }
     /**
      * Removes an argument from the global args set given its name.
@@ -335,11 +340,16 @@ class Runner {
 
     /**
      * Reset input stream, output stream and, registered commands to default.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function reset() {
+    public function reset() : Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
+        
+        return $this;
     }
     /**
      * Executes a command given as object.
@@ -419,8 +429,11 @@ class Runner {
      * is being executed.
      * 
      * @param CLICommand $c The command which is in execution stage.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setActiveCommand(CLICommand $c = null) {
+    public function setActiveCommand(CLICommand $c = null) : Runner {
         if ($this->getActiveCommand() !== null) {
             $this->getActiveCommand()->setOwner();
         }
@@ -431,6 +444,8 @@ class Runner {
             $this->getActiveCommand()->setInputStream($this->getInputStream());
             $this->getActiveCommand()->setOwner($this);
         }
+        
+        return $this;
     }
     /**
      * Add a function to execute after every command.
@@ -443,12 +458,17 @@ class Runner {
      * 
      * @param array $params Any additional parameters that will be passed to the
      * callback.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setAfterExecution(callable $func, array $params = []) {
+    public function setAfterExecution(callable $func, array $params = []) : Runner {
         $this->afterRunPool[] = [
             'func' => $func,
             'params' => $params
         ];
+        
+        return $this;
     }
     /**
      * Sets arguments vector to have specific value.
@@ -462,9 +482,14 @@ class Runner {
      * The second argument is the name of the command that will get executed
      * and, remaining parts are any additional arguments that the command
      * might use.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setArgsVector(array $argsVector) {
+    public function setArgsVector(array $argsVector) : Runner {
         $this->argsV = $argsVector;
+        
+        return $this;
     }
     /**
      * Sets a callable to call before start running CLI engine.
@@ -474,9 +499,14 @@ class Runner {
      * 
      * @param callable $func An executable function. The function will have
      * one parameter which is the runner that the function will be added to.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setBeforeStart(callable $func) {
+    public function setBeforeStart(callable $func) : Runner {
         $this->beforeStartPool[] = $func;
+        
+        return $this;
     }
     /**
      * Sets the default command that will be executed in case no command
@@ -484,13 +514,18 @@ class Runner {
      * 
      * @param string $commandName The name of the command that will be set as
      * default command. Note that it must be a registered command.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setDefaultCommand(string $commandName) {
+    public function setDefaultCommand(string $commandName) : Runner {
         $c = $this->getCommandByName($commandName);
 
         if ($c !== null) {
             $this->defaultCommand = $c;
         }
+        
+        return $this;
     }
     /**
      * Sets an array as an input for running specific command.
@@ -505,27 +540,42 @@ class Runner {
      * and output stream to 'ArrayOutputStream'.
      * 
      * @param array $inputs An array that contain lines of inputs.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setInputs(array $inputs = []) {
+    public function setInputs(array $inputs = []) : Runner {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
+        
+        return $this;
     }
 
     /**
      * Sets the stream at which the runner will be using to read inputs from.
      * 
      * @param InputStream $stream The new stream that will hold inputs.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setInputStream(InputStream $stream) {
+    public function setInputStream(InputStream $stream) : Runner {
         $this->inputStream = $stream;
+        
+        return $this;
     }
     /**
      * Sets the stream at which the runner will be using to send outputs to.
      * 
      * @param OutputStream $stream The new stream that will hold inputs.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
      */
-    public function setOutputStream(OutputStream $stream) {
+    public function setOutputStream(OutputStream $stream) : Runner {
         $this->outputStream = $stream;
+        
+        return $this;
     }
     /**
      * Start command line process.
