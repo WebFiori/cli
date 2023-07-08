@@ -14,40 +14,34 @@ use webfiori\cli\streams\OutputStream;
  * 
  * @author Ibrahim
  * 
- * @version 1.0.1
  */
 abstract class CLICommand {
     /**
      * An associative array that contains extra options that can be added to 
      * the command.
      * @var array
-     * @since 1.0 
      */
     private $commandArgs;
     /**
      * The name of the command such as 'help'.
      * @var string 
-     * @since 1.0
      */
     private $commandName;
     /**
      * A description of how to use the command or what it does.
      * @var string
-     * @since 1.0 
      */
     private $description;
     /**
      * 
      * @var InputStream
      * 
-     * @since 1.0.1
      */
     private $inputStream;
     /**
      * 
      * @var OutputStream
      * 
-     * @since 1.0.1
      */
     private $outputStream;
     private $owner;
@@ -78,7 +72,6 @@ abstract class CLICommand {
      * 
      * @param string $description A string that describes what does the job 
      * do. The description will appear when the command 'help' is executed.
-     * @since 1.0
      */
     public function __construct(string $commandName, array $args = [], string $description = '') {
         if (!$this->setName($commandName)) {
@@ -122,7 +115,6 @@ abstract class CLICommand {
      * @return bool If the argument is added, the method will return true.
      * Other than that, the method will return false.
      * 
-     * @since 1.0
      */
     public function addArg(string $name, array $options = []) : bool {
         $toAdd = CommandArgument::create($name, $options);
@@ -196,9 +188,11 @@ abstract class CLICommand {
      * @param bool $beforeCursor If set to true, the characters which
      * are before the cursor will be cleared. Default is true.
      * 
-     * @since 1.0
+     * @return CLICommand The method will return the instance at which the
+     * method is called on.
+     * 
      */
-    public function clear(int $numberOfCols = 1, bool $beforeCursor = true) {
+    public function clear(int $numberOfCols = 1, bool $beforeCursor = true) : CLICommand {
         if ($numberOfCols >= 1) {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
@@ -223,10 +217,13 @@ abstract class CLICommand {
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
      * 
-     * @since 1.0
+     * @return CLICommand The method will return the instance at which the
+     * method is called on.
      */
-    public function clearConsole() {
+    public function clearConsole() : CLICommand {
         $this->prints("\ec");
+        
+        return $this;
     }
     /**
      * Clears the line at which the cursor is in and move it back to the start 
@@ -235,7 +232,6 @@ abstract class CLICommand {
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
      * 
-     * @since 1.0
      */
     public function clearLine() {
         $this->prints("\e[2K");
@@ -260,7 +256,6 @@ abstract class CLICommand {
      * @return bool If the user choose 'y', the method will return true. If
      * he chooses 'n', the method will return false.
      *
-     * @since 1.0
      * 
      */
     public function confirm(string $confirmTxt, bool $default = null) : bool {
@@ -305,7 +300,6 @@ abstract class CLICommand {
      * 
      * @param string $message The message that will be shown.
      * 
-     * @since 1.0
      */
     public function error(string $message) {
         $this->printMsg($message, 'Error', 'light-red');
@@ -320,7 +314,6 @@ abstract class CLICommand {
      * Other than that, it will return a number which depends on the return value of
      * the method 'CLICommand::exec()'.
      * 
-     * @since 1.0
      */
     public function excCommand() : int {
         $retVal = -1;
@@ -350,7 +343,6 @@ abstract class CLICommand {
      * if the command is executed successfully and return -1 if the 
      * command did not execute successfully.
      * 
-     * @since 1.0
      */
     public abstract function exec() : int;
     /**
@@ -383,7 +375,6 @@ abstract class CLICommand {
      * <ul>
      * Note that the last index might not be set.
      * 
-     * @since 1.0
      */
     public function getArgs() : array {
         return $this->commandArgs;
@@ -407,7 +398,6 @@ abstract class CLICommand {
      * @return string|null If the value of the option is set, the method will 
      * return its value as string. If it is not set, the method will return null.
      * 
-     * @since 1.0
      */
     public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
@@ -432,7 +422,6 @@ abstract class CLICommand {
      * @return string The description of the command. Default return value 
      * is '&lt;NO DESCRIPTION&gt;'
      * 
-     * @since 1.0
      */
     public function getDescription() : string {
         return $this->description;
@@ -460,7 +449,6 @@ abstract class CLICommand {
      * Note that if the input has special characters or spaces at the
      * beginning or the end, they will be trimmed.
      *
-     * @since 1.0
      */
     public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
         $trimmed = trim($prompt);
@@ -496,7 +484,6 @@ abstract class CLICommand {
      * @return null|InputStream If the stream is set, it will be returned as 
      * an object. Other than that, the method will return null.
      * 
-     * @since 1.0.1
      */
     public function getInputStream() : InputStream {
         return $this->inputStream;
@@ -510,7 +497,6 @@ abstract class CLICommand {
      * @return string The name of the command (such as 'v' or 'help'). Default 
      * return value is 'new-command'.
      * 
-     * @since 1.0
      */
     public function getName() : string {
         return $this->commandName;
@@ -521,7 +507,6 @@ abstract class CLICommand {
      * @return null|OutputStream If the stream is set, it will be returned as 
      * an object. Other than that, the method will return null.
      * 
-     * @since 1.0.1
      */
     public function getOutputStream() : OutputStream {
         return $this->outputStream;
@@ -545,7 +530,6 @@ abstract class CLICommand {
      * return true. If no argument which has the given name does exist, the method 
      * will return false.
      * 
-     * @since 1.0
      */
     public function hasArg(string $argName) : bool {
         foreach ($this->getArgs() as $arg) {
@@ -564,7 +548,6 @@ abstract class CLICommand {
      * 
      * @param string $message The message that will be shown.
      * 
-     * @since 1.0
      */
     public function info(string $message) {
         $this->printMsg($message, 'Info', 'blue');
@@ -579,7 +562,6 @@ abstract class CLICommand {
      * @return bool If the argument is provided, the method will return
      * true. Other than that, the method will return false.
      * 
-     * @since 1.0
      */
     public function isArgProvided(string $argName) : bool {
         $argObj = $this->getArg($argName);
@@ -600,7 +582,6 @@ abstract class CLICommand {
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
      * 
-     * @since 1.0
      */
     public function moveCursorDown(int $lines = 1) {
         if ($lines >= 1) {
@@ -616,7 +597,6 @@ abstract class CLICommand {
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
      * 
-     * @since 1.0
      */
     public function moveCursorLeft(int $numberOfCols = 1) {
         if ($numberOfCols >= 1) {
@@ -632,7 +612,6 @@ abstract class CLICommand {
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
      * 
-     * @since 1.0
      */
     public function moveCursorRight(int $numberOfCols = 1) {
         if ($numberOfCols >= 1) {
@@ -653,7 +632,6 @@ abstract class CLICommand {
      * @param int $col The number of column at which the cursor will be moved 
      * to. If not specified, 0 is used.
      * 
-     * @since 1.0
      */
     public function moveCursorTo(int $line = 0, int $col = 0) {
         if ($line > -1 && $col > -1) {
@@ -669,7 +647,6 @@ abstract class CLICommand {
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
      * 
-     * @since 1.0
      */
     public function moveCursorUp(int $lines = 1) {
         if ($lines >= 1) {
@@ -685,7 +662,6 @@ abstract class CLICommand {
      * 
      * @param array $array The array that will be printed.
      * 
-     * @since 1.0
      */
     public function printList(array $array) {
         for ($x = 0 ; $x < count($array) ; $x++) {
@@ -710,7 +686,6 @@ abstract class CLICommand {
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
-     * @since 1.0
      */
     public function println(string $str = '', ...$_) {
         $argsCount = count($_);
@@ -738,7 +713,6 @@ abstract class CLICommand {
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
      * 
-     * @since 1.0
      */
     public function prints(string $str, ...$_) {
         $argCount = count($_);
@@ -763,7 +737,6 @@ abstract class CLICommand {
      * @return string The method will return the string which was given as input 
      * in the input stream.
      * 
-     * @since 1.0
      */
     public function read(int $bytes = 1) : string {
         return $this->getInputStream()->read($bytes);
@@ -870,7 +843,6 @@ abstract class CLICommand {
      * @return string The method will return the string which was taken from 
      * input stream without the end of line character.
      * 
-     * @since 1.0
      */
     public function readln() : string {
         return $this->getInputStream()->readLine();
@@ -950,7 +922,6 @@ abstract class CLICommand {
      * @return string|null The method will return the value which is selected by
      * the user. If choices array is empty, null is returned.
      * 
-     * @since 1.0
      */
     public function select(string $prompt, array $choices, int $defaultIndex = -1) {
         if (count($choices) != 0) {
@@ -991,7 +962,6 @@ abstract class CLICommand {
      * <li>The given value is empty string or null.</li>
      * </u>
      * 
-     * @since 1.0
      */
     public function setArgValue(string $argName, string $argValue = ''): bool {
         $trimmedArgName = trim($argName);
@@ -1031,7 +1001,6 @@ abstract class CLICommand {
      * 
      * @param InputStream $stream An instance that implements an input stream.
      * 
-     * @since 1.0.1
      */
     public function setInputStream(InputStream $stream) {
         $this->inputStream = $stream;
@@ -1048,7 +1017,6 @@ abstract class CLICommand {
      * @return bool If the name of the command is set, the method will return
      * true. Other than that, the method will return false.
      * 
-     * @since 1.0
      */
     public function setName(string $name) : bool {
         $trimmed = trim($name);
@@ -1066,7 +1034,6 @@ abstract class CLICommand {
      * 
      * @param OutputStream $stream An instance that implements output stream.
      * 
-     * @since 1.0.1
      */
     public function setOutputStream(OutputStream $stream) {
         $this->outputStream = $stream;
@@ -1088,7 +1055,6 @@ abstract class CLICommand {
      * 
      * @param string $message The message that will be displayed.
      * 
-     * @since 1.0
      */
     public function success(string $message) {
         $this->printMsg($message, 'Success', 'light-green');
@@ -1101,7 +1067,6 @@ abstract class CLICommand {
      * 
      * @param string $message The message that will be shown.
      * 
-     * @since 1.0
      */
     public function warning(string $message) {
         $this->prints('Warning: ', [
