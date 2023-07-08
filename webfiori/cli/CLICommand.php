@@ -210,6 +210,8 @@ abstract class CLICommand {
                 $this->moveCursorLeft($numberOfCols + 1);
             }
         }
+        
+        return $this;
     }
     /**
      * Clears the whole content of the console.
