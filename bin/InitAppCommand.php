@@ -18,7 +18,18 @@ class InitAppCommand extends CLICommand {
     public function exec(): int {
         $dirName = $this->getArgValue('--dir');
         $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\webfiori\cli\bin')).$dirName;
-        
+        $this->createAppClass($appPath);
+        $this->createEntryPoint($appPath, $dirName);
+        return 0;
+    }
+    private function createEntryPoint(string $appPath, string $dir) {
+        $file = new File($dir, $appPath);
+        $file->append("#!/usr/bin/env php\n"
+                . "<?php\n"
+                . "require \"app.php\";\n\n");
+        $file->write();
+    }
+    private function createAppClass(string $appPath) {
         $file = new File($appPath.DIRECTORY_SEPARATOR.'app.php');
         $file->append("<?php\n\n");
         $file->append("namespace $dirName;\n\n");
@@ -35,6 +46,5 @@ class InitAppCommand extends CLICommand {
         
         $file->write(false, true);
         $this->success('App created successfully.');
-        return 0;
     }
 }
