@@ -23,36 +23,49 @@ class InitAppCommand extends CLICommand {
             $entry = $dirName;
         }
         $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\webfiori\cli\bin')).$dirName;
-        $this->createAppClass($appPath, $dirName);
-        $this->createEntryPoint($appPath, $dirName, $entry);
-        $this->success('App created successfully.');
-        return 0;
+
+        try {
+            $this->createAppClass($appPath, $dirName);
+            $this->createEntryPoint($appPath, $dirName, $entry);
+            $this->success('App created successfully.');
+            return 0;
+        } catch (Exception $ex) {
+            $this->error('Unable to initialize due to an exception:');
+            $this->println($ex->getCode().' - '.$ex->getMessage());
+            return -1;
+        }
     }
     private function createEntryPoint(string $appPath, string $dir, string $eName) {
-        $this->success('Creating "'.$dir.'/'.$eName.'"...');
-        $file = new File($dir, $appPath);
-        $file->append("#!/usr/bin/env php\n"
-                . "<?php\n"
-                . "require \"app.php\";\n\n");
-        $file->write();
+        $this->println('Creating "'.$dir.'/'.$eName.'.sh"...');
+        $file = new File($eName.'.sh', $appPath);
+        if (!$file->isExist()) {
+            $file->append("#!/usr/bin/env php\n");
+            $file->append("<?php\n");
+            $file->append("require \"app.php\";\n\n");
+            $file->write(false, true);
+            return true;
+        }
+        $this->warning('File '.$eName.'.sh already exist!');
     }
     private function createAppClass(string $appPath, string $dirName) {
-        $this->println('Creating "'.$dirName.'/app.php" ...');
+        $this->println('Creating "'.$dirName.'/app.php"...');
         $file = new File($appPath.DIRECTORY_SEPARATOR.'app.php');
-        $file->append("<?php\n\n");
-        $file->append("namespace $dirName;\n\n");
-        $file->append("//Entry point of your application.\n\n");
-        $file->append("use webfiori\cli\Runner;\n");
-        $file->append("use webfiori\cli\commands\HelpCommand;\n\n");
-        
-        
-        $file->append("\$runner = new Runner();\n");
-        $file->append("//TODO: Register Commands.\n");
-        $file->append("\$runner->register(new HelpCommand());\n\n");
-        $file->append("//Start your application.\n");
-        $file->append("\$runner->start();\n\n");
-        
-        $file->write(false, true);
-        
+        if (!$file->isExist()) {
+            $file->append("<?php\n\n");
+            $file->append("namespace $dirName;\n\n");
+            $file->append("//Entry point of your application.\n\n");
+            $file->append("use webfiori\cli\Runner;\n");
+            $file->append("use webfiori\cli\commands\HelpCommand;\n\n");
+
+
+            $file->append("\$runner = new Runner();\n");
+            $file->append("//TODO: Register Commands.\n");
+            $file->append("\$runner->register(new HelpCommand());\n\n");
+            $file->append("//Start your application.\n");
+            $file->append("\$runner->start();\n\n");
+
+            $file->write(false, true);
+        }
+        $this->warning('File app.php already exist!');
     }
 }
