@@ -50,18 +50,18 @@ class InitAppCommandTest extends TestCase {
     }
     /**
      * @test
+     * @depends test01
      */
     public function test02() {
         $r = new Runner();
-        $r->register(new InitAppCommand());
-        $r->setDefaultCommand('init');
-        $r->setInputs([]);
-        $r->setArgsVector([
+        $r->register(new InitAppCommand())
+        ->setDefaultCommand('init')
+        ->setInputs([])
+        ->setArgsVector([
             'app.php',
             'init',
             '--dir' => 'test'
-        ]);
-        $r->start();
+        ])->start();
         $this->assertEquals([
             "Creating \"test/app.php\"...\n",
             "Creating \"test/test.sh\"...\n",
@@ -70,6 +70,7 @@ class InitAppCommandTest extends TestCase {
     }
     /**
      * @test
+     * @depends test02
      */
     public function test03() {
         $r = new Runner();
