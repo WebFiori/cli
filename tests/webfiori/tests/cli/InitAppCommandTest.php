@@ -39,11 +39,11 @@ class InitAppCommandTest extends TestCase {
         $r->setArgsVector([
             'app.php',
             'init',
-            '--dir' => 'test?'
+            '--dir' => "test\0a"
         ]);
         $r->start();
         $this->assertEquals([
-            "Creating \"test?/app.php\"...\n",
+            "Creating \"test\0a/app.php\"...\n",
             "Error: Unable to initialize due to an exception:\n",
             "2 - mkdir(): Invalid path\n"
         ], $r->getOutput());
