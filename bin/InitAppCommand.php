@@ -25,7 +25,7 @@ class InitAppCommand extends CLICommand {
         
         
         if (defined('ROOT_DIR')) {
-            $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$appPath;
+            $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$dirName;
         } else {
             $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\webfiori\cli\bin')).$dirName;
         }
