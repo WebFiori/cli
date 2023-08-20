@@ -45,7 +45,7 @@ class InitAppCommandTest extends TestCase {
         $this->assertEquals([
             "Creating \"test\0a/app.php\"...\n",
             "Error: Unable to initialize due to an exception:\n",
-            "2 - mkdir(): Invalid path\n"
+            "2 - file_exists() expects parameter 1 to be a valid path, string given At class File line 502\n"
         ], $r->getOutput());
     }
     /**
