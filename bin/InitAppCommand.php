@@ -71,6 +71,7 @@ class InitAppCommand extends CLICommand {
             $file->append("\$runner->start();\n\n");
 
             $file->write(false, true);
+            return true;
         }
         $this->warning('File app.php already exist!');
     }
