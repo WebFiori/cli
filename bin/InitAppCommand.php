@@ -22,10 +22,12 @@ class InitAppCommand extends CLICommand {
         if ($entry === null) {
             $entry = $dirName;
         }
-        $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\webfiori\cli\bin')).$dirName;
         
-        if (strlen($appPath) == 0) {
-            $appPath = $this->getDir();
+        
+        if (defined('ROOT_DIR')) {
+            $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$appPath;
+        } else {
+            $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\webfiori\cli\bin')).$dirName;
         }
         
         try {
@@ -38,14 +40,6 @@ class InitAppCommand extends CLICommand {
             $this->println($ex->getCode().' - '.$ex->getMessage());
             return -1;
         }
-    }
-    private function getDir() {
-        $split = explode(DIRECTORY_SEPARATOR, __DIR__);
-        $retVal = '';
-        for ($x = 0 ; $x < count($split) - 2 ; $x++) {
-            $retVal .= $split[$x].DIRECTORY_SEPARATOR;
-        }
-        return $retVal;
     }
     private function createEntryPoint(string $appPath, string $dir, string $eName) {
         $this->println('Creating "'.$dir.'/'.$eName.'.sh"...');
