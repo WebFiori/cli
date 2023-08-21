@@ -42,16 +42,16 @@ class InitAppCommand extends CLICommand {
         }
     }
     private function createEntryPoint(string $appPath, string $dir, string $eName) {
-        $this->println('Creating "'.$dir.'/'.$eName.'.sh"...');
-        $file = new File($eName.'.sh', $appPath);
+        $this->println('Creating "'.$dir.'/'.$eName.'"...');
+        $file = new File($eName, $appPath);
         if (!$file->isExist()) {
-            $file->append("#!/usr/bin/env php\n");
-            $file->append("<?php\n");
-            $file->append("require \"app.php\";\n\n");
-            $file->write(false, true);
+            $data = "#!/usr/bin/env php\n"
+                    ."<?php\n"
+                    ."require \"app.php\";\n\n";
+            file_put_contents($file->getDir().DIRECTORY_SEPARATOR.$eName, $data);
             return true;
         }
-        $this->warning('File '.$eName.'.sh already exist!');
+        $this->warning('File '.$eName.' already exist!');
     }
     private function createAppClass(string $appPath, string $dirName) {
         $this->println('Creating "'.$dirName.'/app.php"...');
@@ -60,15 +60,17 @@ class InitAppCommand extends CLICommand {
             $file->append("<?php\n\n");
             $file->append("namespace $dirName;\n\n");
             $file->append("//Entry point of your application.\n\n");
+            $file->append("require '../vendor/autoload.php';\n\n");
             $file->append("use webfiori\cli\Runner;\n");
             $file->append("use webfiori\cli\commands\HelpCommand;\n\n");
 
 
             $file->append("\$runner = new Runner();\n");
             $file->append("//TODO: Register Commands.\n");
-            $file->append("\$runner->register(new HelpCommand());\n\n");
+            $file->append("\$runner->register(new HelpCommand());\n");
+            $file->append("\$runner->setDefaultCommand('help');\n\n");
             $file->append("//Start your application.\n");
-            $file->append("\$runner->start();\n\n");
+            $file->append("exit(\$runner->start());\n\n");
 
             $file->write(false, true);
             return true;
