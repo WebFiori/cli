@@ -23,7 +23,7 @@ class InitAppCommandTest extends TestCase {
             'app.php',
             'init'
         ]);
-        $r->start();
+        $this->assertEquals(-1, $r->start());
         $this->assertEquals([
             "Error: The following required argument(s) are missing: '--dir'\n"
         ], $r->getOutput());
@@ -41,12 +41,7 @@ class InitAppCommandTest extends TestCase {
             'init',
             '--dir' => "test\0a"
         ]);
-        $r->start();
-        $this->assertEquals([
-            "Creating \"test\0a/app.php\"...\n",
-            "Error: Unable to initialize due to an exception:\n",
-            "2 - file_exists() expects parameter 1 to be a valid path, string given At class File line 502\n"
-        ], $r->getOutput());
+        $this->assertEquals(-1, $r->start());
     }
     /**
      * @test
@@ -61,10 +56,11 @@ class InitAppCommandTest extends TestCase {
             'app.php',
             'init',
             '--dir' => 'test'
-        ])->start();
+        ]);
+        $this->assertEquals(0, $r->start());
         $this->assertEquals([
             "Creating \"test/app.php\"...\n",
-            "Creating \"test/test.sh\"...\n",
+            "Creating \"test/test\"...\n",
             "Success: App created successfully.\n"
         ], $r->getOutput());
     }
@@ -82,13 +78,45 @@ class InitAppCommandTest extends TestCase {
             'init',
             '--dir' => 'test'
         ]);
-        $r->start();
+        $this->assertEquals(0, $r->start());
         $this->assertEquals([
             "Creating \"test/app.php\"...\n",
             "Warning: File app.php already exist!\n",
-            "Creating \"test/test.sh\"...\n",
-            "Warning: File test.sh already exist!\n",
+            "Creating \"test/test\"...\n",
+            "Warning: File test already exist!\n",
             "Success: App created successfully.\n"
         ], $r->getOutput());
+        unlink(ROOT_DIR.DS.'test'.DS.'app.php');
+        unlink(ROOT_DIR.DS.'test'.DS.'test');
+        rmdir(ROOT_DIR.DS.'test');
+    }
+    /**
+     * @test
+     */
+    public function test04() {
+        $r = new Runner();
+        $r->register(new InitAppCommand());
+        $r->setDefaultCommand('init');
+        $r->setInputs([]);
+        $r->setArgsVector([
+            'app.php',
+            'init',
+            '--dir' => 'test2',
+            '--entry' => 'bang'
+        ]);
+        $this->assertEquals(0, $r->start());
+        $this->assertEquals([
+            "Creating \"test2/app.php\"...\n",
+            "Creating \"test2/bang\"...\n",
+            "Success: App created successfully.\n"
+        ], $r->getOutput());
+        unlink(ROOT_DIR.DS.'test2'.DS.'app.php');
+        unlink(ROOT_DIR.DS.'test2'.DS.'bang');
+        rmdir(ROOT_DIR.DS.'test2');
     }
 }
+
+
+
+
+
