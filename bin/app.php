@@ -9,4 +9,5 @@ require 'InitAppCommand.php';
 $runner = new Runner();
 $runner->register(new HelpCommand());
 $runner->register(new InitAppCommand());
-$runner->start();
+$runner->setDefaultCommand('help');
+exit($runner->start());
