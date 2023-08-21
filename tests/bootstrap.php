@@ -49,6 +49,7 @@ require_once $baseDir.DS.'streams'.DS.'StdOut.php';
 require_once $baseDir.DS.'exceptions'.DS.'IOException.php';
 require_once $baseDir.DS.'commands'.DS.'HelpCommand.php';
 
+require_once $rootDir.DS.'bin'.DS.'InitAppCommand.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/TestCommand.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command00.php';
 require_once $rootDir.'/tests/webfiori/tests/cli/testCommands/Command01.php';
