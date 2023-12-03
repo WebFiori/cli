@@ -3,8 +3,8 @@ Class library that can help in writing command line based applications with mini
 
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml">
-    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yml">
+    <img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -42,15 +42,15 @@ Class library that can help in writing command line based applications with mini
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.0/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.1/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.2/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.3/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.4/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.0/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> |
-
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php70.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php71.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php72.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php73.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php74.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php80.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php81.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main"></a> |
 
 
 ## Features
