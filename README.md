@@ -1,10 +1,10 @@
 # WebFiori CLI
-Class library that can help in writing command line based applications using PHP.
+Class library that can help in writing command line based applications with minimum dependencies using PHP.
 
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml">
-    <img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yml">
+    <img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -42,15 +42,15 @@ Class library that can help in writing command line based applications using PHP
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.0/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.1/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.2/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.3/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%207.4/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.0/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> |
-
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php70.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php71.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php72.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php73.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php74.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php80.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php81.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main"></a> |
 
 
 ## Features
@@ -73,7 +73,7 @@ To install the library, simply include it in your `composer.json`'s `require` se
 ### Creating a Command
 
 
-First step in creating new command is to create a new class that extends the class `CLICommand`. The class `CLICommand` is a utility class which has methods which can be used to read inputs, send outputs and use command line arguments.
+First step in creating new command is to create a new class that extends the class `webfiori\cli\CLICommand`. The class `CLICommand` is a utility class which has methods that can be used to read inputs, send outputs and use command line arguments.
 
 The class has one abstract method that must be implemented. The code that will exist in the body of the method will represent the logic of the command.
 
@@ -98,7 +98,7 @@ class SampleCommand extends CLICommand {
 
 ### Running a Command
 
-The class `Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command and start running the application.
+The class `webfiori\cli\Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command and start running the application.
 
 To register a command, the method `Runner::register()` is used. To start the application, the method `Runner::start()` is used.
 
@@ -112,7 +112,7 @@ use SampleCommand;
 
 $runner = new Runner();
 $runner->register(new SampleCommand());
-$runner->start();
+exit($runner->start());
 ```
 
 Now if terminal is opened and following command is executed:
@@ -154,7 +154,7 @@ class SampleCommand extends CLICommand {
 
 ```
 
-Arguments provided as an associative array. Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
+Arguments can be provided as an associative array or array of objects of type `webfiori\cli\CommandArgument`. In case of associative array, Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
 * `optional`: A boolean. if set to true, it means that the argument is optional. Default is false.
 * `default`: An optional default value for the argument to use if it is not provided.
 * `description`: A description of the argument which will be shown if the command `help` is executed.
@@ -217,7 +217,7 @@ One of the commands which comes by default with the library is the `help` comman
 
 ### Setting Help Instructions
 
-Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `CLICommand` as a description. The description can be set for the command and its arguments.
+Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `webfiori\cli\CLICommand` as a description. The description can be set for the command and its arguments.
 
 ``` php
 <?php
@@ -269,7 +269,7 @@ Output of this command will be as follows:
 Usage:
     command [arg1 arg2="val" arg3...]
 
-Global Arguments:[0m[k
+Global Arguments:
     --ansi:[Optional] Force the use of ANSI output.
 Available Commands:
     help:          Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.
@@ -300,7 +300,7 @@ hello:         A command to show greetings.
 ## Unit-Testing Commands
 
 Testing commands using the library is very simple. In any test case, developer must follow following steps to prepare a test case:
-* Create new instance of the class `Runner`.
+* Create new instance of the class `webfiori\cli\Runner`.
 * Register the command that will be tested using the method `Runner::register()`.
 * Set arguments vector using the method `Runner::setArgsVector()`.
 * Set user inputs using the method `Runner::setInputs()`.

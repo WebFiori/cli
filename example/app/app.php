@@ -8,7 +8,10 @@ use webfiori\cli\commands\HelpCommand;
 use webfiori\cli\Runner;
 
 $runner = new Runner();
+
 $runner->register(new HelpCommand());
 $runner->register(new HelloWorldCommand());
 $runner->register(new OpenFileCommand());
-$runner->start();
+$runner->setDefaultCommand('help');
+
+exit($runner->start());
