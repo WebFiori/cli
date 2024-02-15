@@ -2,7 +2,7 @@
 namespace webfiori\tests\cli\testCommands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 
 class Command01 extends CLICommand {
     public function __construct() {
@@ -10,7 +10,7 @@ class Command01 extends CLICommand {
             'arg-1' => [
                 
             ],
-            new CommandArgument('arg-2'),
+            new Argument('arg-2'),
             'arg-3' => [
                 'default' => 'Hello'
             ]

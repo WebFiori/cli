@@ -1,13 +1,13 @@
 <?php
 
-include $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+include $_composer_autoload_path ?? __DIR__.'/../vendor/autoload.php';
 
 use webfiori\cli\commands\HelpCommand;
 use webfiori\cli\Runner;
 
 require 'InitAppCommand.php';
 $runner = new Runner();
-$runner->register(new HelpCommand());
-$runner->register(new InitAppCommand());
-$runner->setDefaultCommand('help');
-exit($runner->start());
+exit($runner->register(new HelpCommand())
+        ->register(new InitAppCommand())
+        ->setDefaultCommand('help')
+        ->start());

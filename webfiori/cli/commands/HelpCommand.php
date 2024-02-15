@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\cli\commands;
 
+use webfiori\cli\Argument;
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
 
 /**
  * A class that implements a basic help command.
@@ -75,7 +75,7 @@ class HelpCommand extends CLICommand {
 
         return $len;
     }
-    private function printArg(CommandArgument $argObj, $spaces = 25) {
+    private function printArg(Argument $argObj, $spaces = 25) {
         $this->prints("    %".$spaces."s:", $argObj->getName(), [
             'bold' => true,
             'color' => 'yellow'

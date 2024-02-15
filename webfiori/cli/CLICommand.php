@@ -117,7 +117,7 @@ abstract class CLICommand {
      * 
      */
     public function addArg(string $name, array $options = []) : bool {
-        $toAdd = CommandArgument::create($name, $options);
+        $toAdd = Argument::create($name, $options);
 
         if ($toAdd === null) {
             return false;
@@ -150,7 +150,7 @@ abstract class CLICommand {
         $this->commandArgs = [];
 
         foreach ($arr as $optionName => $options) {
-            if ($options instanceof CommandArgument) {
+            if ($options instanceof Argument) {
                 $this->addArgument($options);
             } else {
                 $this->addArg($optionName, $options);
@@ -160,13 +160,13 @@ abstract class CLICommand {
     /**
      * Adds new command argument.
      * 
-     * @param CommandArgument $arg The argument that will be added.
+     * @param Argument $arg The argument that will be added.
      * 
      * @return bool If the argument is added, the method will return true.
      * If not, false is returned. The argument will not be added only if an argument
      * which has same name is added.
      */
-    public function addArgument(CommandArgument $arg) : bool {
+    public function addArgument(Argument $arg) : bool {
         if (!$this->hasArg($arg->getName())) {
             $this->commandArgs[] = $arg;
 
@@ -210,7 +210,7 @@ abstract class CLICommand {
                 $this->moveCursorLeft($numberOfCols + 1);
             }
         }
-        
+
         return $this;
     }
     /**
@@ -224,7 +224,7 @@ abstract class CLICommand {
      */
     public function clearConsole() : CLICommand {
         $this->prints("\ec");
-        
+
         return $this;
     }
     /**
@@ -352,7 +352,7 @@ abstract class CLICommand {
      * 
      * @param string $name The name of command argument.
      * 
-     * @return CommandArgument|null If the command has an argument with the
+     * @return Argument|null If the command has an argument with the
      * given name, it will be returned. Other than that, null is returned.
      */
     public function getArg(string $name) {
@@ -410,7 +410,7 @@ abstract class CLICommand {
                 return $arg->getValue();
             }
 
-            return CommandArgument::extractValue($trimmedOptName, $this->getOwner());
+            return Argument::extractValue($trimmedOptName, $this->getOwner());
         }
 
         return null;

@@ -2,7 +2,7 @@
 
 namespace webfiori\tests\cli;
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\cli\Runner;
 /**
  * Description of CommandArgumentTest
@@ -17,7 +17,7 @@ class CommandArgumentTest extends TestCase {
         $_SERVER['argv'] = [
             'name=ibrahim'
         ];
-        $this->assertEquals('ibrahim', CommandArgument::extractValue('name'));
+        $this->assertEquals('ibrahim', Argument::extractValue('name'));
     }
     /**
      * @test
@@ -30,7 +30,7 @@ class CommandArgumentTest extends TestCase {
         $r->setArgsVector([
             'name=ali' 
         ]);
-        $this->assertEquals('ali', CommandArgument::extractValue('name', $r));
+        $this->assertEquals('ali', Argument::extractValue('name', $r));
     }
     /**
      * @test
@@ -40,14 +40,14 @@ class CommandArgumentTest extends TestCase {
             'name="ibrahim Ali"',
             "last-name='bin'"
         ];
-        $this->assertEquals('ibrahim Ali', CommandArgument::extractValue('name'));
-        $this->assertEquals('bin', CommandArgument::extractValue('last-name'));
+        $this->assertEquals('ibrahim Ali', Argument::extractValue('name'));
+        $this->assertEquals('bin', Argument::extractValue('last-name'));
     }
     /**
      * @test
      */
     public function test00() {
-        $arg = new CommandArgument();
+        $arg = new Argument();
         $this->assertNull($arg->getValue());
         $this->assertEquals('', $arg->getDefault());
         $this->assertEquals('', $arg->getDescription());
@@ -68,14 +68,14 @@ class CommandArgumentTest extends TestCase {
      * @test
      */
     public function test01() {
-        $arg = new CommandArgument('');
+        $arg = new Argument('');
         $this->assertEquals('arg', $arg->getName());
     }
     /**
      * @test
      */
     public function test02() {
-        $arg = new CommandArgument('--config');
+        $arg = new Argument('--config');
         $this->assertNull($arg->getValue());
         $this->assertEquals('', $arg->getDefault());
         $this->assertEquals('', $arg->getDescription());
@@ -88,7 +88,7 @@ class CommandArgumentTest extends TestCase {
      * @test
      */
     public function testSetName() {
-        $arg = new CommandArgument('    ');
+        $arg = new Argument('    ');
         $this->assertEquals('arg', $arg->getName());
         $this->assertTrue($arg->setName('my-val'));
         $this->assertEquals('my-val', $arg->getName());
@@ -101,7 +101,7 @@ class CommandArgumentTest extends TestCase {
      * @test
      */
     public function testSetValue00() {
-        $arg = new CommandArgument();
+        $arg = new Argument();
         $this->assertNull($arg->getValue());
         $arg->setValue('');
         $this->assertEquals('', $arg->getValue());
@@ -112,7 +112,7 @@ class CommandArgumentTest extends TestCase {
      * @test
      */
     public function testSetValue01() {
-        $arg = new CommandArgument();
+        $arg = new Argument();
         $this->assertNull($arg->getValue());
         $arg->addAllowedValue('Super');
         $this->assertFalse($arg->setValue(''));

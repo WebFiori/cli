@@ -6,7 +6,7 @@ namespace webfiori\cli;
  *
  * @author Ibrahim
  */
-class CommandArgument {
+class Argument {
     private $allowedValues;
     private $default;
     private $description;
@@ -37,13 +37,18 @@ class CommandArgument {
      * Adds a value to the set of allowed argument values.
      * 
      * @param string $val A string that represents the value.
+     * 
+     * @return Argument The method will return the same instance at which
+     * the method was called on.
      */
-    public function addAllowedValue(string $val) {
+    public function addAllowedValue(string $val) : Argument {
         $trim = trim($val);
 
         if (!in_array($trim, $this->getAllowedValues())) {
             $this->allowedValues[] = $trim;
         }
+
+        return $this;
     }
     /**
      * Creates an instance of the class provided its name and a set of options.
@@ -66,38 +71,38 @@ class CommandArgument {
      * be converted to the string 'n'.</li>
      * </ul>
      * 
-     * @return CommandArgument|null If the instance is created, the method will
+     * @return Argument|null If the instance is created, the method will
      * return it as an object. Other than that, null is returned.
      */
     public static function create(string $name, array $options) {
         if (strlen($name) == 0) {
             return null;
         }
-        $arg = new CommandArgument($name);
+        $arg = new Argument($name);
 
         if ($arg->getName() == 'arg') {
             return null;
         }
 
-        if (isset($options['optional'])) {
-            $arg->setIsOptional($options['optional']);
+        if (isset($options[Option::OPTIONAL])) {
+            $arg->setIsOptional($options[Option::OPTIONAL]);
         }
-        $desc = isset($options['description']) ? trim($options['description']) : '<NO DESCRIPTION>';
+        $desc = isset($options[Option::DESCRIPTION]) ? trim($options[Option::DESCRIPTION]) : '<NO DESCRIPTION>';
 
         if (strlen($desc) != 0) {
             $arg->setDescription($desc);
         } else {
             $arg->setDescription('<NO DESCRIPTION>');
         }
-        $allowedValues = $options['values'] ?? [];
+        $allowedValues = $options[Option::VALUES] ?? [];
 
         foreach ($allowedValues as $val) {
             $arg->addAllowedValue($val);
         }
 
 
-        if (isset($options['default']) && gettype($options['default']) == 'string') {
-            $arg->setDefault($options['default']);
+        if (isset($options[Option::DEFAULT]) && gettype($options[Option::DEFAULT]) == 'string') {
+            $arg->setDefault($options[Option::DEFAULT]);
         }
 
         return $arg;

@@ -78,8 +78,8 @@ class Runner {
         $this->afterRunPool = [];
 
         $this->addArg('--ansi', [
-            'optional' => true,
-            'description' => 'Force the use of ANSI output.'
+            Option::OPTIONAL => true,
+            Option::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
         $this->setBeforeStart(function (Runner $r)
         {
@@ -122,7 +122,7 @@ class Runner {
      * @since 1.0
      */
     public function addArg(string $name, array $options = []) : bool {
-        $toAdd = CommandArgument::create($name, $options);
+        $toAdd = Argument::create($name, $options);
 
         if ($toAdd === null) {
             return false;
@@ -136,12 +136,12 @@ class Runner {
      * Global arguments are set of arguments that will be added automatically
      * to any command which is registered by the runner.
      * 
-     * @param CommandArgument $arg An object that holds argument info.
+     * @param Argument $arg An object that holds argument info.
      * 
      * @return bool If the argument is added, the method will return true.
      * Other than that, false is returned.
      */
-    public function addArgument(CommandArgument $arg) : bool {
+    public function addArgument(Argument $arg) : bool {
         if (!$this->hasArg($arg->getName())) {
             $this->globalArgs[] = $arg;
 
@@ -311,7 +311,7 @@ class Runner {
      */
     public function register(CLICommand $cliCommand) : Runner {
         $this->commands[$cliCommand->getName()] = $cliCommand;
-        
+
         return $this;
     }
     /**
@@ -348,7 +348,7 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
-        
+
         return $this;
     }
     /**
@@ -444,7 +444,7 @@ class Runner {
             $this->getActiveCommand()->setInputStream($this->getInputStream());
             $this->getActiveCommand()->setOwner($this);
         }
-        
+
         return $this;
     }
     /**
@@ -467,7 +467,7 @@ class Runner {
             'func' => $func,
             'params' => $params
         ];
-        
+
         return $this;
     }
     /**
@@ -488,7 +488,7 @@ class Runner {
      */
     public function setArgsVector(array $argsVector) : Runner {
         $this->argsV = $argsVector;
-        
+
         return $this;
     }
     /**
@@ -505,7 +505,7 @@ class Runner {
      */
     public function setBeforeStart(callable $func) : Runner {
         $this->beforeStartPool[] = $func;
-        
+
         return $this;
     }
     /**
@@ -524,7 +524,7 @@ class Runner {
         if ($c !== null) {
             $this->defaultCommand = $c;
         }
-        
+
         return $this;
     }
     /**
@@ -547,7 +547,7 @@ class Runner {
     public function setInputs(array $inputs = []) : Runner {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
-        
+
         return $this;
     }
 
@@ -561,7 +561,7 @@ class Runner {
      */
     public function setInputStream(InputStream $stream) : Runner {
         $this->inputStream = $stream;
-        
+
         return $this;
     }
     /**
@@ -574,7 +574,7 @@ class Runner {
      */
     public function setOutputStream(OutputStream $stream) : Runner {
         $this->outputStream = $stream;
-        
+
         return $this;
     }
     /**
