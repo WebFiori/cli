@@ -210,7 +210,7 @@ abstract class CLICommand {
                 $this->moveCursorLeft($numberOfCols + 1);
             }
         }
-        
+
         return $this;
     }
     /**
@@ -224,7 +224,7 @@ abstract class CLICommand {
      */
     public function clearConsole() : CLICommand {
         $this->prints("\ec");
-        
+
         return $this;
     }
     /**

@@ -47,7 +47,7 @@ class Argument {
         if (!in_array($trim, $this->getAllowedValues())) {
             $this->allowedValues[] = $trim;
         }
-        
+
         return $this;
     }
     /**

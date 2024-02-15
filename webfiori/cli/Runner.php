@@ -311,7 +311,7 @@ class Runner {
      */
     public function register(CLICommand $cliCommand) : Runner {
         $this->commands[$cliCommand->getName()] = $cliCommand;
-        
+
         return $this;
     }
     /**
@@ -348,7 +348,7 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
-        
+
         return $this;
     }
     /**
@@ -444,7 +444,7 @@ class Runner {
             $this->getActiveCommand()->setInputStream($this->getInputStream());
             $this->getActiveCommand()->setOwner($this);
         }
-        
+
         return $this;
     }
     /**
@@ -467,7 +467,7 @@ class Runner {
             'func' => $func,
             'params' => $params
         ];
-        
+
         return $this;
     }
     /**
@@ -488,7 +488,7 @@ class Runner {
      */
     public function setArgsVector(array $argsVector) : Runner {
         $this->argsV = $argsVector;
-        
+
         return $this;
     }
     /**
@@ -505,7 +505,7 @@ class Runner {
      */
     public function setBeforeStart(callable $func) : Runner {
         $this->beforeStartPool[] = $func;
-        
+
         return $this;
     }
     /**
@@ -524,7 +524,7 @@ class Runner {
         if ($c !== null) {
             $this->defaultCommand = $c;
         }
-        
+
         return $this;
     }
     /**
@@ -547,7 +547,7 @@ class Runner {
     public function setInputs(array $inputs = []) : Runner {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
-        
+
         return $this;
     }
 
@@ -561,7 +561,7 @@ class Runner {
      */
     public function setInputStream(InputStream $stream) : Runner {
         $this->inputStream = $stream;
-        
+
         return $this;
     }
     /**
@@ -574,7 +574,7 @@ class Runner {
      */
     public function setOutputStream(OutputStream $stream) : Runner {
         $this->outputStream = $stream;
-        
+
         return $this;
     }
     /**
