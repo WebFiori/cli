@@ -1,7 +1,7 @@
 <?php
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\file\File;
 /**
  * A class which is used to initialize a new CLI application.
@@ -11,8 +11,8 @@ use webfiori\file\File;
 class InitAppCommand extends CLICommand {
     public function __construct() {
         parent::__construct('init', [
-            new CommandArgument('--dir', 'The name of application root directory.'),
-            new CommandArgument('--entry', 'The name of entry point that is used to execute the application. Default value is application directory name.', true)
+            new Argument('--dir', 'The name of application root directory.'),
+            new Argument('--entry', 'The name of entry point that is used to execute the application. Default value is application directory name.', true)
         ], 'Initialize new CLI application.');
 
     }
@@ -48,6 +48,7 @@ class InitAppCommand extends CLICommand {
             $data = "#!/usr/bin/env php\n"
                     ."<?php\n"
                     ."require \"app.php\";\n\n";
+            $file->create(true);
             file_put_contents($file->getDir().DIRECTORY_SEPARATOR.$eName, $data);
             return true;
         }
@@ -71,8 +72,8 @@ class InitAppCommand extends CLICommand {
             $file->append("\$runner->setDefaultCommand('help');\n\n");
             $file->append("//Start your application.\n");
             $file->append("exit(\$runner->start());\n\n");
-
-            $file->write(false, true);
+            $file->create(true);
+            $file->write(false);
             return true;
         }
         $this->warning('File app.php already exist!');
