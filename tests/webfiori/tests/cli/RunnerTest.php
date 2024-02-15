@@ -11,7 +11,7 @@ use webfiori\tests\cli\testCommands\Command00;
 use webfiori\cli\commands\HelpCommand;
 use webfiori\tests\cli\testCommands\WithExceptionCommand;
 use webfiori\tests\cli\testCommands\Command01;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 /**
  * Description of RunnerTest
  *
@@ -48,7 +48,7 @@ class RunnerTest extends TestCase {
         $this->assertNull($runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
         
-        $argObj = new CommandArgument('--ansi');
+        $argObj = new Argument('--ansi');
         $this->assertFalse($runner->addArgument($argObj));
         
         $this->assertTrue($runner->addArg('global-arg', [
