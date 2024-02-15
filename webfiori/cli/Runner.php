@@ -78,8 +78,8 @@ class Runner {
         $this->afterRunPool = [];
 
         $this->addArg('--ansi', [
-            'optional' => true,
-            'description' => 'Force the use of ANSI output.'
+            Option::OPTIONAL => true,
+            Option::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
         $this->setBeforeStart(function (Runner $r)
         {
@@ -122,7 +122,7 @@ class Runner {
      * @since 1.0
      */
     public function addArg(string $name, array $options = []) : bool {
-        $toAdd = CommandArgument::create($name, $options);
+        $toAdd = Argument::create($name, $options);
 
         if ($toAdd === null) {
             return false;
@@ -136,12 +136,12 @@ class Runner {
      * Global arguments are set of arguments that will be added automatically
      * to any command which is registered by the runner.
      * 
-     * @param CommandArgument $arg An object that holds argument info.
+     * @param Argument $arg An object that holds argument info.
      * 
      * @return bool If the argument is added, the method will return true.
      * Other than that, false is returned.
      */
-    public function addArgument(CommandArgument $arg) : bool {
+    public function addArgument(Argument $arg) : bool {
         if (!$this->hasArg($arg->getName())) {
             $this->globalArgs[] = $arg;
 
