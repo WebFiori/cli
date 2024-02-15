@@ -2,7 +2,7 @@
 namespace webfiori\tests\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\cli\exceptions\IOException;
 use webfiori\cli\InputValidator;
 use webfiori\cli\Runner;
@@ -41,7 +41,7 @@ class CLICommandTest extends TestCase {
      */
     public function testSussess01() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -66,7 +66,7 @@ class CLICommandTest extends TestCase {
      */
     public function testInfo01() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -91,7 +91,7 @@ class CLICommandTest extends TestCase {
      */
     public function testWarning01() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -116,7 +116,7 @@ class CLICommandTest extends TestCase {
      */
     public function testError01() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -264,7 +264,7 @@ class CLICommandTest extends TestCase {
      */
     public function testSelect05() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -395,7 +395,7 @@ class CLICommandTest extends TestCase {
      */
     public function testConfirm03() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -415,7 +415,7 @@ class CLICommandTest extends TestCase {
      */
     public function testConfirm04() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -432,7 +432,7 @@ class CLICommandTest extends TestCase {
      */
     public function testConfirm05() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -463,7 +463,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput01() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -483,7 +483,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput02() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -501,7 +501,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput03() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -519,7 +519,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput04() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -546,7 +546,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput05() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
@@ -573,7 +573,7 @@ class CLICommandTest extends TestCase {
      */
     public function testGetInput06() {
         $command = new TestCommand('cool');
-        $ansiArg = new CommandArgument('--ansi');
+        $ansiArg = new Argument('--ansi');
         $ansiArg->setValue('');
         $command->addArgument($ansiArg);
         $command->setOutputStream(new ArrayOutputStream());
