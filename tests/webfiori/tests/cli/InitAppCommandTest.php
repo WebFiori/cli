@@ -118,7 +118,7 @@ class InitAppCommandTest extends TestCase {
         ], $r->getOutput());
         unlink($appPath.DS.'main.php');
         unlink($appPath.DS.'bang');
-        rmdir($appPath.'test2');
+        rmdir($appPath. DS.'test2');
     }
 }
 
