@@ -56,6 +56,14 @@ class CommandTestCase extends TestCase {
         
         return $this->exitStatus;
     }
+    /**
+     * Returns the instance that the class is using to execute the commands.
+     * 
+     * @param bool $reset If set to true, input stream, output stream and, 
+     * registered commands of the runner will reset to default.
+     * 
+     * @return Runner The instance that the class is using to execute the commands.
+     */
     public function getRunner(bool $reset = false) : Runner {
         if ($this->runner === null) {
             $this->runner = new Runner();
@@ -65,33 +73,49 @@ class CommandTestCase extends TestCase {
         }
         return $this->runner;
     }
-    
-    
+    /**
+     * Register multiple commands and simulate the process of executing the app
+     * as if in production environment.
+     * 
+     * @param array $commands An array that holds objects of type 'CLICommand'.
+     * Each object represents the registered command.
+     * 
+     * @param string $default A string that represents the name of the command
+     * that will get executed by default if no command name is provided
+     * in arguments victor.
+     * 
+     * @param array $argv An array that represents arguments vector. The array
+     * can be indexed or associative. If associative, the key will represent
+     * an option and the value of the key will represent its value.
+     * 
+     * @param array $userInputs An array that holds user inputs. Each index
+     * should hold one line that represent an input to specific prompt.
+     * 
+     * @return array The method will return an array of strings that represents
+     * the output of execution.
+     */
     public function executeMultiCommand(array $commands, string $default = '', array $argv = [], array $userInputs = []) : array {
         $runner = $this->getRunner(true);
+        
         foreach ($commands as $command) {
             $runner->register($command);
         }
         $runner->setDefaultCommand($default);
         $this->exec($argv, $userInputs);
+        
         return $this->getOutput();
     }
     /**
      * Executes a specific command and return its output as an array.
      * 
-     * @param array $commands An array that holds the names of commands to be
-     * registered with the command that will be executed.
+     * @param CLICommand $command The command that will be tested.
      * 
      * @param array $argv Arguments vector that will be passed to the command.
      * This can be an associative array of options and values or just options.
-     * Note that first index can have the name of the command that will be
-     * tested if last argument of the method is set to null.
      * 
      * @param array $userInputs A sequence of strings that represents user inputs
      * when the command is executing. Each index in the array represents a single
      * line of input.
-     * 
-     * @param CLICommand $command The command that will be tested.
      * 
      * @return array The method will return an array that will hold
      * outputs line by line in each index.
