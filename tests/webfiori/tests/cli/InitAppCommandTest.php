@@ -117,7 +117,7 @@ class InitAppCommandTest extends TestCase {
             "Success: App created successfully.\n"
         ], $r->getOutput());
         unlink($appPath.DS.'main.php');
-        unlink($appPath.DS.'test2'.DS.'bang');
+        unlink($appPath.DS.'bang');
         rmdir($appPath.'test2');
     }
 }
