@@ -1,23 +1,23 @@
 <?php
 namespace webfiori\tests\cli;
 
+use webfiori\cli\Argument;
+use webfiori\cli\commands\HelpCommand;
+use webfiori\cli\CommandTestCase;
+use webfiori\cli\Runner;
 use webfiori\cli\streams\ArrayInputStream;
 use webfiori\cli\streams\ArrayOutputStream;
 use webfiori\cli\streams\StdIn;
 use webfiori\cli\streams\StdOut;
-use webfiori\cli\Runner;
-use PHPUnit\Framework\TestCase;
 use webfiori\tests\cli\testCommands\Command00;
-use webfiori\cli\commands\HelpCommand;
-use webfiori\tests\cli\testCommands\WithExceptionCommand;
 use webfiori\tests\cli\testCommands\Command01;
-use webfiori\cli\Argument;
+use webfiori\tests\cli\testCommands\WithExceptionCommand;
 /**
  * Description of RunnerTest
  *
  * @author Ibrahim
  */
-class RunnerTest extends TestCase {
+class RunnerTest extends CommandTestCase {
     /**
      * @test
      */
@@ -107,40 +107,31 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function testRunner03() {
-        $runner = new Runner();
-        $runner->register(new Command00());
-        $runner->setInputs([]);
-        $this->assertEquals(-1, $runner->runCommand(null, [
-            'super-hero',
-            'name' => 'Ok'
-        ]));
-        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "Error: The following argument(s) have invalid values: 'name'\n",
             "Info: Allowed values for the argument 'name':\n",
             "Ibrahim\n",
             "Ali\n"
-        ], $runner->getOutput());
+        ], $this->executeSingleCommand(new Command00(), [
+            'super-hero',
+            'name' => 'Ok'
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
      */
     public function testRunner04() {
-        $runner = new Runner();
-        $runner->register(new Command00());
-        $runner->setInputs([]);
-        $this->assertEquals(-1, $runner->runCommand(null, [
-            'super-hero',
-            'name' => 'Ok',
-            '--ansi'
-        ]));
-        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
         $this->assertEquals([
             "\e[1;91mError: \e[0mThe following argument(s) have invalid values: 'name'\n",
             "\e[1;34mInfo: \e[0mAllowed values for the argument 'name':\n",
             "Ibrahim\n",
             "Ali\n"
-        ], $runner->getOutput());
+        ], $this->executeSingleCommand(new Command00(), [
+            'name' => 'Ok',
+            '--ansi'
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
@@ -166,11 +157,7 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function testRunner06() {
-        $runner = new Runner();
-        $runner->register(new Command00());
-        $runner->setDefaultCommand('help');
-        $runner->setInputs([]);
-        $this->assertEquals(0, $runner->runCommand(new HelpCommand(), []));
+        
         $this->assertEquals([
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
@@ -178,7 +165,12 @@ class RunnerTest extends TestCase {
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
             "    super-hero:     A command to display hero's name.\n",
-        ], $runner->getOutput());
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n"
+        ], $this->executeMultiCommand([
+            new Command00(),
+            new HelpCommand()
+        ], 'help'));
+        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test
