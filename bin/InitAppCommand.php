@@ -31,6 +31,7 @@ class InitAppCommand extends CLICommand {
         }
 
         try {
+            $this->println('Creating new app at"'.$appPath.'" ...');
             $this->createAppClass($appPath, $dirName);
             $this->createEntryPoint($appPath, $dirName, $entry);
             $this->success('App created successfully.');
