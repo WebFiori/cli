@@ -33,6 +33,15 @@ class CommandTestCase extends TestCase {
      * Register multiple commands and simulate the process of executing the app
      * as if in production environment.
      * 
+     * @param array $argv An array that represents arguments vector. The array
+     * can be indexed or associative. If associative, the key will represent
+     * an option and the value of the key will represent its value. First
+     * index should contain the name of the command that will be executed from
+     * the registered commands.
+     * 
+     * @param array $userInputs An array that holds user inputs. Each index
+     * should hold one line that represent an input to specific prompt.
+     * 
      * @param array $commands An array that holds objects of type 'CLICommand'.
      * Each object represents the registered command.
      * 
@@ -40,17 +49,10 @@ class CommandTestCase extends TestCase {
      * that will get executed by default if no command name is provided
      * in arguments victor.
      * 
-     * @param array $argv An array that represents arguments vector. The array
-     * can be indexed or associative. If associative, the key will represent
-     * an option and the value of the key will represent its value.
-     * 
-     * @param array $userInputs An array that holds user inputs. Each index
-     * should hold one line that represent an input to specific prompt.
-     * 
      * @return array The method will return an array of strings that represents
      * the output of execution.
      */
-    public function executeMultiCommand(array $commands, string $default = '', array $argv = [], array $userInputs = []) : array {
+    public function executeMultiCommand(array $argv = [], array $userInputs = [], array $commands = [], string $default = '') : array {
         $runner = $this->getRunner(true);
 
         foreach ($commands as $command) {
@@ -127,7 +129,17 @@ class CommandTestCase extends TestCase {
 
         return $this->runner;
     }
-
+    /**
+     * Sets a custom runner to use in test execution.
+     * 
+     * @param Runner $runner
+     * 
+     * @return CommandTestCase The method will return same instance at which
+     * the method is called from.
+     */
+    public function setRunner(Runner $runner) : CommandTestCase {
+        $this->runner = $runner;
+    }
     private function exec(array $argv, array $userInputs, CLICommand $command = null) {
         if ($command !== null) {
             $key = array_search($command->getName(), $argv);
