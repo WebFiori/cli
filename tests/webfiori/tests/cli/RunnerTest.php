@@ -166,7 +166,7 @@ class RunnerTest extends CommandTestCase {
             "Available Commands:\n",
             "    super-hero:     A command to display hero's name.\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n"
-        ], $this->executeMultiCommand([
+        ], $this->executeMultiCommand([], [], [
             new Command00(),
             new HelpCommand()
         ], 'help'));
