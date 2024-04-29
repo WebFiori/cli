@@ -31,6 +31,7 @@ class InitAppCommand extends CLICommand {
         }
 
         try {
+            $this->println('Creating new app at "'.$appPath.'" ...');
             $this->createAppClass($appPath, $dirName);
             $this->createEntryPoint($appPath, $dirName, $entry);
             $this->success('App created successfully.');
@@ -44,8 +45,8 @@ class InitAppCommand extends CLICommand {
         }
     }
     private function createAppClass(string $appPath, string $dirName) {
-        $this->println('Creating "'.$dirName.'/app.php"...');
-        $file = new File($appPath.DIRECTORY_SEPARATOR.'app.php');
+        $this->println('Creating "'.$dirName.'/main.php"...');
+        $file = new File($appPath.DIRECTORY_SEPARATOR.'main.php');
 
         if (!$file->isExist()) {
             $file->append("<?php\n\n");
@@ -67,7 +68,7 @@ class InitAppCommand extends CLICommand {
 
             return true;
         }
-        $this->warning('File app.php already exist!');
+        $this->warning('File main.php already exist!');
     }
     private function createEntryPoint(string $appPath, string $dir, string $eName) {
         $this->println('Creating "'.$dir.'/'.$eName.'"...');
@@ -76,7 +77,7 @@ class InitAppCommand extends CLICommand {
         if (!$file->isExist()) {
             $data = "#!/usr/bin/env php\n"
                     ."<?php\n"
-                    ."require \"app.php\";\n\n";
+                    ."require \"main.php\";\n\n";
             $file->create(true);
             file_put_contents($file->getDir().DIRECTORY_SEPARATOR.$eName, $data);
 

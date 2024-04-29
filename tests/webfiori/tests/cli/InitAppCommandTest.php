@@ -20,7 +20,7 @@ class InitAppCommandTest extends TestCase {
         $r->setDefaultCommand('init');
         $r->setInputs([]);
         $r->setArgsVector([
-            'app.php',
+            'main.php',
             'init'
         ]);
         $this->assertEquals(-1, $r->start());
@@ -37,7 +37,7 @@ class InitAppCommandTest extends TestCase {
         $r->setDefaultCommand('init');
         $r->setInputs([]);
         $r->setArgsVector([
-            'app.php',
+            'main.php',
             'init',
             '--dir' => "test\0a"
         ]);
@@ -53,13 +53,15 @@ class InitAppCommandTest extends TestCase {
         ->setDefaultCommand('init')
         ->setInputs([])
         ->setArgsVector([
-            'app.php',
+            'main.php',
             'init',
             '--dir' => 'test'
         ]);
+        $appPath = ROOT_DIR.DS.'test';
         $this->assertEquals(0, $r->start());
         $this->assertEquals([
-            "Creating \"test/app.php\"...\n",
+            "Creating new app at \"$appPath\" ...\n",
+            "Creating \"test/main.php\"...\n",
             "Creating \"test/test\"...\n",
             "Success: App created successfully.\n"
         ], $r->getOutput());
@@ -74,19 +76,21 @@ class InitAppCommandTest extends TestCase {
         $r->setDefaultCommand('init');
         $r->setInputs([]);
         $r->setArgsVector([
-            'app.php',
+            'main.php',
             'init',
             '--dir' => 'test'
         ]);
         $this->assertEquals(0, $r->start());
+        $appPath = ROOT_DIR.DS.'test';
         $this->assertEquals([
-            "Creating \"test/app.php\"...\n",
-            "Warning: File app.php already exist!\n",
+            "Creating new app at \"$appPath\" ...\n",
+            "Creating \"test/main.php\"...\n",
+            "Warning: File main.php already exist!\n",
             "Creating \"test/test\"...\n",
             "Warning: File test already exist!\n",
             "Success: App created successfully.\n"
         ], $r->getOutput());
-        unlink(ROOT_DIR.DS.'test'.DS.'app.php');
+        unlink(ROOT_DIR.DS.'test'.DS.'main.php');
         unlink(ROOT_DIR.DS.'test'.DS.'test');
         rmdir(ROOT_DIR.DS.'test');
     }
@@ -99,20 +103,22 @@ class InitAppCommandTest extends TestCase {
         $r->setDefaultCommand('init');
         $r->setInputs([]);
         $r->setArgsVector([
-            'app.php',
+            'main.php',
             'init',
             '--dir' => 'test2',
             '--entry' => 'bang'
         ]);
         $this->assertEquals(0, $r->start());
+        $appPath = ROOT_DIR.DS.'test2';
         $this->assertEquals([
-            "Creating \"test2/app.php\"...\n",
+            "Creating new app at \"$appPath\" ...\n",
+            "Creating \"test2/main.php\"...\n",
             "Creating \"test2/bang\"...\n",
             "Success: App created successfully.\n"
         ], $r->getOutput());
-        unlink(ROOT_DIR.DS.'test2'.DS.'app.php');
-        unlink(ROOT_DIR.DS.'test2'.DS.'bang');
-        rmdir(ROOT_DIR.DS.'test2');
+        unlink($appPath.DS.'main.php');
+        unlink($appPath.DS.'bang');
+        rmdir($appPath);
     }
 }
 
