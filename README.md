@@ -103,7 +103,7 @@ The class `webfiori\cli\Runner` is the class which is used to manage the logic o
 To register a command, the method `Runner::register()` is used. To start the application, the method `Runner::start()` is used.
 
 ``` php
-// File src/app.php
+// File src/main.php
 require_once '../vendor/autoload.php';
 
 use webfiori\cli\Runner;
@@ -118,7 +118,7 @@ exit($runner->start());
 Now if terminal is opened and following command is executed:
 
 ``` bash
-php app.php say-hi
+php main.php say-hi
 ```
 
 The output will be the string `Hi People!`.
@@ -135,13 +135,14 @@ Arguments can be added in the constructor of the class as follows:
 <?php
 //File 'src/SampleCommand.php'
 use webfiori\cli\CLICommand;
+use webfiori\cli\Option;
 
 class SampleCommand extends CLICommand {
 
     public function __construct(){
         parent::__construct('say-hi', [
             '--person-name' => [
-                'optional' => true
+                Option::OPTIONAL => true
             ]
         ]);
     }
@@ -154,11 +155,13 @@ class SampleCommand extends CLICommand {
 
 ```
 
-Arguments can be provided as an associative array or array of objects of type `webfiori\cli\CommandArgument`. In case of associative array, Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
+Arguments can be provided as an associative array or array of objects of type `webfiori\cli\Argument`. In case of associative array, Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
 * `optional`: A boolean. if set to true, it means that the argument is optional. Default is false.
 * `default`: An optional default value for the argument to use if it is not provided.
 * `description`: A description of the argument which will be shown if the command `help` is executed.
 * `values`: A set of values that the argument can have. If provided, only the values on the list will be allowed.
+
+The class `webfiori\cli\Option` can be used to access the options.
 
 #### Accessing Argument Value
 
@@ -168,13 +171,14 @@ Accessing the value of an argument is performed using the method `CLICommand::ge
 <?php
 //File 'src/SampleCommand.php'
 use webfiori\cli\CLICommand;
+use webfiori\cli\Option;
 
 class SampleCommand extends CLICommand {
 
     public function __construct(){
         parent::__construct('say-hi', [
             '--person-name' => [
-                'optional' => true
+                Option::OPTIONAL => true
             ]
         ]);
     }
@@ -199,7 +203,7 @@ class SampleCommand extends CLICommand {
 Interactive mode is a way that can be used to keep your application running and execute more than one command using same PHP process. To start the application in interactive mode, add the argument `-i` when starting the application as follows:
 
 ``` bash
-php app.php -i
+php main.php -i
 ```
 
 This will show following output in terminal:
@@ -223,14 +227,15 @@ Help instructions are provided by the developer who created the command during i
 <?php
 //File 'src/SampleCommand.php'
 use webfiori\cli\CLICommand;
+use webfiori\cli\Option;
 
 class GreetingsCommand extends CLICommand {
 
     public function __construct() {
         parent::__construct('hello', [
             '--person-name' => [
-                'description' => 'Name of someone to greet.',
-                'optional' => true
+                Option::DESCRIPTION => 'Name of someone to greet.',
+                Option::OPTIONAL => true
             ]
         ], 'A command to show greetings.');
     }
@@ -259,8 +264,8 @@ Help command can be used in two ways, one way is to display a general help for t
 To show general help of the application, following command can be executed.
 
 ``` bash
-//File 'src/app.php'
-php app.php help 
+//File 'src/main.php'
+php main.php help 
 ```
 
 Output of this command will be as follows:
@@ -285,8 +290,8 @@ Available Commands:
 To show help instructions for a specific command, the name of the command can be included using the argument `--command-name` as follows:
 
 ``` bash
-//File 'src/app.php'
-php app.php help --command-name=hello
+//File 'src/main.php'
+php main.php help --command-name=hello
 ```
 
 Output of this command will be as follows:
@@ -299,50 +304,35 @@ hello:         A command to show greetings.
 
 ## Unit-Testing Commands
 
-Testing commands using the library is very simple. In any test case, developer must follow following steps to prepare a test case:
-* Create new instance of the class `webfiori\cli\Runner`.
-* Register the command that will be tested using the method `Runner::register()`.
-* Set arguments vector using the method `Runner::setArgsVector()`.
-* Set user inputs using the method `Runner::setInputs()`.
-* Start the command using the method `Runner::start()`.
-* Get the output of command execution using the method `Runner::getOutput()` and compare it to expected output.
+The library provides the helper class `webfiori\cli\CommandTestCase` which can be used to write unit tests for diffrent commands. The developer have to only extend the class and use utility methods to write tests. The class is based on PHPUnit.
 
-Assuming that PHPUnit is used to test a command, a test case would be similar to the following:
+The class has two methods which can be used to execute tests:
+
+* `CommandTestCase::executeSingleCommand()`: Used to run one command at a time and return its output.
+* `CommandTestCase::executeMultiCommand()`: Used to register multiple commands,set default command and/or run one of registered commands.
+
+First method is good to verify the output of one specific command. The second one is usefule to simulate the execution of an application with multiple commands.
+
+Both methods support simulating arguments vector and user inputs.
+
 
 ``` php
 namespace tests\cli;
 
-use webfiori\cli\Runner;
-use PHPUnit\Framework\TestCase;
+use webfiori\cli\CommandTestCase;
 
-class HelloCommandTest extends TestCase {
+class HelloCommandTest extends CommandTestCase {
     /**
      * @test
      */
     public function test00() {
-        $runner = new Runner();
-        
-        //Register the command that will be tested.
-        $runner->register(new HelloWorldCommand());
-        
-        //Set arguments vector
-        $runner->setArgsVector([
-            'app.php',//First argument is always name of entry point. This Can be set to anything since its testing env.
-            'hello'
-        ]);
-        
-        //Set user inputs.
-        //Must be called to use Array as input and output stream even if there are no inputs.
-        $runner->setInput([]);
-        
-        //Start the process
-        $exitStatus = $runner->start();
         
         //Verify test results
-        $this->assertEquals(0, $exitStatus);
+        
         $this->assertEquals([
             "Hello World!\n"
-        ], $runner->getOutput());
+        ], $this->executeSingleCommand(new HelloWorldCommand()));
+        $this->assertEquals(0, $this->getgetExitCode());
     }
 }
 
