@@ -542,6 +542,30 @@ class RunnerTest extends CommandTestCase {
             "Command Exit Status: -1\n"
         ], $output);
     }
+    public function testRunner22() {
+        $runner = new Runner();
+        $runner->register(new testCommands\Command03());
+        $runner->setArgsVector([
+            'entry.php',
+            'run-another',
+            'arg-1' => 'Nice',
+            'arg-2' => 'Cool'
+        ]);
+        $runner->setInputStream(new ArrayInputStream([
+
+        ]));
+        $runner->setOutputStream(new ArrayOutputStream());
+        $exitCode = $runner->start();
+        $output = $runner->getOutput();
+        $this->assertEquals([
+            "Running Sub Command\n",
+            "System version: 1.0.0\n",
+            "Nice\n",
+            "Cool\n",
+            "Ur\n",
+            "Done\n",
+        ], $output);
+    }
     /**
      * @test
      */

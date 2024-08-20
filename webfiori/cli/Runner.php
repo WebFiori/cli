@@ -352,6 +352,45 @@ class Runner {
         return $this;
     }
     /**
+     * Execute a registered command using a sub-runner.
+     * 
+     * This method can be used to execute a registered command using another
+     * runner instance which shares argsv, input and output streams with the
+     * main runner. It can be used to invoke another command from within a
+     * running command.
+     * 
+     * @param string $commandName The name of the command. It must be a part of
+     * registered commands.
+     * 
+     * @param array $additionalArgs An associative array that represents additional arguments
+     * to be passed to the command.
+     * 
+     * @return int The method will return an integer that represent exit status
+     * code of the command after execution.
+     */
+    public function runCommandAsSub(string $commandName, array $additionalArgs = []) : int {
+        $c = $this->getCommandByName($commandName);
+        
+        if ($c === null) {
+            return -1;
+        }
+        $subRunner = new Runner();
+        $subRunner->setInputStream($this->getInputStream());
+        $subRunner->setOutputStream($this->getOutputStream());
+        $subRunner->register($c);
+        $args = $this->getArgsVector();
+        $args[0] = $commandName;
+        $code = $subRunner->runCommand(null, array_merge($args, $additionalArgs), $this->isAnsi);
+        
+        if ($code != 0) {
+            if ($this->getActiveCommand() !== null) {
+                $this->getActiveCommand()->warning('Command "'.$commandName.'" exited with code '.$code.'.');
+            }
+        }
+        
+        return $code;
+    }
+    /**
      * Executes a command given as object.
      * 
      * @param CLICommand $c The command that will be executed. If null is given,

@@ -306,7 +306,33 @@ abstract class CLICommand {
     public function error(string $message) {
         $this->printMsg($message, 'Error', 'light-red');
     }
-
+    /**
+     * Execute a registered command using a sub-runner.
+     * 
+     * This method can be used to execute a registered command within the runner 
+     * using another
+     * runner instance which shares argsv, input and output streams with the
+     * main runner. It can be used to invoke another command from within a
+     * running command.
+     * 
+     * @param string $name The name of the command. It must be a part of
+     * registered commands.
+     * 
+     * @param array $additionalArgs An associative array that represents additional arguments
+     * to be passed to the command.
+     * 
+     * @return int The method will return an integer that represent exit status
+     * code of the command after execution.
+     */
+    public function execSubCommand(string $name, $additionalArgs = []) : int {
+        $owner = $this->getOwner();
+        
+        if ($owner === null) {
+            return -1;
+        }
+        
+        return $owner->runCommandAsSub($name, $additionalArgs);
+    }
     /**
      * Execute the command.
      * 
