@@ -306,7 +306,6 @@ abstract class CLICommand {
     public function error(string $message) {
         $this->printMsg($message, 'Error', 'light-red');
     }
-
     /**
      * Execute the command.
      * 
@@ -320,17 +319,23 @@ abstract class CLICommand {
     public function excCommand() : int {
         $retVal = -1;
 
-        foreach ($this->getOwner()->getArgs() as $arg) {
-            $this->addArgument($arg);
+        $owner = $this->getOwner();
+
+        if ($owner !== null) {
+            foreach ($owner->getArgs() as $arg) {
+                $this->addArgument($arg);
+            }
         }
 
         if ($this->parseArgsHelper() && $this->checkIsArgsSetHelper()) {
             $retVal = $this->exec();
         }
 
-        foreach ($this->getOwner()->getArgs() as $arg) {
-            $this->removeArgument($arg->getName());
-            $arg->resetValue();
+        if ($owner !== null) {
+            foreach ($owner->getArgs() as $arg) {
+                $this->removeArgument($arg->getName());
+                $arg->resetValue();
+            }
         }
 
         return $retVal;
@@ -347,6 +352,33 @@ abstract class CLICommand {
      * 
      */
     public abstract function exec() : int;
+    /**
+     * Execute a registered command using a sub-runner.
+     * 
+     * This method can be used to execute a registered command within the runner 
+     * using another
+     * runner instance which shares argsv, input and output streams with the
+     * main runner. It can be used to invoke another command from within a
+     * running command.
+     * 
+     * @param string $name The name of the command. It must be a part of
+     * registered commands.
+     * 
+     * @param array $additionalArgs An associative array that represents additional arguments
+     * to be passed to the command.
+     * 
+     * @return int The method will return an integer that represent exit status
+     * code of the command after execution.
+     */
+    public function execSubCommand(string $name, $additionalArgs = []) : int {
+        $owner = $this->getOwner();
+
+        if ($owner === null) {
+            return -1;
+        }
+
+        return $owner->runCommandAsSub($name, $additionalArgs);
+    }
     /**
      * Returns an object that holds argument info if the command.
      * 
@@ -406,11 +438,13 @@ abstract class CLICommand {
         $arg = $this->getArg($trimmedOptName);
 
         if ($arg !== null) {
-            if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isInteractive())) {
+            $owner = $this->getOwner();
+
+            if ($arg->getValue() !== null && !($owner !== null && $owner->isInteractive())) {
                 return $arg->getValue();
             }
 
-            return Argument::extractValue($trimmedOptName, $this->getOwner());
+            return Argument::extractValue($trimmedOptName, $owner);
         }
 
         return null;
