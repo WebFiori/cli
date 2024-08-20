@@ -332,7 +332,7 @@ class HelloCommandTest extends CommandTestCase {
         $this->assertEquals([
             "Hello World!\n"
         ], $this->executeSingleCommand(new HelloWorldCommand()));
-        $this->assertEquals(0, $this->getgetExitCode());
+        $this->assertEquals(0, $this->getExitCode());
     }
 }
 
