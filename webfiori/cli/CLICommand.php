@@ -319,18 +319,26 @@ abstract class CLICommand {
      */
     public function excCommand() : int {
         $retVal = -1;
-
-        foreach ($this->getOwner()->getArgs() as $arg) {
-            $this->addArgument($arg);
+        
+        $owner = $this->getOwner();
+        
+        if ($owner !== null) {
+            
+            foreach ($owner->getArgs() as $arg) {
+                $this->addArgument($arg);
+            }
         }
 
         if ($this->parseArgsHelper() && $this->checkIsArgsSetHelper()) {
             $retVal = $this->exec();
         }
 
-        foreach ($this->getOwner()->getArgs() as $arg) {
-            $this->removeArgument($arg->getName());
-            $arg->resetValue();
+        if ($owner !== null) {
+            
+            foreach ($owner->getArgs() as $arg) {
+                $this->removeArgument($arg->getName());
+                $arg->resetValue();
+            }
         }
 
         return $retVal;
@@ -406,11 +414,13 @@ abstract class CLICommand {
         $arg = $this->getArg($trimmedOptName);
 
         if ($arg !== null) {
-            if ($arg->getValue() !== null && !($this->getOwner() !== null && $this->getOwner()->isInteractive())) {
+            $owner = $this->getOwner();
+            
+            if ($arg->getValue() !== null && !($owner !== null && $owner->isInteractive())) {
                 return $arg->getValue();
             }
 
-            return Argument::extractValue($trimmedOptName, $this->getOwner());
+            return Argument::extractValue($trimmedOptName, $owner);
         }
 
         return null;
