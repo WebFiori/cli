@@ -380,6 +380,8 @@ class RunnerTest extends CommandTestCase {
             'exit'
         ]);
         $runner->start();
+        $output = $runner->getOutput();
+        $output[12] = null;
         $this->assertEquals([
             "[1;34m>>[0m Running in interactive mode.\n",
             "[1;34m>>[0m Type command name or 'exit' to close.\n",
@@ -392,9 +394,11 @@ class RunnerTest extends CommandTestCase {
             "[1;33mCode:[0m 0\n",
             "[1;33mAt:[0m ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 12\n",
+            "[1;33mStack Trace:[0m \n\n",
+            null,
             "Command Exit Status: -1\n",
             "[1;34m>>[0m ",
-        ], $runner->getOutput());
+        ], $output);
     }
     /**
      * @test
@@ -524,14 +528,19 @@ class RunnerTest extends CommandTestCase {
         ]);
         $runner->setInputs([]);
         $runner->start();
+        $output = $runner->getOutput();
+        //Removing the trace
+        $output[6] = null;
         $this->assertEquals([
             "Error: An exception was thrown.\n",
             "Exception Message: Call to undefined method webfiori\\tests\cli\\testCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
             "At: ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
             "Line: 12\n",
+            "Stack Trace: \n\n",
+            null,
             "Command Exit Status: -1\n"
-        ], $runner->getOutput());
+        ], $output);
     }
     /**
      * @test
