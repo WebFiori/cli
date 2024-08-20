@@ -413,6 +413,8 @@ class Runner {
             $this->printMsg($ex->getCode(), 'Code:', 'yellow');
             $this->printMsg($ex->getFile(), 'At:', 'yellow');
             $this->printMsg($ex->getLine(), 'Line:', 'yellow');
+            $this->printMsg("\n", 'Stack Trace:', 'yellow');
+            $this->printMsg("\n".$ex->getTraceAsString());
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
         }
 
