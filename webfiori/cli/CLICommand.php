@@ -486,7 +486,7 @@ abstract class CLICommand {
      * beginning or the end, they will be trimmed.
      *
      */
-    public function getInput(string $prompt, ?string $default = null, InputValidator $validator = null) {
+    public function getInput(string $prompt, ?string $default = null, ?InputValidator $validator = null) {
         $trimmed = trim($prompt);
 
         if (strlen($trimmed) > 0) {
