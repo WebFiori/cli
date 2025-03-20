@@ -117,7 +117,7 @@ class Argument {
      * the method will return its value. If provided without any value,
      * the method will return empty string. If not provided, null is returned.
      */
-    public static function extractValue(string $argName, Runner $runner = null) {
+    public static function extractValue(string $argName, ?Runner $runner = null) {
         $trimmedOptName = trim($argName);
 
         if ($runner !== null) {

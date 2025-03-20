@@ -140,7 +140,7 @@ class CommandTestCase extends TestCase {
     public function setRunner(Runner $runner) : CommandTestCase {
         $this->runner = $runner;
     }
-    private function exec(array $argv, array $userInputs, CLICommand $command = null) {
+    private function exec(array $argv, array $userInputs, ?CLICommand $command = null) {
         if ($command !== null) {
             $key = array_search($command->getName(), $argv);
 
