@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
+    <php>
+    </php>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <file>../webfiori/cli/CLICommand.php</file>
+            <file>../webfiori/cli/CommandArgument.php</file>
+            <file>../webfiori/cli/Formatter.php</file>
+            <file>../webfiori/cli/KeysMap.php</file>
+            <file>../webfiori/cli/Runner.php</file>
+            <file>../webfiori/cli/CommandTestCase.php</file>
+            <file>../webfiori/cli/InputValidator.php</file>
+            <file>../webfiori/cli/streams/ArrayInputStream.php</file>
+            <file>../webfiori/cli/streams/ArrayOutputStream.php</file>
+            <file>../webfiori/cli/streams/FileInputStream.php</file>
+            <file>../webfiori/cli/streams/FileOutputStream.php</file>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="clover.xml"/>
+    </logging>
+    <testsuites>
+        <testsuite name="Tests">
+            <directory>./webfiori/tests/cli</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
