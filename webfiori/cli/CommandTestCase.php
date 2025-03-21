@@ -142,7 +142,7 @@ class CommandTestCase extends TestCase {
 
         return $this;
     }
-    private function exec(array $argv, array $userInputs, CLICommand $command = null) {
+    private function exec(array $argv, array $userInputs, ?CLICommand $command = null) {
         if ($command !== null) {
             $key = array_search($command->getName(), $argv);
 

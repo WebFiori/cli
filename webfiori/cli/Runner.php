@@ -369,7 +369,7 @@ class Runner {
      * running the command. Usually, if the command exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public function runCommand(CLICommand $c = null, array $args = [], bool $ansi = false) : int {
+    public function runCommand(?CLICommand $c = null, array $args = [], bool $ansi = false) : int {
         $commandName = null;
 
         if ($c === null) {
@@ -474,7 +474,7 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setActiveCommand(CLICommand $c = null) : Runner {
+    public function setActiveCommand(?CLICommand $c = null) : Runner {
         if ($this->getActiveCommand() !== null) {
             $this->getActiveCommand()->setOwner();
         }
@@ -666,7 +666,7 @@ class Runner {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
     }
-    private function printMsg(string $msg, string $prefix = null, string $color = null) {
+    private function printMsg(string $msg, ?string $prefix = null, ?string $color = null) {
         if ($prefix !== null) {
             $prefix = Formatter::format($prefix, [
                 'color' => $color,

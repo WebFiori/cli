@@ -260,7 +260,7 @@ abstract class CLICommand {
      *
      * 
      */
-    public function confirm(string $confirmTxt, bool $default = null) : bool {
+    public function confirm(string $confirmTxt, ?bool $default = null) : bool {
         $answer = null;
 
         do {
@@ -486,7 +486,7 @@ abstract class CLICommand {
      * beginning or the end, they will be trimmed.
      *
      */
-    public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
+    public function getInput(string $prompt, ?string $default = null, ?InputValidator $validator = null) {
         $trimmed = trim($prompt);
 
         if (strlen($trimmed) > 0) {
@@ -791,7 +791,7 @@ abstract class CLICommand {
      * @return string A string that represents a valid class name. If suffix is
      * not null, the method will return the name with the suffix included.
      */
-    public function readClassName(string $prompt, string $suffix = null, string $errMsg = 'Invalid class name is given.') {
+    public function readClassName(string $prompt, ?string $suffix = null, string $errMsg = 'Invalid class name is given.') {
         return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix)
         {
             if ($suffix !== null) {
@@ -818,7 +818,7 @@ abstract class CLICommand {
      *
      * @return float
      */
-    public function readFloat(string $prompt, float $default = null) : float {
+    public function readFloat(string $prompt, ?float $default = null) : float {
         return $this->getInput($prompt, $default, new InputValidator(function ($val)
         {
             return InputValidator::isFloat($val);
@@ -864,7 +864,7 @@ abstract class CLICommand {
      * 
      * @return int
      */
-    public function readInteger(string $prompt, int $default = null) : int {
+    public function readInteger(string $prompt, ?int $default = null) : int {
         return $this->getInput($prompt, $default, new InputValidator(function ($val)
         {
             return InputValidator::isInt($val);
@@ -901,7 +901,7 @@ abstract class CLICommand {
      *
      * @throws IOException If given default namespace does not represent a namespace.
      */
-    public function readNamespace(string $prompt, string $defaultNs = null, string $errMsg = 'Invalid Namespace!') {
+    public function readNamespace(string $prompt, ?string $defaultNs = null, string $errMsg = 'Invalid Namespace!') {
         if ($defaultNs !== null && !InputValidator::isValidNamespace($defaultNs)) {
             throw new IOException('Provided default namespace is not valid.');
         }
@@ -1081,7 +1081,7 @@ abstract class CLICommand {
      * 
      * @param Runner $owner
      */
-    public function setOwner(Runner $owner = null) {
+    public function setOwner(?Runner $owner = null) {
         $this->owner = $owner;
     }
     /**
@@ -1205,7 +1205,7 @@ abstract class CLICommand {
      * 'value'. The 'valid' index contains a boolean that is set to true if the
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper(string &$input, InputValidator $validator = null, string $default = null) : array {
+    private function getInputHelper(string &$input, ?InputValidator $validator = null, ?string $default = null) : array {
         $retVal = [
             'valid' => true
         ];
