@@ -18,7 +18,7 @@
         "webfiori/file":"1.3.*"
     },
     "require-dev": {
-        
+        "phpunit/phpunit": "^10.0"
     },
     "autoload" :{
         "psr-4":{
@@ -26,6 +26,8 @@
         }
     },
     "scripts" : {
+        "phpunit": "vendor/bin/phpunit -c tests/phpunit.xml",
+        "wfcli":"bin/wfc",
         "check-cs": "bin/ecs check --ansi",
         "fix-cs": "bin/ecs check --fix --ansi",
         "phpstan": "vendor/bin/phpstan analyse --ansi  --error-format symplify"
