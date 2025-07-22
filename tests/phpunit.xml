@@ -22,7 +22,7 @@
     </logging>
     <testsuites>
         <testsuite name="Tests">
-            <directory>./Cli</directory>
+            <directory>./WebFiori/Tests/Cli</directory>
         </testsuite>
     </testsuites>
 </phpunit>
