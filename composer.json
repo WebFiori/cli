@@ -22,7 +22,7 @@
     },
     "autoload" :{
         "psr-4":{
-            "webfiori\\cli\\":"webfiori\\cli"
+            "WebFiori\\Cli\\":"WebFiori/Cli"
         }
     },
     "scripts" : {
