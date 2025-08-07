@@ -1,4 +1,4 @@
 #!/usr/bin/env php
 <?php
-require "app.php";
+require "main.php";
 

@@ -139,6 +139,8 @@ class CommandTestCase extends TestCase {
      */
     public function setRunner(Runner $runner) : CommandTestCase {
         $this->runner = $runner;
+
+        return $this;
     }
     private function exec(array $argv, array $userInputs, ?CLICommand $command = null) {
         if ($command !== null) {
