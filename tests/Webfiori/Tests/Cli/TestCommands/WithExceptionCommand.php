@@ -1,8 +1,9 @@
 <?php
-namespace webfiori\tests\cli\testCommands;
+namespace WebFiori\Tests\Cli\TestCommands;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\CLICommand;
 use Exception;
+
 
 class WithExceptionCommand extends CLICommand {
     public function __construct() {

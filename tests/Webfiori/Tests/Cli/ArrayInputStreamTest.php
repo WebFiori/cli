@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\streams\ArrayInputStream;
-use PHPUnit\Framework\TestCase;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use WebFiori\Cli\Streams\ArrayInputStream;
 /**
  * Description of ArrayInputStreamTest
  *

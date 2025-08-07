@@ -1,7 +1,8 @@
 <?php
 
-use webfiori\cli\CLICommand;
-use webfiori\cli\Option;
+use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Option;
+
 
 class HelloWorldCommand extends CLICommand {
     public function __construct() {

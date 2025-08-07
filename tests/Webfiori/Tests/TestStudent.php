@@ -1,6 +1,6 @@
 <?php
 
-namespace webfiori\tests;
+namespace WebFiori\Tests;
 
 class TestStudent {
     

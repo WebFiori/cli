@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\Formatter;
 use PHPUnit\Framework\TestCase;
+use WebFiori\Cli\Formatter;
 /**
  * Description of OutputFormatterTest
  *

@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\cli\streams;
+namespace WebFiori\Cli\Streams;
 
 /**
  * A class that implements default standard output for command line interface.

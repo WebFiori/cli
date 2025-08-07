@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\KeysMap;
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\streams\ArrayInputStream;
+use WebFiori\Cli\KeysMap;
+use WebFiori\Cli\Streams\ArrayInputStream;
 /**
  * Description of KeysMapTest
  *

@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\streams\ArrayOutputStream;
 use PHPUnit\Framework\TestCase;
+use WebFiori\Cli\Streams\ArrayOutputStream;
 /**
  * Description of ArrayInputStreamTest
  *

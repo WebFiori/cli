@@ -1,10 +1,10 @@
 <?php
 
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\CLICommand;
-use webfiori\cli\streams\StdIn;
-use webfiori\cli\streams\ArrayOutputStream;
+use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\Cli\Streams\StdIn;
 
 class TestCommand extends CLICommand {
     public function __construct($commandName, $args = array(), $description = '') {

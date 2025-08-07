@@ -1,8 +1,10 @@
 <?php
-namespace webfiori\tests\cli\testCommands;
+namespace WebFiori\Tests\Cli\TestCommands;
 
-use webfiori\cli\CLICommand;
-use webfiori\cli\Argument;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\CLICommand;
+
+
 
 class Command01 extends CLICommand {
     public function __construct() {

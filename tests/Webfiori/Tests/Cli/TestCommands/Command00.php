@@ -1,7 +1,9 @@
 <?php
-namespace webfiori\tests\cli\testCommands;
+namespace WebFiori\Tests\Cli\TestCommands;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\CLICommand;
+
+
 /**
  * Description of Command00
  *

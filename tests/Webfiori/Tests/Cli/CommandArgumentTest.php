@@ -1,9 +1,11 @@
 <?php
 
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
+
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\Argument;
-use webfiori\cli\Runner;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Runner;
+
 /**
  * Description of CommandArgumentTest
  *

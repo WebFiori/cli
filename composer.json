@@ -15,7 +15,7 @@
         "terminal"
     ],
     "require": {
-        "webfiori/file":"1.3.*"
+        "webfiori/file":"2.0.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"

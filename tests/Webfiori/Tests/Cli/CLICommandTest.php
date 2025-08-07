@@ -1,15 +1,15 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\Argument;
-use webfiori\cli\exceptions\IOException;
-use webfiori\cli\InputValidator;
-use webfiori\cli\Runner;
-use webfiori\cli\streams\ArrayInputStream;
-use webfiori\cli\streams\ArrayOutputStream;
-use webfiori\tests\cli\TestCommand;
-use webfiori\tests\TestStudent;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\InputValidator;
+use WebFiori\Cli\Runner;
+use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\Tests\TestStudent;
+
 
 class CLICommandTest extends TestCase {
     /**

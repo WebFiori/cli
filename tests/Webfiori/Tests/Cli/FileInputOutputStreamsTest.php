@@ -1,10 +1,13 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\streams\FileOutputStream;
-use webfiori\cli\streams\FileInputStream;
-use webfiori\cli\exceptions\IOException;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\Streams\FileInputStream;
+use WebFiori\Cli\Streams\FileOutputStream;
+use const DS;
+use const ROOT_DIR;
+
 
 /**
  * Description of FileInputOutputStreamsTest

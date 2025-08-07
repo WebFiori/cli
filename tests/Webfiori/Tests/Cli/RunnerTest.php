@@ -1,17 +1,19 @@
 <?php
-namespace webfiori\tests\cli;
+namespace WebFiori\Tests\Cli;
 
-use webfiori\cli\Argument;
+use WebFiori\Cli\Argument;
 use webfiori\cli\commands\HelpCommand;
-use webfiori\cli\CommandTestCase;
-use webfiori\cli\Runner;
-use webfiori\cli\streams\ArrayInputStream;
-use webfiori\cli\streams\ArrayOutputStream;
-use webfiori\cli\streams\StdIn;
-use webfiori\cli\streams\StdOut;
-use webfiori\tests\cli\testCommands\Command00;
-use webfiori\tests\cli\testCommands\Command01;
-use webfiori\tests\cli\testCommands\WithExceptionCommand;
+use WebFiori\Cli\CommandTestCase;
+use WebFiori\Cli\Runner;
+use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\Cli\Streams\StdIn;
+use WebFiori\Cli\Streams\StdOut;
+use WebFiori\Tests\Cli\TestCommands\Command00;
+use WebFiori\Tests\Cli\TestCommands\Command01;
+use WebFiori\Tests\Cli\TestCommands\WithExceptionCommand;
+
+
 /**
  * Description of RunnerTest
  *

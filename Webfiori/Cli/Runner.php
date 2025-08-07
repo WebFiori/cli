@@ -1,13 +1,14 @@
 <?php
-namespace webfiori\cli;
+namespace WebFiori\Cli;
 
 use Throwable;
-use webfiori\cli\streams\ArrayInputStream;
-use webfiori\cli\streams\ArrayOutputStream;
-use webfiori\cli\streams\InputStream;
-use webfiori\cli\streams\OutputStream;
-use webfiori\cli\streams\StdIn;
-use webfiori\cli\streams\StdOut;
+use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\Cli\Streams\InputStream;
+use WebFiori\Cli\Streams\OutputStream;
+use WebFiori\Cli\Streams\StdIn;
+use WebFiori\Cli\Streams\StdOut;
+
 
 /**
  * The core class which is used to manage command line related operations.
