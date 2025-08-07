@@ -22,11 +22,16 @@
     },
     "autoload" :{
         "psr-4":{
-            "webfiori\\cli\\":"webfiori\\cli"
+            "WebFiori\\cli\\":"WebFiori\\Cli"
+        }
+    },
+    "autoload-dev" :{
+        "psr-4":{
+            "WebFiori\\Tests\\":"Tests\\WebFiori\\Tests"
         }
     },
     "scripts" : {
-        "phpunit": "vendor/bin/phpunit -c tests/phpunit.xml",
+        "test": "vendor/bin/phpunit -c tests/phpunit.xml",
         "wfcli":"bin/wfc",
         "check-cs": "bin/ecs check --ansi",
         "fix-cs": "bin/ecs check --fix --ansi",
