@@ -18,7 +18,8 @@ if (explode($DS, $rootDirTrimmed)[0] == 'home') {
 define('ROOT_DIR', $rootDir);
 define('DS', DIRECTORY_SEPARATOR);
 //echo 'Root Directory: \''.$rootDir.'\'.'."\n";
-$jsonLibPath = $rootDir.'vendor'.DS.'autoload.php';
+$path = $rootDir.'vendor'.DS.'autoload.php';
+require_once $path;
 
 
 
