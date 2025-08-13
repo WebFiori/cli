@@ -706,8 +706,8 @@ class CLICommandTest extends TestCase {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
         $command->setInputStream(new ArrayInputStream([
-            '\\webfiori\\tests\\TestStudentXO',
-            '\\webfiori\\tests\\TestStudent',
+            '\\WebFiori\\Tests\\TestStudentXO',
+            '\WebFiori\Tests\TestStudent',
         ]));
         $input = $command->readInstance('Give me class:', 'Not a class!');
         $this->assertTrue($input instanceof TestStudent);
@@ -724,8 +724,8 @@ class CLICommandTest extends TestCase {
         $command = new TestCommand('cool');
         $command->setOutputStream(new ArrayOutputStream());
         $command->setInputStream(new ArrayInputStream([
-            '\\webfiori\\tests\\TestStudent2',
-            '\\webfiori\\tests\\TestStudent',
+            '\WebFiori\Tests\TestStudent2',
+            '\WebFiori\Tests\TestStudent',
         ]));
         $input = $command->readInstance('Give me class:', 'Not a class!');
         $this->assertTrue($input instanceof TestStudent);

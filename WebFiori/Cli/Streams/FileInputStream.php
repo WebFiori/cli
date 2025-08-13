@@ -1,10 +1,10 @@
 <?php
 namespace WebFiori\Cli\Streams;
 
-use webfiori\cli\exceptions\IOException;
-use webfiori\cli\KeysMap;
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\KeysMap;
+use WebFiori\File\Exceptions\FileException;
+use WebFiori\File\File;
 /**
  * A class that implements input stream which can be based on files.
  *

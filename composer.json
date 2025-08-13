@@ -22,12 +22,12 @@
     },
     "autoload" :{
         "psr-4":{
-            "WebFiori\\cli\\":"WebFiori\\Cli"
+            "WebFiori\\Cli\\":"WebFiori/Cli"
         }
     },
     "autoload-dev" :{
         "psr-4":{
-            "WebFiori\\Tests\\":"Tests\\WebFiori\\Tests"
+            "WebFiori\\Tests\\":"tests/WebFiori/Tests"
         }
     },
     "scripts" : {

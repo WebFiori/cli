@@ -15,7 +15,7 @@ use const ROOT_DIR;
  * @author i.binalshikh
  */
 class FileInputOutputStreamsTest extends TestCase {
-    const STREAMS_PATH = ROOT_DIR.'tests'.DS.'webfiori'.DS.'tests'.DS.'files'.DS;
+    const STREAMS_PATH = ROOT_DIR.'tests'.DS.'WebFiori'.DS.'Tests'.DS.'Files'.DS;
     /**
      * @test
      */

@@ -1,8 +1,8 @@
 <?php
 namespace WebFiori\Cli\Streams;
 
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\File\Exceptions\FileException;
+use WebFiori\File\File;
 /**
  * A class that implements output stream which can be based on files.
  *

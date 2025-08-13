@@ -3,7 +3,7 @@ namespace WebFiori\Cli;
 
 use ReflectionClass;
 use ReflectionException;
-use webfiori\cli\exceptions\IOException;
+use WebFiori\Cli\Exceptions\IOException;
 use webfiori\cli\streams\InputStream;
 use webfiori\cli\streams\OutputStream;
 /**
