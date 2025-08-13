@@ -1,7 +1,7 @@
 <?php
 namespace WebFiori\Tests\Cli;
 
-use InitAppCommand;
+use WebFiori\Cli\Commands\InitAppCommand;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Cli\Runner;
 

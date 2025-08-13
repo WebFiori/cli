@@ -1,8 +1,10 @@
 <?php
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
-use webfiori\file\File;
+namespace WebFiori\Cli\Commands;
+
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\CLICommand;
+use WebFiori\File\File;
 /**
  * A class which is used to initialize a new CLI application.
  *
