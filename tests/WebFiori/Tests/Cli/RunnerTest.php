@@ -2,7 +2,7 @@
 namespace WebFiori\Tests\Cli;
 
 use WebFiori\Cli\Argument;
-use webfiori\cli\commands\HelpCommand;
+use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\CommandTestCase;
 use WebFiori\Cli\Runner;
 use WebFiori\Cli\Streams\ArrayInputStream;
@@ -12,6 +12,7 @@ use WebFiori\Cli\Streams\StdOut;
 use WebFiori\Tests\Cli\TestCommands\Command00;
 use WebFiori\Tests\Cli\TestCommands\Command01;
 use WebFiori\Tests\Cli\TestCommands\WithExceptionCommand;
+use WebFiori\Tests\Cli\TestCommands\Command03;
 
 
 /**
@@ -392,9 +393,9 @@ class RunnerTest extends CommandTestCase {
             "[1;33m                         name:[0m The name of the hero\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
-            "[1;33mException Message:[0m Call to undefined method webfiori\\tests\\cli\\testCommands\\WithExceptionCommand::notExist()\n",
+            "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
-            "[1;33mAt:[0m ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
+            "[1;33mAt:[0m ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 12\n",
             "[1;33mStack Trace:[0m \n\n",
             null,
@@ -537,8 +538,8 @@ class RunnerTest extends CommandTestCase {
             "Error: An exception was thrown.\n",
             "Exception Message: Call to undefined method webfiori\\tests\cli\\testCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
-            "At: ".ROOT_DIR."tests".DS."webfiori".DS."tests".DS."cli".DS."testCommands".DS."WithExceptionCommand.php\n",
-            "Line: 12\n",
+            "At: ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
+            "Line: 13\n",
             "Stack Trace: \n\n",
             null,
             "Command Exit Status: -1\n"
@@ -546,7 +547,7 @@ class RunnerTest extends CommandTestCase {
     }
     public function testRunner22() {
         $runner = new Runner();
-        $runner->register(new testCommands\Command03());
+        $runner->register(new Command03());
         $runner->setArgsVector([
             'entry.php',
             'run-another',
