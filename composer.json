@@ -32,6 +32,7 @@
     },
     "scripts" : {
         "test": "vendor/bin/phpunit -c tests/phpunit.xml",
+        "test10": "vendor/bin/phpunit -c tests/phpunit10.xml",
         "wfcli":"bin/wfc",
         "check-cs": "bin/ecs check --ansi",
         "fix-cs": "bin/ecs check --fix --ansi",
