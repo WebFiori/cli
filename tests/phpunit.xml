@@ -4,17 +4,17 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <file>../webfiori/cli/CLICommand.php</file>
-            <file>../webfiori/cli/CommandArgument.php</file>
-            <file>../webfiori/cli/Formatter.php</file>
-            <file>../webfiori/cli/KeysMap.php</file>
-            <file>../webfiori/cli/Runner.php</file>
-            <file>../webfiori/cli/CommandTestCase.php</file>
-            <file>../webfiori/cli/InputValidator.php</file>
-            <file>../webfiori/cli/streams/ArrayInputStream.php</file>
-            <file>../webfiori/cli/streams/ArrayOutputStream.php</file>
-            <file>../webfiori/cli/streams/FileInputStream.php</file>
-            <file>../webfiori/cli/streams/FileOutputStream.php</file>
+            <file>../WebFiori/Cli/CLICommand.php</file>
+            <file>../WebFiori/Cli/CommandArgument.php</file>
+            <file>../WebFiori/Cli/Formatter.php</file>
+            <file>../WebFiori/Cli/KeysMap.php</file>
+            <file>../WebFiori/Cli/Runner.php</file>
+            <file>../WebFiori/Cli/CommandTestCase.php</file>
+            <file>../WebFiori/Cli/InputValidator.php</file>
+            <file>../WebFiori/Cli/Streams/ArrayInputStream.php</file>
+            <file>../WebFiori/Cli/Streams/ArrayOutputStream.php</file>
+            <file>../WebFiori/Cli/Streams/FileInputStream.php</file>
+            <file>../WebFiori/Cli/Streams/FileOutputStream.php</file>
         </whitelist>
     </filter>
     <logging>
@@ -22,7 +22,7 @@
     </logging>
     <testsuites>
         <testsuite name="Tests">
-            <directory>./webfiori/tests/cli</directory>
+            <directory>./WebFiori/Tests/Cli</directory>
         </testsuite>
     </testsuites>
 </phpunit>

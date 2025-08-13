@@ -1,10 +1,11 @@
 <?php
 
+use WebFiori\Cli\CommandTestCase;
+
 
 require_once(realpath(dirname(__FILE__).'\\..\\..\\vendor\\autoload.php'));
 require_once(realpath(dirname(__FILE__).'\\..\\app\\HelloWorldCommand.php'));
 
-use webfiori\cli\CommandTestCase;
 
 class HelloCommandTest  extends CommandTestCase {
     /**

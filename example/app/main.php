@@ -1,11 +1,13 @@
 <?php
 
+use webfiori\cli\commands\HelpCommand;
+use WebFiori\Cli\Runner;
+
 require_once '../../vendor/autoload.php';
 require_once './HelloWorldCommand.php';
 require_once './OpenFileCommand.php';
 
-use webfiori\cli\commands\HelpCommand;
-use webfiori\cli\Runner;
+
 
 $runner = new Runner();
 

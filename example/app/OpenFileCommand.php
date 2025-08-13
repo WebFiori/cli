@@ -1,6 +1,8 @@
 <?php
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\CLICommand;
+
+
 
 class OpenFileCommand extends CLICommand {
     public function __construct() {

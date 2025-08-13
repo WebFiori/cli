@@ -15,17 +15,25 @@
         "terminal"
     ],
     "require": {
-        "webfiori/file":"1.3.*"
+        "webfiori/file":"2.0.*"
     },
     "require-dev": {
-        
+        "phpunit/phpunit": "^10.0"
     },
     "autoload" :{
         "psr-4":{
-            "webfiori\\cli\\":"webfiori\\cli"
+            "WebFiori\\Cli\\":"WebFiori/Cli"
+        }
+    },
+    "autoload-dev" :{
+        "psr-4":{
+            "WebFiori\\Tests\\":"tests/WebFiori/Tests"
         }
     },
     "scripts" : {
+        "test": "vendor/bin/phpunit -c tests/phpunit.xml",
+        "test10": "vendor/bin/phpunit -c tests/phpunit10.xml",
+        "wfcli":"bin/wfc",
         "check-cs": "bin/ecs check --ansi",
         "fix-cs": "bin/ecs check --fix --ansi",
         "phpstan": "vendor/bin/phpstan analyse --ansi  --error-format symplify"
