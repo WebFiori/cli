@@ -396,7 +396,7 @@ class RunnerTest extends CommandTestCase {
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
             "[1;33mAt:[0m ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
-            "[1;33mLine:[0m 12\n",
+            "[1;33mLine:[0m 13\n",
             "[1;33mStack Trace:[0m \n\n",
             null,
             "Command Exit Status: -1\n",
@@ -536,7 +536,7 @@ class RunnerTest extends CommandTestCase {
         $output[6] = null;
         $this->assertEquals([
             "Error: An exception was thrown.\n",
-            "Exception Message: Call to undefined method webfiori\\tests\cli\\testCommands\WithExceptionCommand::notExist()\n",
+            "Exception Message: Call to undefined method WebFiori\\Tests\Cli\\TestCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
             "At: ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
             "Line: 13\n",
