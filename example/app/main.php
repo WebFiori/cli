@@ -1,6 +1,6 @@
 <?php
 
-use webfiori\cli\commands\HelpCommand;
+use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\Runner;
 
 require_once '../../vendor/autoload.php';

@@ -61,21 +61,20 @@ A sample application can be found here: https://github.com/WebFiori/cli/tree/mai
 
 ## Installation
 
-To install the library, simply include it in your `composer.json`'s `require` section: `"webfiori\cli":"*"`.
+To install the library, simply include it in your `composer.json`'s `require` section: `"webfiori/cli":"*"`.
 
 ## Creating and Running Commands
 
 ### Creating a Command
 
-
-First step in creating new command is to create a new class that extends the class `webfiori\cli\CLICommand`. The class `CLICommand` is a utility class which has methods that can be used to read inputs, send outputs and use command line arguments.
+First step in creating new command is to create a new class that extends the class `WebFiori\Cli\CLICommand`. The class `CLICommand` is a utility class which has methods that can be used to read inputs, send outputs and use command line arguments.
 
 The class has one abstract method that must be implemented. The code that will exist in the body of the method will represent the logic of the command.
 
 ``` php
 <?php
 //File 'src/SampleCommand.php'
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\CLICommand;
 
 class SampleCommand extends CLICommand {
 
@@ -85,6 +84,7 @@ class SampleCommand extends CLICommand {
 
     public function exec(): int {
         $this->println("Hi People!");
+        return 0;
     }
 
 }
@@ -93,7 +93,7 @@ class SampleCommand extends CLICommand {
 
 ### Running a Command
 
-The class `webfiori\cli\Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command and start running the application.
+The class `WebFiori\Cli\Runner` is the class which is used to manage the logic of executing the commands. In order to run a command, an instance of this class must be created and used to register the command and start running the application.
 
 To register a command, the method `Runner::register()` is used. To start the application, the method `Runner::start()` is used.
 
@@ -101,7 +101,7 @@ To register a command, the method `Runner::register()` is used. To start the app
 // File src/main.php
 require_once '../vendor/autoload.php';
 
-use webfiori\cli\Runner;
+use WebFiori\Cli\Runner;
 use SampleCommand;
 
 
@@ -129,8 +129,8 @@ Arguments can be added in the constructor of the class as follows:
 ``` php
 <?php
 //File 'src/SampleCommand.php'
-use webfiori\cli\CLICommand;
-use webfiori\cli\Option;
+use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Option;
 
 class SampleCommand extends CLICommand {
 
@@ -144,19 +144,20 @@ class SampleCommand extends CLICommand {
 
     public function exec(): int {
         $this->println("Hi People!");
+        return 0;
     }
 
 }
 
 ```
 
-Arguments can be provided as an associative array or array of objects of type `webfiori\cli\Argument`. In case of associative array, Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
+Arguments can be provided as an associative array or array of objects of type `WebFiori\Cli\Argument`. In case of associative array, Index is name of the argument and the value of the index is sub-associative array of options. Each argument can have the following options:
 * `optional`: A boolean. if set to true, it means that the argument is optional. Default is false.
 * `default`: An optional default value for the argument to use if it is not provided.
 * `description`: A description of the argument which will be shown if the command `help` is executed.
 * `values`: A set of values that the argument can have. If provided, only the values on the list will be allowed.
 
-The class `webfiori\cli\Option` can be used to access the options.
+The class `WebFiori\Cli\Option` can be used to access the options.
 
 #### Accessing Argument Value
 
@@ -165,8 +166,8 @@ Accessing the value of an argument is performed using the method `CLICommand::ge
 ``` php
 <?php
 //File 'src/SampleCommand.php'
-use webfiori\cli\CLICommand;
-use webfiori\cli\Option;
+use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Option;
 
 class SampleCommand extends CLICommand {
 
@@ -187,6 +188,7 @@ class SampleCommand extends CLICommand {
             $this->println("Hi People!");
         }
         
+        return 0;
     }
 
 }
@@ -209,20 +211,20 @@ This will show following output in terminal:
 >>
 ```
 
-## `help` Command
+## The `help` Command
 One of the commands which comes by default with the library is the `help` command. It can be used to display help instructions for all registered commands. 
 
 > Note: In order to use this command, it must be registered using the method `Runner::register()`. 
 
 ### Setting Help Instructions
 
-Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `webfiori\cli\CLICommand` as a description. The description can be set for the command and its arguments.
+Help instructions are provided by the developer who created the command during its implementation. Instructions can be set on the constructor of the class that extends the class `WebFiori\Cli\CLICommand` as a description. The description can be set for the command and its arguments.
 
 ``` php
 <?php
 //File 'src/SampleCommand.php'
-use webfiori\cli\CLICommand;
-use webfiori\cli\Option;
+use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Option;
 
 class GreetingsCommand extends CLICommand {
 
@@ -259,7 +261,6 @@ Help command can be used in two ways, one way is to display a general help for t
 To show general help of the application, following command can be executed.
 
 ``` bash
-//File 'src/main.php'
 php main.php help 
 ```
 
@@ -285,7 +286,6 @@ Available Commands:
 To show help instructions for a specific command, the name of the command can be included using the argument `--command-name` as follows:
 
 ``` bash
-//File 'src/main.php'
 php main.php help --command-name=hello
 ```
 
@@ -299,14 +299,14 @@ hello:         A command to show greetings.
 
 ## Unit-Testing Commands
 
-The library provides the helper class `webfiori\cli\CommandTestCase` which can be used to write unit tests for diffrent commands. The developer have to only extend the class and use utility methods to write tests. The class is based on PHPUnit.
+The library provides the helper class `WebFiori\Cli\CommandTestCase` which can be used to write unit tests for different commands. The developer has to only extend the class and use utility methods to write tests. The class is based on PHPUnit.
 
 The class has two methods which can be used to execute tests:
 
 * `CommandTestCase::executeSingleCommand()`: Used to run one command at a time and return its output.
-* `CommandTestCase::executeMultiCommand()`: Used to register multiple commands,set default command and/or run one of registered commands.
+* `CommandTestCase::executeMultiCommand()`: Used to register multiple commands, set default command and/or run one of registered commands.
 
-First method is good to verify the output of one specific command. The second one is usefule to simulate the execution of an application with multiple commands.
+First method is good to verify the output of one specific command. The second one is useful to simulate the execution of an application with multiple commands.
 
 Both methods support simulating arguments vector and user inputs.
 
@@ -314,7 +314,7 @@ Both methods support simulating arguments vector and user inputs.
 ``` php
 namespace tests\cli;
 
-use webfiori\cli\CommandTestCase;
+use WebFiori\Cli\CommandTestCase;
 
 class HelloCommandTest extends CommandTestCase {
     /**
@@ -334,5 +334,3 @@ class HelloCommandTest extends CommandTestCase {
 ```
 
 A sample of tests can be found [here](https://github.com/WebFiori/cli/tree/main/example/tests/HelloCommandTest.php)
-
-

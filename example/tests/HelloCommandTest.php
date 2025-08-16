@@ -3,11 +3,11 @@
 use WebFiori\Cli\CommandTestCase;
 
 
-require_once(realpath(dirname(__FILE__).'\\..\\..\\vendor\\autoload.php'));
-require_once(realpath(dirname(__FILE__).'\\..\\app\\HelloWorldCommand.php'));
+require_once(realpath(dirname(__FILE__).'/../../vendor/autoload.php'));
+require_once(realpath(dirname(__FILE__).'/../app/HelloWorldCommand.php'));
 
 
-class HelloCommandTest  extends CommandTestCase {
+class HelloCommandTest extends CommandTestCase {
     /**
      * @test
      */
@@ -15,7 +15,7 @@ class HelloCommandTest  extends CommandTestCase {
         //A basic test case without using arg vector or user inputs
         $this->assertEquals([
             "Hello World!".self::NL
-        ], $this->executeSingleCommand([new HelloWorldCommand()]));
+        ], $this->executeSingleCommand(new HelloWorldCommand()));
     }
     /**
      * @test
@@ -23,10 +23,9 @@ class HelloCommandTest  extends CommandTestCase {
     public function test01() {
         //A test case that uses arg vector
         $this->assertEquals([
-            "Hello Ibrahim BinAlshikh!\n".self::NL
+            "Hello Ibrahim BinAlshikh!".self::NL
         ], $this->executeSingleCommand(new HelloWorldCommand(), [
             '--person-name' => 'Ibrahim BinAlshikh'
         ]));
     }
 }
-
