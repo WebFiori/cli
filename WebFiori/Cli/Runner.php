@@ -8,6 +8,10 @@ use WebFiori\Cli\Streams\InputStream;
 use WebFiori\Cli\Streams\OutputStream;
 use WebFiori\Cli\Streams\StdIn;
 use WebFiori\Cli\Streams\StdOut;
+use WebFiori\Cli\Discovery\AutoDiscoverable;
+use WebFiori\Cli\Discovery\CommandCache;
+use WebFiori\Cli\Discovery\CommandDiscovery;
+use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 
 
 /**
@@ -65,6 +69,24 @@ class Runner {
      */
     private $outputStream;
     /**
+     * Command discovery instance for auto-registration.
+     * 
+     * @var CommandDiscovery|null
+     */
+    private $commandDiscovery;
+    /**
+     * Whether auto-discovery is enabled.
+     * 
+     * @var bool
+     */
+    private $autoDiscoveryEnabled;
+    /**
+     * Whether commands have been discovered yet.
+     * 
+     * @var bool
+     */
+    private $commandsDiscovered;
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
@@ -77,6 +99,11 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commandExitVal = 0;
         $this->afterRunPool = [];
+
+        // Initialize discovery properties
+        $this->commandDiscovery = null;
+        $this->autoDiscoveryEnabled = false;
+        $this->commandsDiscovered = false;
 
         $this->addArg('--ansi', [
             Option::OPTIONAL => true,
@@ -737,4 +764,204 @@ class Runner {
         }
         $this->argsV = $argV;
     }
-}
+    
+    /**
+     * Enable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function enableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = true;
+        
+        if ($this->commandDiscovery === null) {
+            $this->commandDiscovery = new CommandDiscovery();
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Disable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function disableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = false;
+        return $this;
+    }
+    
+    /**
+     * Add a directory path to search for commands.
+     * 
+     * @param string $path Directory path to search
+     * @return Runner
+     */
+    public function addDiscoveryPath(string $path): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPath($path);
+        return $this;
+    }
+    
+    /**
+     * Add multiple discovery paths.
+     * 
+     * @param array $paths Array of directory paths
+     * @return Runner
+     */
+    public function addDiscoveryPaths(array $paths): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPaths($paths);
+        return $this;
+    }
+    
+    /**
+     * Add a pattern to exclude files/directories from discovery.
+     * 
+     * @param string $pattern Glob pattern to exclude
+     * @return Runner
+     */
+    public function excludePattern(string $pattern): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePattern($pattern);
+        return $this;
+    }
+    
+    /**
+     * Add multiple exclude patterns.
+     * 
+     * @param array $patterns Array of glob patterns
+     * @return Runner
+     */
+    public function excludePatterns(array $patterns): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePatterns($patterns);
+        return $this;
+    }
+    
+    /**
+     * Enable or disable strict mode for discovery.
+     * 
+     * @param bool $strict
+     * @return Runner
+     */
+    public function setDiscoveryStrictMode(bool $strict): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->setStrictMode($strict);
+        return $this;
+    }
+    
+    /**
+     * Get the command discovery instance.
+     * 
+     * @return CommandDiscovery|null
+     */
+    public function getCommandDiscovery(): ?CommandDiscovery {
+        return $this->commandDiscovery;
+    }
+    
+    /**
+     * Set a custom command discovery instance.
+     * 
+     * @param CommandDiscovery $discovery
+     * @return Runner
+     */
+    public function setCommandDiscovery(CommandDiscovery $discovery): Runner {
+        $this->commandDiscovery = $discovery;
+        $this->autoDiscoveryEnabled = true;
+        return $this;
+    }
+    
+    /**
+     * Discover and register commands from configured paths.
+     * 
+     * @return Runner
+     */
+    public function discoverCommands(): Runner {
+        if (!$this->autoDiscoveryEnabled || $this->commandsDiscovered) {
+            return $this;
+        }
+        
+        $commands = $this->commandDiscovery->discover();
+        
+        foreach ($commands as $command) {
+            // Check if command implements AutoDiscoverable
+            if ($command instanceof AutoDiscoverable) {
+                if (!$command::shouldAutoRegister()) {
+                    continue;
+                }
+            }
+            
+            $this->register($command);
+        }
+        
+        $this->commandsDiscovered = true;
+        return $this;
+    }
+    
+    /**
+     * Auto-register commands from a directory (convenience method).
+     * 
+     * @param string $path Directory path to search
+     * @param array $excludePatterns Optional exclude patterns
+     * @return Runner
+     */
+    public function autoRegister(string $path, array $excludePatterns = []): Runner {
+        return $this->addDiscoveryPath($path)
+                   ->excludePatterns($excludePatterns)
+                   ->discoverCommands();
+    }
+    
+    /**
+     * Check if auto-discovery is enabled.
+     * 
+     * @return bool
+     */
+    public function isAutoDiscoveryEnabled(): bool {
+        return $this->autoDiscoveryEnabled;
+    }
+    
+    /**
+     * Get discovery cache instance.
+     * 
+     * @return CommandCache|null
+     */
+    public function getDiscoveryCache(): ?CommandCache {
+        return $this->commandDiscovery?->getCache();
+    }
+    
+    /**
+     * Enable discovery caching.
+     * 
+     * @param string $cacheFile Optional cache file path
+     * @return Runner
+     */
+    public function enableDiscoveryCache(string $cacheFile = 'cache/commands.json'): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->getCache()->setEnabled(true);
+        $this->commandDiscovery->getCache()->setCacheFile($cacheFile);
+        return $this;
+    }
+    
+    /**
+     * Disable discovery caching.
+     * 
+     * @return Runner
+     */
+    public function disableDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->setEnabled(false);
+        }
+        return $this;
+    }
+    
+    /**
+     * Clear discovery cache.
+     * 
+     * @return Runner
+     */
+    public function clearDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->clear();
+        }
+        return $this;
+    }}
