@@ -4,8 +4,8 @@ namespace WebFiori\Cli;
 use ReflectionClass;
 use ReflectionException;
 use WebFiori\Cli\Exceptions\IOException;
-use webfiori\cli\streams\InputStream;
-use webfiori\cli\streams\OutputStream;
+use WebFiori\Cli\Streams\InputStream;
+use WebFiori\Cli\Streams\OutputStream;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 

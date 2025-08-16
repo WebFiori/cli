@@ -1,7 +1,7 @@
 <?php
 namespace WebFiori\Cli;
 
-use webfiori\cli\streams\InputStream;
+use WebFiori\Cli\Streams\InputStream;
 /**
  * A utility class which can be used to map control characters to string values.
  *
