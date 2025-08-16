@@ -1,7 +1,7 @@
 <?php
 namespace WebFiori\Tests\Cli\TestCommands;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 
 /**
@@ -9,7 +9,7 @@ use WebFiori\Cli\CLICommand;
  *
  * @author i.binalshikh
  */
-class Command00 extends CLICommand {
+class Command00 extends Command {
 
     public function __construct() {
         parent::__construct('super-hero', [

@@ -3,14 +3,14 @@
 namespace WebFiori\Cli\Commands;
 
 use WebFiori\Cli\Argument;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\File\File;
 /**
  * A class which is used to initialize a new CLI application.
  *
  * @author Ibrahim
  */
-class InitAppCommand extends CLICommand {
+class InitAppCommand extends Command {
     public function __construct() {
         parent::__construct('init', [
             new Argument('--dir', 'The name of application root directory.'),

@@ -23,7 +23,7 @@ class Runner {
     /**
      * The command that will be executed now.
      * 
-     * @var CLICommand|null
+     * @var Command|null
      */
     private $activeCommand;
     /**
@@ -45,7 +45,7 @@ class Runner {
     private $commands;
     /**
      * 
-     * @var CLICommand|null
+     * @var Command|null
      */
     private $defaultCommand;
     private $globalArgs;
@@ -181,7 +181,7 @@ class Runner {
     /**
      * Returns the command which is being executed.
      * 
-     * @return CLICommand|null If a command is requested and currently in execute 
+     * @return Command|null If a command is requested and currently in execute 
      * stage, the method will return it as an object. If 
      * no command is active, the method will return null.
      * 
@@ -211,7 +211,7 @@ class Runner {
      * @param string $name The name of the command as specified when it was
      * initialized.
      * 
-     * @return CLICommand|null If the command is registered, it is returned
+     * @return Command|null If the command is registered, it is returned
      * as an object. Other than that, null is returned.
      */
     public function getCommandByName(string $name) {
@@ -236,7 +236,7 @@ class Runner {
      * Return the command which will get executed in case no command name
      * was provided as argument.
      * 
-     * @return CLICommand|null If set, it will be returned as object.
+     * @return Command|null If set, it will be returned as object.
      * Other than that, null is returned.
      */
     public function getDefaultCommand() {
@@ -331,13 +331,13 @@ class Runner {
     /**
      * Register new command.
      * 
-     * @param CLICommand $cliCommand The command that will be registered.
+     * @param Command $cliCommand The command that will be registered.
      * 
      * @return Runner The method will return the instance at which the method
      * is called on
      * 
      */
-    public function register(CLICommand $cliCommand) : Runner {
+    public function register(Command $cliCommand) : Runner {
         $this->commands[$cliCommand->getName()] = $cliCommand;
 
         return $this;
@@ -382,7 +382,7 @@ class Runner {
     /**
      * Executes a command given as object.
      * 
-     * @param CLICommand $c The command that will be executed. If null is given,
+     * @param Command $c The command that will be executed. If null is given,
      * the method will take command name from the array '$args'.
      * 
      * @param array $args An optional array that can hold command arguments.
@@ -397,7 +397,7 @@ class Runner {
      * running the command. Usually, if the command exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public function runCommand(?CLICommand $c = null, array $args = [], bool $ansi = false) : int {
+    public function runCommand(?Command $c = null, array $args = [], bool $ansi = false) : int {
         $commandName = null;
 
         if ($c === null) {
@@ -497,12 +497,12 @@ class Runner {
      * This method is used internally by execution engine to set the command which
      * is being executed.
      * 
-     * @param CLICommand $c The command which is in execution stage.
+     * @param Command $c The command which is in execution stage.
      * 
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setActiveCommand(?CLICommand $c = null) : Runner {
+    public function setActiveCommand(?Command $c = null) : Runner {
         if ($this->getActiveCommand() !== null) {
             $this->getActiveCommand()->setOwner();
         }

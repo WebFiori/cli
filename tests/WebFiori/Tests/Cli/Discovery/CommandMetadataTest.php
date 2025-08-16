@@ -54,7 +54,7 @@ class CommandMetadataTest extends TestCase {
      */
     public function testExtractNonCommandClass() {
         $this->expectException(CommandDiscoveryException::class);
-        $this->expectExceptionMessage('is not a CLICommand');
+        $this->expectExceptionMessage('is not a Command');
         
         CommandMetadata::extract(NotACommand::class);
     }
@@ -74,7 +74,7 @@ class CommandMetadataTest extends TestCase {
      */
     public function testExtractCommandNameFromClassName() {
         // Create a temporary command class without annotations
-        $tempClass = new class extends \WebFiori\Cli\CLICommand {
+        $tempClass = new class extends \WebFiori\Cli\Command {
             public function __construct() {
                 parent::__construct('temp', [], 'Temp command');
             }

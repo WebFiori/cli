@@ -1,10 +1,10 @@
 <?php
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 
 
-class OpenFileCommand extends CLICommand {
+class OpenFileCommand extends Command {
     public function __construct() {
         parent::__construct('open-file', [
             'path' => [

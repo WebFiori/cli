@@ -2,7 +2,7 @@
 namespace WebFiori\Cli\Commands;
 
 use WebFiori\Cli\Argument;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 /**
  * A class that implements a basic help command.
@@ -10,7 +10,7 @@ use WebFiori\Cli\CLICommand;
  * @author Ibrahim
  * @version 1.0
  */
-class HelpCommand extends CLICommand {
+class HelpCommand extends Command {
     /**
      * Creates new instance of the class.
      * 
@@ -95,13 +95,13 @@ class HelpCommand extends CLICommand {
     /**
      * Prints meta information of a specific command.
      *
-     * @param CLICommand $cliCommand
+     * @param Command $cliCommand
      *
      * @param int $len
      *
      * @param bool $withArgs
      */
-    private function printCommandInfo(CLICommand $cliCommand, int $len, bool $withArgs = false) {
+    private function printCommandInfo(Command $cliCommand, int $len, bool $withArgs = false) {
         $this->prints("    %s", $cliCommand->getName(), [
             'color' => 'yellow',
             'bold' => true

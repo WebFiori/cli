@@ -2,11 +2,11 @@
 namespace WebFiori\Tests\Cli\TestCommands;
 
 use WebFiori\Cli\Argument;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 
 
-class Command01 extends CLICommand {
+class Command01 extends Command {
     public function __construct() {
         parent::__construct('show-v', [
             'arg-1' => [

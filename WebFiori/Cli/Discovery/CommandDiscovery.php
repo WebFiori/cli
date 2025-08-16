@@ -4,7 +4,7 @@ namespace WebFiori\Cli\Discovery;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 
 /**
@@ -113,7 +113,7 @@ class CommandDiscovery {
     /**
      * Discover commands from configured search paths.
      * 
-     * @return array Array of CLICommand instances
+     * @return array Array of Command instances
      * @throws CommandDiscoveryException If strict mode is enabled and errors occur
      */
     public function discover(): array {
@@ -261,7 +261,7 @@ class CommandDiscovery {
             
             $reflection = new ReflectionClass($className);
             
-            return $reflection->isSubclassOf(CLICommand::class) 
+            return $reflection->isSubclassOf(Command::class) 
                 && !$reflection->isAbstract()
                 && !$reflection->isInterface()
                 && !$reflection->isTrait();
@@ -275,7 +275,7 @@ class CommandDiscovery {
      * Instantiate commands from metadata.
      * 
      * @param array $commandMetadata
-     * @return array Array of CLICommand instances
+     * @return array Array of Command instances
      */
     private function instantiateCommands(array $commandMetadata): array {
         $commands = [];

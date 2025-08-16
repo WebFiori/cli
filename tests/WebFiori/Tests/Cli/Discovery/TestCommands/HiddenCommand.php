@@ -1,14 +1,14 @@
 <?php
 namespace WebFiori\Tests\Cli\Discovery\TestCommands;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 /**
  * A hidden test command.
  * 
  * @Hidden
  */
-class HiddenCommand extends CLICommand {
+class HiddenCommand extends Command {
     public function __construct() {
         parent::__construct('hidden-cmd', [], 'A hidden test command');
     }

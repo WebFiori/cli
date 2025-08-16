@@ -2,7 +2,7 @@
 namespace WebFiori\Cli\Discovery;
 
 use ReflectionClass;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 
 /**
@@ -24,8 +24,8 @@ class CommandMetadata {
         
         $reflection = new ReflectionClass($className);
         
-        if (!$reflection->isSubclassOf(CLICommand::class)) {
-            throw new CommandDiscoveryException("Class {$className} is not a CLICommand");
+        if (!$reflection->isSubclassOf(Command::class)) {
+            throw new CommandDiscoveryException("Class {$className} is not a Command");
         }
         
         if ($reflection->isAbstract()) {

@@ -1,10 +1,10 @@
 <?php
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\Cli\Option;
 
 
-class HelloWorldCommand extends CLICommand {
+class HelloWorldCommand extends Command {
     public function __construct() {
         parent::__construct('hello', [
             '--person-name' => [

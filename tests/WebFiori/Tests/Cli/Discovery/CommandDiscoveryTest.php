@@ -108,7 +108,7 @@ class CommandDiscoveryTest extends TestCase {
         
         // Should not include abstract commands or non-commands
         foreach ($commands as $command) {
-            $this->assertInstanceOf(\WebFiori\Cli\CLICommand::class, $command);
+            $this->assertInstanceOf(\WebFiori\Cli\Command::class, $command);
         }
     }
     

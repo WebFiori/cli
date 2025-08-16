@@ -1,13 +1,13 @@
 <?php
 namespace WebFiori\Tests\Cli\Discovery\TestCommands;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\Cli\Discovery\AutoDiscoverable;
 
 /**
  * A test command that implements AutoDiscoverable.
  */
-class AutoDiscoverableCommand extends CLICommand implements AutoDiscoverable {
+class AutoDiscoverableCommand extends Command implements AutoDiscoverable {
     private static bool $shouldRegister = true;
     
     public function __construct() {

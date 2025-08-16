@@ -15,7 +15,7 @@ use WebFiori\Cli\Streams\OutputStream;
  * @author Ibrahim
  * 
  */
-abstract class CLICommand {
+abstract class Command {
     /**
      * An associative array that contains extra options that can be added to 
      * the command.
@@ -188,11 +188,11 @@ abstract class CLICommand {
      * @param bool $beforeCursor If set to true, the characters which
      * are before the cursor will be cleared. Default is true.
      * 
-     * @return CLICommand The method will return the instance at which the
+     * @return Command The method will return the instance at which the
      * method is called on.
      * 
      */
-    public function clear(int $numberOfCols = 1, bool $beforeCursor = true) : CLICommand {
+    public function clear(int $numberOfCols = 1, bool $beforeCursor = true) : Command {
         if ($numberOfCols >= 1) {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
@@ -219,10 +219,10 @@ abstract class CLICommand {
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
      * 
-     * @return CLICommand The method will return the instance at which the
+     * @return Command The method will return the instance at which the
      * method is called on.
      */
-    public function clearConsole() : CLICommand {
+    public function clearConsole() : Command {
         $this->prints("\ec");
 
         return $this;
@@ -313,7 +313,7 @@ abstract class CLICommand {
      * 
      * @return int If the command is executed, the method will return 0.
      * Other than that, it will return a number which depends on the return value of
-     * the method 'CLICommand::exec()'.
+     * the method 'Command::exec()'.
      * 
      */
     public function excCommand() : int {
@@ -713,7 +713,7 @@ abstract class CLICommand {
      * 
      * This method will work like the function fprintf(). The difference is that 
      * it will print out to the stream at which was specified by the method 
-     * CLICommand::setOutputStream() and the text can have formatting 
+     * Command::setOutputStream() and the text can have formatting 
      * options. Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
      * 
@@ -721,7 +721,7 @@ abstract class CLICommand {
      * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
-     * for available options, check the method CLICommand::formatOutput().
+     * for available options, check the method Command::formatOutput().
      */
     public function println(string $str = '', ...$_) {
         $argsCount = count($_);
@@ -738,7 +738,7 @@ abstract class CLICommand {
      * 
      * This method works exactly like the function 'fprintf()'. The only 
      * difference is that the method will print out the output to the stream 
-     * that was specified using the method CLICommand::setOutputStream() and 
+     * that was specified using the method Command::setOutputStream() and 
      * the method accepts formatting options as last argument to format the output. 
      * Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
@@ -747,7 +747,7 @@ abstract class CLICommand {
      * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
-     * for available options, check the method CLICommand::formatOutput().
+     * for available options, check the method Command::formatOutput().
      * 
      */
     public function prints(string $str, ...$_) {

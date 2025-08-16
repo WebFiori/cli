@@ -15,7 +15,7 @@
   </testsuites>
   <source>
     <include>
-      <file>../WebFiori/Cli/CLICommand.php</file>
+      <file>../WebFiori/Cli/Command.php</file>
       <file>../WebFiori/Cli/CommandArgument.php</file>
       <file>../WebFiori/Cli/Formatter.php</file>
       <file>../WebFiori/Cli/KeysMap.php</file>

@@ -1,12 +1,12 @@
 <?php
 namespace WebFiori\Tests\Cli\Discovery\TestCommands;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 /**
  * An abstract test command that should not be discovered.
  */
-abstract class AbstractTestCommand extends CLICommand {
+abstract class AbstractTestCommand extends Command {
     public function __construct() {
         parent::__construct('abstract-cmd', [], 'Abstract test command');
     }

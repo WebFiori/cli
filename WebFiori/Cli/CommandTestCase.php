@@ -42,7 +42,7 @@ class CommandTestCase extends TestCase {
      * @param array $userInputs An array that holds user inputs. Each index
      * should hold one line that represent an input to specific prompt.
      * 
-     * @param array $commands An array that holds objects of type 'CLICommand'.
+     * @param array $commands An array that holds objects of type 'Command'.
      * Each object represents the registered command.
      * 
      * @param string $default A string that represents the name of the command
@@ -66,7 +66,7 @@ class CommandTestCase extends TestCase {
     /**
      * Executes a specific command and return its output as an array.
      * 
-     * @param CLICommand $command The command that will be tested.
+     * @param Command $command The command that will be tested.
      * 
      * @param array $argv Arguments vector that will be passed to the command.
      * This can be an associative array of options and values or just options.
@@ -78,7 +78,7 @@ class CommandTestCase extends TestCase {
      * @return array The method will return an array that will hold
      * outputs line by line in each index.
      */
-    public function executeSingleCommand(CLICommand $command, array $argv = [], array $userInputs = []) : array {
+    public function executeSingleCommand(Command $command, array $argv = [], array $userInputs = []) : array {
         $this->getRunner(true)->register($command);
         $this->exec($argv, $userInputs, $command);
 
@@ -142,7 +142,7 @@ class CommandTestCase extends TestCase {
 
         return $this;
     }
-    private function exec(array $argv, array $userInputs, ?CLICommand $command = null) {
+    private function exec(array $argv, array $userInputs, ?Command $command = null) {
         if ($command !== null) {
             $key = array_search($command->getName(), $argv);
 
