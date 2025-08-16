@@ -20,6 +20,9 @@
             <file>../WebFiori/Cli/Discovery/CommandCache.php</file>
             <file>../WebFiori/Cli/Discovery/AutoDiscoverable.php</file>
             <file>../WebFiori/Cli/Exceptions/CommandDiscoveryException.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBar.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarStyle.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarFormat.php</file>
         </whitelist>
     </filter>
     <logging>

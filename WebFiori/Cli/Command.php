@@ -6,6 +6,7 @@ use ReflectionException;
 use WebFiori\Cli\Exceptions\IOException;
 use WebFiori\Cli\Streams\InputStream;
 use WebFiori\Cli\Streams\OutputStream;
+use WebFiori\Cli\Progress\ProgressBar;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -1281,5 +1282,38 @@ abstract class Command {
 
         ]);
         $this->println($msg);
+    }
+    
+    /**
+     * Creates and returns a new progress bar instance.
+     * 
+     * @param int $total Total number of steps
+     * @return ProgressBar
+     */
+    public function createProgressBar(int $total = 100): ProgressBar {
+        return new ProgressBar($this->getOutputStream(), $total);
+    }
+    
+    /**
+     * Executes a callback for each item with a progress bar.
+     * 
+     * @param iterable $items Items to iterate over
+     * @param callable $callback Callback to execute for each item
+     * @param string $message Optional message to display
+     * @return void
+     */
+    public function withProgressBar(iterable $items, callable $callback, string $message = ''): void {
+        $items = is_array($items) ? $items : iterator_to_array($items);
+        $total = count($items);
+        
+        $progressBar = $this->createProgressBar($total);
+        $progressBar->start($message);
+        
+        foreach ($items as $key => $item) {
+            $callback($item, $key);
+            $progressBar->advance();
+        }
+        
+        $progressBar->finish();
     }
 }
