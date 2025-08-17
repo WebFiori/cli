@@ -44,6 +44,12 @@ class Runner {
      */
     private $commands;
     /**
+     * An associative array that maps aliases to command names.
+     * 
+     * @var array
+     */
+    private $aliases;
+    /**
      * 
      * @var Command|null
      */
@@ -91,7 +97,7 @@ class Runner {
      */
     public function __construct() {
         $this->commands = [];
-        $this->globalArgs = [];
+        $this->aliases = [];        $this->globalArgs = [];
         $this->argsV = [];
         $this->isInteractive = false;
         $this->isAnsi = false;
@@ -215,10 +221,18 @@ class Runner {
      * as an object. Other than that, null is returned.
      */
     public function getCommandByName(string $name) {
+        // First check if it's a direct command name
         if (isset($this->getCommands()[$name])) {
             return $this->getCommands()[$name];
         }
-
+        
+        // Then check if it's an alias
+        if (isset($this->aliases[$name])) {
+            $commandName = $this->aliases[$name];
+            if (isset($this->getCommands()[$commandName])) {
+                return $this->getCommands()[$commandName];
+            }
+        }
         return null;
     }
     /**
@@ -337,12 +351,89 @@ class Runner {
      * is called on
      * 
      */
-    public function register(Command $cliCommand) : Runner {
+    public function register(Command $cliCommand, array $aliases = []) : Runner {
         $this->commands[$cliCommand->getName()] = $cliCommand;
+        
+        // Register aliases
+        foreach ($aliases as $alias) {
+            $this->registerAlias($alias, $cliCommand->getName());
+        }
+        
+        // Register aliases from command itself
+        foreach ($cliCommand->getAliases() as $alias) {
+            $this->registerAlias($alias, $cliCommand->getName());
+        }
 
         return $this;
     }
     /**
+     * Register an alias for a command.
+     * 
+     * @param string $alias The alias to register.
+     * @param string $commandName The name of the command the alias points to.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
+     */
+    private function registerAlias(string $alias, string $commandName) : Runner {
+        // Check for conflicts
+        if (isset($this->aliases[$alias])) {
+            $existingCommand = $this->aliases[$alias];
+            
+            if ($this->isInteractive()) {
+                // Interactive mode: prompt user to choose
+                $choice = $this->resolveAliasConflictInteractively($alias, $existingCommand, $commandName);
+                if ($choice === $commandName) {
+                    $this->aliases[$alias] = $commandName;
+                }
+                // If user chose existing command, do nothing
+            } else {
+                // Non-interactive mode: use first-come-first-served (do nothing)
+                $this->printMsg("Warning: Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+            }
+        } else {
+            // No conflict, register the alias
+            $this->aliases[$alias] = $commandName;
+        }
+        
+        return $this;
+    }
+    /**
+     * Resolve alias conflict interactively by prompting the user.
+     * 
+     * @param string $alias The conflicting alias.
+     * @param string $existingCommand The existing command that uses the alias.
+     * @param string $newCommand The new command trying to use the alias.
+     * 
+     * @return string The command name chosen by the user.
+    /**
+     * Get all registered aliases.
+     * 
+     * @return array An associative array where keys are aliases and values are command names.
+     */
+    public function getAliases() : array {
+        return $this->aliases;
+    }
+    /**
+     * Check if an alias is registered.
+     * 
+     * @param string $alias The alias to check.
+     * 
+     * @return bool True if the alias exists, false otherwise.
+     */
+    public function hasAlias(string $alias) : bool {
+        return isset($this->aliases[$alias]);
+    }
+    /**
+     * Get the command name for a given alias.
+     * 
+     * @param string $alias The alias to resolve.
+     * 
+     * @return string|null The command name if alias exists, null otherwise.
+     */
+    public function resolveAlias(string $alias) : ?string {
+        return $this->aliases[$alias] ?? null;
+    }
      * Removes an argument from the global args set given its name.
      * 
      * @param string $name The name of the argument that will be removed.
@@ -376,7 +467,8 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
-
+        $this->commands = [];
+        $this->aliases = [];
         return $this;
     }
     /**

@@ -45,6 +45,11 @@ abstract class Command {
      * 
      */
     private $outputStream;
+    /**
+     * An array of aliases for the command.
+     * @var array
+     */
+    private $aliases;
     private $owner;
     /**
      * Creates new instance of the class.
@@ -73,11 +78,14 @@ abstract class Command {
      * 
      * @param string $description A string that describes what does the job 
      * do. The description will appear when the command 'help' is executed.
+     * 
+     * @param array $aliases An optional array of aliases for the command.
      */
-    public function __construct(string $commandName, array $args = [], string $description = '') {
+    public function __construct(string $commandName, array $args = [], string $description = '', array $aliases = []) {
         if (!$this->setName($commandName)) {
             $this->setName('new-command');
         }
+        $this->aliases = $aliases;
         $this->addArgs($args);
 
         if (!$this->setDescription($description)) {
@@ -537,6 +545,14 @@ abstract class Command {
      */
     public function getName() : string {
         return $this->commandName;
+    }
+    /**
+     * Returns an array of aliases for the command.
+     * 
+     * @return array An array of aliases.
+     */
+    public function getAliases() : array {
+        return $this->aliases;
     }
     /**
      * Returns the stream at which the command is using to send output.
