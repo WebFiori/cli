@@ -42,7 +42,6 @@ Class library that can help in writing command line based applications with mini
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php80.yaml/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php81.yaml/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yaml/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yaml/badge.svg?branch=main"></a> |
