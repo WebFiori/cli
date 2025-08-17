@@ -434,6 +434,7 @@ class Runner {
     public function resolveAlias(string $alias) : ?string {
         return $this->aliases[$alias] ?? null;
     }
+    /**
      * Removes an argument from the global args set given its name.
      * 
      * @param string $name The name of the argument that will be removed.
