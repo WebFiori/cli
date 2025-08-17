@@ -3,8 +3,8 @@ Class library that can help in writing command line based applications with mini
 
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yml">
-    <img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yaml">
+    <img src="https://github.com/WebFiori/cli/actions/workflows/php83.yaml/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -42,11 +42,11 @@ Class library that can help in writing command line based applications with mini
 ## Supported PHP Versions
 |                                                                                      Build Status                                                                                       |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php80.yml/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php81.yml/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yml/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main"></a> |
-| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yml"><img src="https://github.com/WebFiori/cli/actions/workflows/php84.yml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php80.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php80.yaml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php81.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php81.yaml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yaml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yaml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php84.yaml/badge.svg?branch=main"></a> |
 
 ## Features
 * Help in creating command line based applications.
