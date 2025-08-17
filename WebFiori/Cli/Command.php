@@ -1316,4 +1316,196 @@ abstract class Command {
         
         $progressBar->finish();
     }
+    
+    /**
+     * Creates and displays a table with the given data.
+     * 
+     * This method provides a convenient way to display tabular data in CLI applications
+     * using the WebFiori CLI Table feature. It supports various table styles, themes,
+     * column configuration, and data formatting options.
+     * 
+     * @param array $data The data to display. Can be:
+     *                   - Array of arrays (indexed): [['John', 30], ['Jane', 25]]
+     *                   - Array of associative arrays: [['name' => 'John', 'age' => 30]]
+     * @param array $headers Optional headers for the table columns. If not provided
+     *                      and data contains associative arrays, keys will be used as headers.
+     * @param array $options Optional configuration options. Use TableOptions constants for keys:
+     *                      - TableOptions::STYLE: Table style ('bordered', 'simple', 'minimal', 'compact', 'markdown')
+     *                      - TableOptions::THEME: Color theme ('default', 'dark', 'light', 'colorful', 'professional', 'minimal')
+     *                      - TableOptions::TITLE: Table title to display above the table
+     *                      - TableOptions::WIDTH: Maximum table width (auto-detected if not specified)
+     *                      - TableOptions::SHOW_HEADERS: Whether to show column headers (default: true)
+     *                      - TableOptions::COLUMNS: Column-specific configuration
+     *                      - TableOptions::COLORIZE: Column colorization rules
+     *                      - TableOptions::AUTO_WIDTH: Auto-calculate column widths (default: true)
+     *                      - TableOptions::SHOW_ROW_SEPARATORS: Show separators between rows (default: false)
+     *                      - TableOptions::SHOW_HEADER_SEPARATOR: Show separator after headers (default: true)
+     *                      - TableOptions::PADDING: Cell padding configuration
+     *                      - TableOptions::WORD_WRAP: Enable word wrapping (default: false)
+     *                      - TableOptions::ELLIPSIS: Truncation string (default: '...')
+     *                      - TableOptions::SORT: Sort configuration
+     *                      - TableOptions::LIMIT: Limit number of rows displayed
+     *                      - TableOptions::FILTER: Filter function for rows
+     * 
+     * @return Command Returns the same instance for method chaining.
+     * 
+     * @since 1.0.0
+     * 
+     * Example usage:
+     * ```php
+     * use WebFiori\Cli\Table\TableOptions;
+     * 
+     * // Basic table
+     * $this->table([
+     *     ['John Doe', 30, 'Active'],
+     *     ['Jane Smith', 25, 'Inactive']
+     * ], ['Name', 'Age', 'Status']);
+     * 
+     * // Advanced table with constants
+     * $this->table($users, ['Name', 'Status', 'Balance'], [
+     *     TableOptions::STYLE => 'bordered',
+     *     TableOptions::THEME => 'colorful',
+     *     TableOptions::TITLE => 'User Management',
+     *     TableOptions::COLUMNS => [
+     *         'Balance' => ['align' => 'right', 'formatter' => fn($v) => '$' . number_format($v, 2)]
+     *     ],
+     *     TableOptions::COLORIZE => [
+     *         'Status' => fn($v) => match($v) {
+     *             'Active' => ['color' => 'green', 'bold' => true],
+     *             'Inactive' => ['color' => 'red'],
+     *             default => []
+     *         }
+     *     ]
+     * ]);
+     * ```
+     */
+    public function table(array $data, array $headers = [], array $options = []): Command {
+        // Include table classes if not already loaded
+        $tableClassPath = __DIR__ . '/Table/';
+        $tableClasses = [
+            'TableOptions.php',
+            'TableStyle.php',
+            'Column.php', 
+            'TableData.php',
+            'ColumnCalculator.php',
+            'TableFormatter.php',
+            'TableTheme.php',
+            'TableRenderer.php',
+            'TableBuilder.php'
+        ];
+        
+        foreach ($tableClasses as $class) {
+            $classFile = $tableClassPath . $class;
+            if (file_exists($classFile)) {
+                require_once $classFile;
+            }
+        }
+        
+        // Check if TableBuilder class is available
+        if (!class_exists('WebFiori\\Cli\\Table\\TableBuilder')) {
+            $this->error('WebFiori CLI Table feature is not available. Please ensure table classes are installed.');
+            return $this;
+        }
+        
+        // Handle empty data
+        if (empty($data)) {
+            $this->info('No data to display in table.');
+            return $this;
+        }
+        
+        try {
+            // Create table builder instance
+            $tableBuilder = \WebFiori\Cli\Table\TableBuilder::create();
+            
+            // Set headers
+            if (!empty($headers)) {
+                $tableBuilder->setHeaders($headers);
+            }
+            
+            // Set data
+            $tableBuilder->setData($data);
+            
+            // Apply style (support both constant and string)
+            $style = $options[\WebFiori\Cli\Table\TableOptions::STYLE] ?? $options['style'] ?? 'bordered';
+            $tableBuilder->useStyle($style);
+            
+            // Apply theme (support both constant and string)
+            $theme = $options[\WebFiori\Cli\Table\TableOptions::THEME] ?? $options['theme'] ?? null;
+            if ($theme !== null) {
+                $themeObj = \WebFiori\Cli\Table\TableTheme::create($theme);
+                $tableBuilder->setTheme($themeObj);
+            }
+            
+            // Set title (support both constant and string)
+            $title = $options[\WebFiori\Cli\Table\TableOptions::TITLE] ?? $options['title'] ?? null;
+            if ($title !== null) {
+                $tableBuilder->setTitle($title);
+            }
+            
+            // Set width (support both constant and string)
+            $width = $options[\WebFiori\Cli\Table\TableOptions::WIDTH] ?? $options['width'] ?? $this->getTerminalWidth();
+            $tableBuilder->setMaxWidth($width);
+            
+            // Configure headers visibility (support both constant and string)
+            $showHeaders = $options[\WebFiori\Cli\Table\TableOptions::SHOW_HEADERS] ?? $options['showHeaders'] ?? true;
+            $tableBuilder->showHeaders($showHeaders);
+            
+            // Configure columns (support both constant and string)
+            $columns = $options[\WebFiori\Cli\Table\TableOptions::COLUMNS] ?? $options['columns'] ?? [];
+            if (!empty($columns) && is_array($columns)) {
+                foreach ($columns as $columnName => $columnConfig) {
+                    $tableBuilder->configureColumn($columnName, $columnConfig);
+                }
+            }
+            
+            // Apply colorization (support both constant and string)
+            $colorize = $options[\WebFiori\Cli\Table\TableOptions::COLORIZE] ?? $options['colorize'] ?? [];
+            if (!empty($colorize) && is_array($colorize)) {
+                foreach ($colorize as $columnName => $colorizer) {
+                    if (is_callable($colorizer)) {
+                        $tableBuilder->colorizeColumn($columnName, $colorizer);
+                    }
+                }
+            }
+            
+            // Render and display the table
+            $output = $tableBuilder->render();
+            $this->prints($output);
+            
+        } catch (\Exception $e) {
+            $this->error('Failed to display table: ' . $e->getMessage());
+        } catch (\Error $e) {
+            $this->error('Table display error: ' . $e->getMessage());
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Get terminal width for responsive table display.
+     * 
+     * @return int Terminal width in characters, defaults to 80 if unable to detect.
+     */
+    private function getTerminalWidth(): int {
+        // Try to get terminal width using tput
+        $width = @exec('tput cols 2>/dev/null');
+        if (is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+        
+        // Try environment variable
+        $width = getenv('COLUMNS');
+        if ($width !== false && is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+        
+        // Try using stty
+        $width = @exec('stty size 2>/dev/null | cut -d" " -f2');
+        if (is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+        
+        // Default fallback
+        return 80;
+    }
 }

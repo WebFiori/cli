@@ -13,6 +13,83 @@ namespace WebFiori\Cli\Table;
  */
 class TableStyle {
     
+    /**
+     * Style name constants for supported table styles.
+     * 
+     * These constants provide type safety and IDE autocompletion when
+     * specifying table styles in configuration.
+     */
+    
+    /**
+     * Default bordered style with Unicode box-drawing characters.
+     * 
+     * @var string
+     */
+    const DEFAULT = 'default';
+    
+    /**
+     * Bordered style (alias for default).
+     * 
+     * @var string
+     */
+    const BORDERED = 'bordered';
+    
+    /**
+     * Simple ASCII style for maximum compatibility.
+     * 
+     * @var string
+     */
+    const SIMPLE = 'simple';
+    
+    /**
+     * Minimal style with reduced borders.
+     * 
+     * @var string
+     */
+    const MINIMAL = 'minimal';
+    
+    /**
+     * Compact style with minimal spacing.
+     * 
+     * @var string
+     */
+    const COMPACT = 'compact';
+    
+    /**
+     * Markdown-compatible table style.
+     * 
+     * @var string
+     */
+    const MARKDOWN = 'markdown';
+    
+    /**
+     * Double-line bordered style.
+     * 
+     * @var string
+     */
+    const DOUBLE_BORDERED = 'double-bordered';
+    
+    /**
+     * Rounded corners style.
+     * 
+     * @var string
+     */
+    const ROUNDED = 'rounded';
+    
+    /**
+     * Heavy/thick borders style.
+     * 
+     * @var string
+     */
+    const HEAVY = 'heavy';
+    
+    /**
+     * No borders style - just data with spacing.
+     * 
+     * @var string
+     */
+    const NONE = 'none';
+    
     public readonly string $topLeft;
     public readonly string $topRight;
     public readonly string $bottomLeft;
@@ -329,5 +406,56 @@ class TableStyle {
             showHeaderSeparator: $config['showHeaderSeparator'],
             showRowSeparators: $config['showRowSeparators']
         );
+    }
+    
+    /**
+     * Get all available style names.
+     * 
+     * @return array Array of supported style names
+     */
+    public static function getAvailableStyles(): array {
+        return [
+            self::DEFAULT,
+            self::BORDERED,
+            self::SIMPLE,
+            self::MINIMAL,
+            self::COMPACT,
+            self::MARKDOWN,
+            self::DOUBLE_BORDERED,
+            self::ROUNDED,
+            self::HEAVY,
+            self::NONE
+        ];
+    }
+    
+    /**
+     * Check if a style name is valid.
+     * 
+     * @param string $styleName The style name to validate
+     * @return bool True if the style is supported, false otherwise
+     */
+    public static function isValidStyle(string $styleName): bool {
+        return in_array(strtolower($styleName), array_map('strtolower', self::getAvailableStyles()), true);
+    }
+    
+    /**
+     * Create a style by name.
+     * 
+     * @param string $name The style name
+     * @return self The style instance
+     */
+    public static function create(string $name): self {
+        return match(strtolower($name)) {
+            self::DEFAULT, self::BORDERED => self::default(),
+            self::SIMPLE => self::simple(),
+            self::MINIMAL => self::minimal(),
+            self::COMPACT => self::compact(),
+            self::MARKDOWN => self::markdown(),
+            self::DOUBLE_BORDERED, 'double-bordered', 'doublebordered' => self::doubleBordered(),
+            self::ROUNDED => self::rounded(),
+            self::HEAVY => self::heavy(),
+            self::NONE => self::none(),
+            default => self::default()
+        };
     }
 }

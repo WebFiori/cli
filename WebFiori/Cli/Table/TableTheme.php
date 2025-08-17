@@ -13,6 +13,62 @@ namespace WebFiori\Cli\Table;
  */
 class TableTheme {
     
+    /**
+     * Theme name constants for supported table themes.
+     * 
+     * These constants provide type safety and IDE autocompletion when
+     * specifying table themes in configuration.
+     */
+    
+    /**
+     * Default theme with standard colors.
+     * 
+     * @var string
+     */
+    const DEFAULT = 'default';
+    
+    /**
+     * Dark theme optimized for dark terminals.
+     * 
+     * @var string
+     */
+    const DARK = 'dark';
+    
+    /**
+     * Light theme optimized for light terminals.
+     * 
+     * @var string
+     */
+    const LIGHT = 'light';
+    
+    /**
+     * Colorful theme with vibrant colors and styling.
+     * 
+     * @var string
+     */
+    const COLORFUL = 'colorful';
+    
+    /**
+     * Minimal theme with no colors, just formatting.
+     * 
+     * @var string
+     */
+    const MINIMAL = 'minimal';
+    
+    /**
+     * Professional theme with business-appropriate styling.
+     * 
+     * @var string
+     */
+    const PROFESSIONAL = 'professional';
+    
+    /**
+     * High contrast theme for accessibility.
+     * 
+     * @var string
+     */
+    const HIGH_CONTRAST = 'high-contrast';
+    
     private array $headerColors = [];
     private array $cellColors = [];
     private array $alternatingRowColors = [];
@@ -426,14 +482,24 @@ class TableTheme {
      */
     public static function getAvailableThemes(): array {
         return [
-            'default',
-            'dark',
-            'light',
-            'colorful',
-            'minimal',
-            'professional',
-            'high-contrast'
+            self::DEFAULT,
+            self::DARK,
+            self::LIGHT,
+            self::COLORFUL,
+            self::MINIMAL,
+            self::PROFESSIONAL,
+            self::HIGH_CONTRAST
         ];
+    }
+    
+    /**
+     * Check if a theme name is valid.
+     * 
+     * @param string $themeName The theme name to validate
+     * @return bool True if the theme is supported, false otherwise
+     */
+    public static function isValidTheme(string $themeName): bool {
+        return in_array(strtolower($themeName), array_map('strtolower', self::getAvailableThemes()), true);
     }
     
     /**
@@ -441,12 +507,12 @@ class TableTheme {
      */
     public static function create(string $name): self {
         return match(strtolower($name)) {
-            'dark' => self::dark(),
-            'light' => self::light(),
-            'colorful' => self::colorful(),
-            'minimal' => self::minimal(),
-            'professional' => self::professional(),
-            'high-contrast', 'highcontrast' => self::highContrast(),
+            self::DARK => self::dark(),
+            self::LIGHT => self::light(),
+            self::COLORFUL => self::colorful(),
+            self::MINIMAL => self::minimal(),
+            self::PROFESSIONAL => self::professional(),
+            self::HIGH_CONTRAST, 'high-contrast', 'highcontrast' => self::highContrast(),
             'environment', 'auto' => self::fromEnvironment(),
             default => self::default()
         };
