@@ -11,7 +11,7 @@ use WebFiori\Cli\Streams\ArrayOutputStream;
 use WebFiori\Tests\TestStudent;
 
 
-class CommandTest extends TestCase {
+class CLICommandTest extends TestCase {
     /**
      * @test
      */
