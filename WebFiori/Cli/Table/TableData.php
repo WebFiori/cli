@@ -318,7 +318,9 @@ class TableData {
         $headers = null;
         
         foreach ($lines as $line) {
-            if (trim($line) === '') continue;
+            if (trim($line) === '') {
+                continue;
+            }
             
             $row = str_getcsv($line, $delimiter);
             

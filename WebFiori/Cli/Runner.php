@@ -974,9 +974,9 @@ class Runner {
             return $this;
         }
         
-        $commands = $this->commandDiscovery->discover();
+        $discoveredCommands = $this->commandDiscovery->discover();
         
-        foreach ($commands as $command) {
+        foreach ($discoveredCommands as $command) {
             // Check if command implements AutoDiscoverable
             if ($command instanceof AutoDiscoverable) {
                 if (!$command::shouldAutoRegister()) {

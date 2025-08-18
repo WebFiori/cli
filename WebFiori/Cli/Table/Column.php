@@ -87,11 +87,11 @@ class Column {
     /**
      * Set text alignment.
      */
-    public function setAlignment(string $alignment): self {
+    public function setAlignment(string $alignmentValue): self {
         $validAlignments = [self::ALIGN_LEFT, self::ALIGN_RIGHT, self::ALIGN_CENTER, self::ALIGN_AUTO];
         
-        if (in_array($alignment, $validAlignments)) {
-            $this->alignment = $alignment;
+        if (in_array($alignmentValue, $validAlignments)) {
+            $this->alignment = $alignmentValue;
         }
         
         return $this;
@@ -490,7 +490,9 @@ class Column {
             ->setAlignment(self::ALIGN_LEFT)
             ->setWidth($width)
             ->setFormatter(function($value) use ($format) {
-                if (empty($value)) return '';
+                if (empty($value)) {
+                    return '';
+                }
                 
                 try {
                     if (is_string($value)) {

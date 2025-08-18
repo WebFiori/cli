@@ -16,3 +16,4 @@ app/sto
 test/*
 tests/clover.xml
 cache/commands.json
+*.Identifier

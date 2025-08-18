@@ -28,6 +28,7 @@ class TableFormatter {
         $formatted = $this->applyHeaderFormatting($header);
         
         // Don't apply column cell formatters to headers
+        // Note: $column parameter reserved for future column-specific header formatting
         return $formatted;
     }
     
@@ -113,20 +114,24 @@ class TableFormatter {
         }
         
         try {
+            $dateObj = null;
+            
             if (is_string($date)) {
                 $dateObj = new \DateTime($date);
             } elseif ($date instanceof \DateTime) {
                 $dateObj = $date;
             } elseif (is_int($date)) {
                 $dateObj = new \DateTime('@' . $date);
-            } else {
-                return (string)$date;
             }
             
-            return $dateObj->format($format);
+            if ($dateObj !== null) {
+                return $dateObj->format($format);
+            }
         } catch (\Exception $e) {
-            return (string)$date;
+            // Fall through to default return
         }
+        
+        return (string)$date;
     }
     
     /**

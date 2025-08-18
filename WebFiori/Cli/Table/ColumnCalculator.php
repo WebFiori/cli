@@ -14,7 +14,6 @@ namespace WebFiori\Cli\Table;
 class ColumnCalculator {
     
     private const MIN_COLUMN_WIDTH = 3;
-    private const DEFAULT_COLUMN_WIDTH = 10;
     
     /**
      * Calculate optimal column widths for the table.
@@ -203,7 +202,6 @@ class ColumnCalculator {
         // Sort columns by their ideal width requirement (smallest first)
         $requirements = [];
         for ($i = 0; $i < $columnCount; $i++) {
-            $needed = $idealWidths[$i] - $finalWidths[$i];
             $maxAllowed = $maxWidths[$i] ? min($maxWidths[$i], $idealWidths[$i]) : $idealWidths[$i];
             $actualNeeded = max(0, $maxAllowed - $finalWidths[$i]);
             

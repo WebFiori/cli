@@ -202,22 +202,20 @@ abstract class Command {
      * 
      */
     public function clear(int $numberOfCols = 1, bool $beforeCursor = true) : Command {
-        if ($numberOfCols >= 1) {
-            if ($beforeCursor) {
-                for ($x = 0 ; $x < $numberOfCols ; $x++) {
-                    $this->moveCursorLeft();
-                    $this->prints(" ");
-                    $this->moveCursorLeft();
-                }
-                $this->moveCursorRight($numberOfCols);
-            } else {
-                $this->moveCursorRight();
-
-                for ($x = 0 ; $x < $numberOfCols ; $x++) {
-                    $this->prints(" ");
-                }
-                $this->moveCursorLeft($numberOfCols + 1);
+        if ($numberOfCols >= 1 && $beforeCursor) {
+            for ($x = 0 ; $x < $numberOfCols ; $x++) {
+                $this->moveCursorLeft();
+                $this->prints(" ");
+                $this->moveCursorLeft();
             }
+            $this->moveCursorRight($numberOfCols);
+        } else if ($numberOfCols >= 1) {
+            $this->moveCursorRight();
+
+            for ($x = 0 ; $x < $numberOfCols ; $x++) {
+                $this->prints(" ");
+            }
+            $this->moveCursorLeft($numberOfCols + 1);
         }
 
         return $this;
@@ -328,10 +326,10 @@ abstract class Command {
     public function excCommand() : int {
         $retVal = -1;
 
-        $owner = $this->getOwner();
+        $runner = $this->getOwner();
 
-        if ($owner !== null) {
-            foreach ($owner->getArgs() as $arg) {
+        if ($runner !== null) {
+            foreach ($runner->getArgs() as $arg) {
                 $this->addArgument($arg);
             }
         }
@@ -340,8 +338,8 @@ abstract class Command {
             $retVal = $this->exec();
         }
 
-        if ($owner !== null) {
-            foreach ($owner->getArgs() as $arg) {
+        if ($runner !== null) {
+            foreach ($runner->getArgs() as $arg) {
                 $this->removeArgument($arg->getName());
                 $arg->resetValue();
             }
@@ -380,13 +378,13 @@ abstract class Command {
      * code of the command after execution.
      */
     public function execSubCommand(string $name, $additionalArgs = []) : int {
-        $owner = $this->getOwner();
+        $runner = $this->getOwner();
 
-        if ($owner === null) {
+        if ($runner === null) {
             return -1;
         }
 
-        return $owner->runCommandAsSub($name, $additionalArgs);
+        return $runner->runCommandAsSub($name, $additionalArgs);
     }
     /**
      * Returns an object that holds argument info if the command.
@@ -447,13 +445,13 @@ abstract class Command {
         $arg = $this->getArg($trimmedOptName);
 
         if ($arg !== null) {
-            $owner = $this->getOwner();
+            $runner = $this->getOwner();
 
-            if ($arg->getValue() !== null && !($owner !== null && $owner->isInteractive())) {
+            if ($arg->getValue() !== null && !($runner !== null && $runner->isInteractive())) {
                 return $arg->getValue();
             }
 
-            return Argument::extractValue($trimmedOptName, $owner);
+            return Argument::extractValue($trimmedOptName, $runner);
         }
 
         return null;
@@ -1145,12 +1143,10 @@ abstract class Command {
         $missingMandatory = [];
 
         foreach ($this->commandArgs as $argObj) {
-            if (!$argObj->isOptional() && $argObj->getValue() === null) {
-                if ($argObj->getDefault() != '') {
-                    $argObj->setValue($argObj->getDefault());
-                } else {
-                    $missingMandatory[] = $argObj->getName();
-                }
+            if (!$argObj->isOptional() && $argObj->getValue() === null && $argObj->getDefault() != '') {
+                $argObj->setValue($argObj->getDefault());
+            } else if (!$argObj->isOptional() && $argObj->getValue() === null) {
+                $missingMandatory[] = $argObj->getName();
             }
         }
 
