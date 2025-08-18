@@ -107,40 +107,47 @@ class TableStyle {
     public readonly bool $showHeaderSeparator;
     public readonly bool $showRowSeparators;
     
-    public function __construct(
-        string $topLeft = '┌',
-        string $topRight = '┐',
-        string $bottomLeft = '└',
-        string $bottomRight = '┘',
-        string $horizontal = '─',
-        string $vertical = '│',
-        string $cross = '┼',
-        string $topTee = '┬',
-        string $bottomTee = '┴',
-        string $leftTee = '├',
-        string $rightTee = '┤',
-        int $paddingLeft = 1,
-        int $paddingRight = 1,
-        bool $showBorders = true,
-        bool $showHeaderSeparator = true,
-        bool $showRowSeparators = false
-    ) {
-        $this->topLeft = $topLeft;
-        $this->topRight = $topRight;
-        $this->bottomLeft = $bottomLeft;
-        $this->bottomRight = $bottomRight;
-        $this->horizontal = $horizontal;
-        $this->vertical = $vertical;
-        $this->cross = $cross;
-        $this->topTee = $topTee;
-        $this->bottomTee = $bottomTee;
-        $this->leftTee = $leftTee;
-        $this->rightTee = $rightTee;
-        $this->paddingLeft = $paddingLeft;
-        $this->paddingRight = $paddingRight;
-        $this->showBorders = $showBorders;
-        $this->showHeaderSeparator = $showHeaderSeparator;
-        $this->showRowSeparators = $showRowSeparators;
+    public function __construct(array $components = []) {
+        // Default values for all table components
+        $defaults = [
+            'topLeft' => '┌',
+            'topRight' => '┐',
+            'bottomLeft' => '└',
+            'bottomRight' => '┘',
+            'horizontal' => '─',
+            'vertical' => '│',
+            'cross' => '┼',
+            'topTee' => '┬',
+            'bottomTee' => '┴',
+            'leftTee' => '├',
+            'rightTee' => '┤',
+            'paddingLeft' => 1,
+            'paddingRight' => 1,
+            'showBorders' => true,
+            'showHeaderSeparator' => true,
+            'showRowSeparators' => false
+        ];
+        
+        // Merge provided components with defaults
+        $config = array_merge($defaults, $components);
+        
+        // Assign values to readonly properties
+        $this->topLeft = $config['topLeft'];
+        $this->topRight = $config['topRight'];
+        $this->bottomLeft = $config['bottomLeft'];
+        $this->bottomRight = $config['bottomRight'];
+        $this->horizontal = $config['horizontal'];
+        $this->vertical = $config['vertical'];
+        $this->cross = $config['cross'];
+        $this->topTee = $config['topTee'];
+        $this->bottomTee = $config['bottomTee'];
+        $this->leftTee = $config['leftTee'];
+        $this->rightTee = $config['rightTee'];
+        $this->paddingLeft = $config['paddingLeft'];
+        $this->paddingRight = $config['paddingRight'];
+        $this->showBorders = $config['showBorders'];
+        $this->showHeaderSeparator = $config['showHeaderSeparator'];
+        $this->showRowSeparators = $config['showRowSeparators'];
     }
     
     /**
@@ -161,157 +168,157 @@ class TableStyle {
      * Simple ASCII style for maximum compatibility.
      */
     public static function simple(): self {
-        return new self(
-            topLeft: '+',
-            topRight: '+',
-            bottomLeft: '+',
-            bottomRight: '+',
-            horizontal: '-',
-            vertical: '|',
-            cross: '+',
-            topTee: '+',
-            bottomTee: '+',
-            leftTee: '+',
-            rightTee: '+'
-        );
+        return new self([
+            'topLeft' => '+',
+            'topRight' => '+',
+            'bottomLeft' => '+',
+            'bottomRight' => '+',
+            'horizontal' => '-',
+            'vertical' => '|',
+            'cross' => '+',
+            'topTee' => '+',
+            'bottomTee' => '+',
+            'leftTee' => '+',
+            'rightTee' => '+'
+        ]);
     }
     
     /**
      * Minimal style with reduced borders.
      */
     public static function minimal(): self {
-        return new self(
-            topLeft: '',
-            topRight: '',
-            bottomLeft: '',
-            bottomRight: '',
-            horizontal: '─',
-            vertical: '',
-            cross: '',
-            topTee: '',
-            bottomTee: '',
-            leftTee: '',
-            rightTee: '',
-            showBorders: false,
-            showHeaderSeparator: true
-        );
+        return new self([
+            'topLeft' => '',
+            'topRight' => '',
+            'bottomLeft' => '',
+            'bottomRight' => '',
+            'horizontal' => '─',
+            'vertical' => '',
+            'cross' => '',
+            'topTee' => '',
+            'bottomTee' => '',
+            'leftTee' => '',
+            'rightTee' => '',
+            'showBorders' => false,
+            'showHeaderSeparator' => true
+        ]);
     }
     
     /**
      * Compact style with minimal spacing.
      */
     public static function compact(): self {
-        return new self(
-            paddingLeft: 0,
-            paddingRight: 1,
-            showBorders: false,
-            showHeaderSeparator: true
-        );
+        return new self([
+            'paddingLeft' => 0,
+            'paddingRight' => 1,
+            'showBorders' => false,
+            'showHeaderSeparator' => true
+        ]);
     }
     
     /**
      * Markdown-compatible table style.
      */
     public static function markdown(): self {
-        return new self(
-            topLeft: '',
-            topRight: '',
-            bottomLeft: '',
-            bottomRight: '',
-            horizontal: '-',
-            vertical: '|',
-            cross: '|',
-            topTee: '',
-            bottomTee: '',
-            leftTee: '|',
-            rightTee: '|',
-            paddingLeft: 1,
-            paddingRight: 1,
-            showBorders: true,
-            showHeaderSeparator: true,
-            showRowSeparators: false
-        );
+        return new self([
+            'topLeft' => '',
+            'topRight' => '',
+            'bottomLeft' => '',
+            'bottomRight' => '',
+            'horizontal' => '-',
+            'vertical' => '|',
+            'cross' => '|',
+            'topTee' => '',
+            'bottomTee' => '',
+            'leftTee' => '|',
+            'rightTee' => '|',
+            'paddingLeft' => 1,
+            'paddingRight' => 1,
+            'showBorders' => true,
+            'showHeaderSeparator' => true,
+            'showRowSeparators' => false
+        ]);
     }
     
     /**
      * Double-line bordered style.
      */
     public static function doubleBordered(): self {
-        return new self(
-            topLeft: '╔',
-            topRight: '╗',
-            bottomLeft: '╚',
-            bottomRight: '╝',
-            horizontal: '═',
-            vertical: '║',
-            cross: '╬',
-            topTee: '╦',
-            bottomTee: '╩',
-            leftTee: '╠',
-            rightTee: '╣'
-        );
+        return new self([
+            'topLeft' => '╔',
+            'topRight' => '╗',
+            'bottomLeft' => '╚',
+            'bottomRight' => '╝',
+            'horizontal' => '═',
+            'vertical' => '║',
+            'cross' => '╬',
+            'topTee' => '╦',
+            'bottomTee' => '╩',
+            'leftTee' => '╠',
+            'rightTee' => '╣'
+        ]);
     }
     
     /**
      * Rounded corners style.
      */
     public static function rounded(): self {
-        return new self(
-            topLeft: '╭',
-            topRight: '╮',
-            bottomLeft: '╰',
-            bottomRight: '╯',
-            horizontal: '─',
-            vertical: '│',
-            cross: '┼',
-            topTee: '┬',
-            bottomTee: '┴',
-            leftTee: '├',
-            rightTee: '┤'
-        );
+        return new self([
+            'topLeft' => '╭',
+            'topRight' => '╮',
+            'bottomLeft' => '╰',
+            'bottomRight' => '╯',
+            'horizontal' => '─',
+            'vertical' => '│',
+            'cross' => '┼',
+            'topTee' => '┬',
+            'bottomTee' => '┴',
+            'leftTee' => '├',
+            'rightTee' => '┤'
+        ]);
     }
     
     /**
      * Heavy/thick borders style.
      */
     public static function heavy(): self {
-        return new self(
-            topLeft: '┏',
-            topRight: '┓',
-            bottomLeft: '┗',
-            bottomRight: '┛',
-            horizontal: '━',
-            vertical: '┃',
-            cross: '╋',
-            topTee: '┳',
-            bottomTee: '┻',
-            leftTee: '┣',
-            rightTee: '┫'
-        );
+        return new self([
+            'topLeft' => '┏',
+            'topRight' => '┓',
+            'bottomLeft' => '┗',
+            'bottomRight' => '┛',
+            'horizontal' => '━',
+            'vertical' => '┃',
+            'cross' => '╋',
+            'topTee' => '┳',
+            'bottomTee' => '┻',
+            'leftTee' => '┣',
+            'rightTee' => '┫'
+        ]);
     }
     
     /**
      * No borders style - just data with spacing.
      */
     public static function none(): self {
-        return new self(
-            topLeft: '',
-            topRight: '',
-            bottomLeft: '',
-            bottomRight: '',
-            horizontal: '',
-            vertical: '',
-            cross: '',
-            topTee: '',
-            bottomTee: '',
-            leftTee: '',
-            rightTee: '',
-            paddingLeft: 0,
-            paddingRight: 2,
-            showBorders: false,
-            showHeaderSeparator: false,
-            showRowSeparators: false
-        );
+        return new self([
+            'topLeft' => '',
+            'topRight' => '',
+            'bottomLeft' => '',
+            'bottomRight' => '',
+            'horizontal' => '',
+            'vertical' => '',
+            'cross' => '',
+            'topTee' => '',
+            'bottomTee' => '',
+            'leftTee' => '',
+            'rightTee' => '',
+            'paddingLeft' => 0,
+            'paddingRight' => 2,
+            'showBorders' => false,
+            'showHeaderSeparator' => false,
+            'showRowSeparators' => false
+        ]);
     }
     
     /**
@@ -367,45 +374,7 @@ class TableStyle {
      * Create a custom style with specific overrides.
      */
     public static function custom(array $overrides): self {
-        $defaults = [
-            'topLeft' => '┌',
-            'topRight' => '┐',
-            'bottomLeft' => '└',
-            'bottomRight' => '┘',
-            'horizontal' => '─',
-            'vertical' => '│',
-            'cross' => '┼',
-            'topTee' => '┬',
-            'bottomTee' => '┴',
-            'leftTee' => '├',
-            'rightTee' => '┤',
-            'paddingLeft' => 1,
-            'paddingRight' => 1,
-            'showBorders' => true,
-            'showHeaderSeparator' => true,
-            'showRowSeparators' => false
-        ];
-        
-        $config = array_merge($defaults, $overrides);
-        
-        return new self(
-            topLeft: $config['topLeft'],
-            topRight: $config['topRight'],
-            bottomLeft: $config['bottomLeft'],
-            bottomRight: $config['bottomRight'],
-            horizontal: $config['horizontal'],
-            vertical: $config['vertical'],
-            cross: $config['cross'],
-            topTee: $config['topTee'],
-            bottomTee: $config['bottomTee'],
-            leftTee: $config['leftTee'],
-            rightTee: $config['rightTee'],
-            paddingLeft: $config['paddingLeft'],
-            paddingRight: $config['paddingRight'],
-            showBorders: $config['showBorders'],
-            showHeaderSeparator: $config['showHeaderSeparator'],
-            showRowSeparators: $config['showRowSeparators']
-        );
+        return new self($overrides);
     }
     
     /**

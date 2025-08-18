@@ -176,7 +176,7 @@ class TableStyleTest extends TestCase {
      * @test
      */
     public function testGetTotalPadding() {
-        $style = new TableStyle(paddingLeft: 2, paddingRight: 3);
+        $style = new TableStyle(['paddingLeft' => 2, 'paddingRight' => 3]);
         
         $this->assertEquals(5, $style->getTotalPadding());
     }
@@ -185,7 +185,7 @@ class TableStyleTest extends TestCase {
      * @test
      */
     public function testGetBorderWidth() {
-        $style = new TableStyle(showBorders: true);
+        $style = new TableStyle(['showBorders' => true]);
         
         // 3 columns = left border + right border + 2 separators = 4
         $this->assertEquals(4, $style->getBorderWidth(3));
@@ -195,7 +195,7 @@ class TableStyleTest extends TestCase {
      * @test
      */
     public function testGetBorderWidthNoBorders() {
-        $style = new TableStyle(showBorders: false);
+        $style = new TableStyle(['showBorders' => false]);
         
         $this->assertEquals(0, $style->getBorderWidth(3));
     }
@@ -243,24 +243,24 @@ class TableStyleTest extends TestCase {
      * @test
      */
     public function testConstructorWithAllParameters() {
-        $style = new TableStyle(
-            topLeft: 'A',
-            topRight: 'B',
-            bottomLeft: 'C',
-            bottomRight: 'D',
-            horizontal: 'E',
-            vertical: 'F',
-            cross: 'G',
-            topTee: 'H',
-            bottomTee: 'I',
-            leftTee: 'J',
-            rightTee: 'K',
-            paddingLeft: 2,
-            paddingRight: 3,
-            showBorders: false,
-            showHeaderSeparator: false,
-            showRowSeparators: true
-        );
+        $style = new TableStyle([
+            'topLeft' => 'A',
+            'topRight' => 'B',
+            'bottomLeft' => 'C',
+            'bottomRight' => 'D',
+            'horizontal' => 'E',
+            'vertical' => 'F',
+            'cross' => 'G',
+            'topTee' => 'H',
+            'bottomTee' => 'I',
+            'leftTee' => 'J',
+            'rightTee' => 'K',
+            'paddingLeft' => 2,
+            'paddingRight' => 3,
+            'showBorders' => false,
+            'showHeaderSeparator' => false,
+            'showRowSeparators' => true
+        ]);
         
         $this->assertEquals('A', $style->topLeft);
         $this->assertEquals('B', $style->topRight);
@@ -278,6 +278,46 @@ class TableStyleTest extends TestCase {
         $this->assertFalse($style->showBorders);
         $this->assertFalse($style->showHeaderSeparator);
         $this->assertTrue($style->showRowSeparators);
+    }
+    
+    /**
+     * @test
+     */
+    public function testConstructorWithEmptyArray() {
+        $style = new TableStyle([]);
+        
+        // Should use all defaults
+        $this->assertEquals('┌', $style->topLeft);
+        $this->assertEquals('┐', $style->topRight);
+        $this->assertEquals('─', $style->horizontal);
+        $this->assertEquals('│', $style->vertical);
+        $this->assertEquals(1, $style->paddingLeft);
+        $this->assertEquals(1, $style->paddingRight);
+        $this->assertTrue($style->showBorders);
+        $this->assertTrue($style->showHeaderSeparator);
+        $this->assertFalse($style->showRowSeparators);
+    }
+    
+    /**
+     * @test
+     */
+    public function testConstructorWithPartialOverrides() {
+        $style = new TableStyle([
+            'topLeft' => 'X',
+            'paddingLeft' => 5,
+            'showBorders' => false
+        ]);
+        
+        // Should use provided values
+        $this->assertEquals('X', $style->topLeft);
+        $this->assertEquals(5, $style->paddingLeft);
+        $this->assertFalse($style->showBorders);
+        
+        // Should use defaults for non-provided values
+        $this->assertEquals('┐', $style->topRight);
+        $this->assertEquals('─', $style->horizontal);
+        $this->assertEquals(1, $style->paddingRight);
+        $this->assertTrue($style->showHeaderSeparator);
     }
     
     /**

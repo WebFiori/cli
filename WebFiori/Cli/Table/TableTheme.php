@@ -119,7 +119,11 @@ class TableTheme {
     }
     
     /**
-     * Apply cell styling.
+     * 
+     * @param string $text
+     * @param int $rowIndex
+     * @param int $columnIndex
+     * @return string
      */
     public function applyCellStyle(string $text, int $rowIndex, int $columnIndex): string {
         // Apply custom cell styler if available
@@ -140,9 +144,7 @@ class TableTheme {
         }
         
         // Apply status-based colors
-        $text = $this->applyStatusColors($text);
-        
-        return $text;
+        return $this->applyStatusColors($text);
     }
     
     /**
@@ -458,7 +460,6 @@ class TableTheme {
      */
     private static function detectDarkTerminal(): bool {
         // This is a best guess - terminal background detection is limited
-        $term = getenv('TERM');
         $termProgram = getenv('TERM_PROGRAM');
         
         // Some terminals are typically dark by default
