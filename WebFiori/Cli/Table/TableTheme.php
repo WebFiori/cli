@@ -332,8 +332,8 @@ class TableTheme {
      */
     public static function fromEnvironment(): self {
         // Detect terminal capabilities and user preferences
-        $supportsColor = $this->detectColorSupport();
-        $isDarkTerminal = $this->detectDarkTerminal();
+        $supportsColor = self::detectColorSupport();
+        $isDarkTerminal = self::detectDarkTerminal();
         
         if (!$supportsColor) {
             return self::minimal();
