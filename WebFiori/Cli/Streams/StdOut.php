@@ -6,9 +6,7 @@ namespace WebFiori\Cli\Streams;
  *
  * @author Ibrahim
  * 
- * @since 2.3.1
  * 
- * @version 1.0
  */
 class StdOut implements OutputStream {
     public function println(string $str, ...$_) {

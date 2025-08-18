@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class provides color schemes, style combinations, and CLI integration
  * for consistent table appearance across applications.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableTheme {
     /**

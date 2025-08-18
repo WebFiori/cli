@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class is responsible for calculating widths, formatting content,
  * and generating the final table output with proper styling.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableRenderer {
     private ColumnCalculator $calculator;

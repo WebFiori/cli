@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class handles formatting of different data types, number formatting,
  * date formatting, and other content-specific transformations.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableFormatter {
     private array $formatters = [];

@@ -1151,7 +1151,6 @@ abstract class Command {
      * 
      * @return Command Returns the same instance for method chaining.
      * 
-     * @since 1.0.0
      * 
      * Example usage:
      * ```php

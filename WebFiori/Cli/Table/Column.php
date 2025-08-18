@@ -8,7 +8,6 @@ namespace WebFiori\Cli\Table;
  * formatting, and content processing rules.
  * 
  * @author Ibrahim
- * @version 1.0.0
  */
 class Column {
     public const ALIGN_AUTO = 'auto';

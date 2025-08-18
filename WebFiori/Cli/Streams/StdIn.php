@@ -7,9 +7,7 @@ use WebFiori\Cli\KeysMap;
  *
  * @author Ibrahim
  * 
- * @since 2.3.1
  * 
- * @version 1.0
  */
 class StdIn implements InputStream {
     /**
@@ -21,7 +19,6 @@ class StdIn implements InputStream {
      * @return string The method will return the string which was given as input 
      * in STDIN.
      * 
-     * @since 1.0
      */
     public function read(int $bytes = 1) : string {
         $input = '';
@@ -57,7 +54,6 @@ class StdIn implements InputStream {
      * @return string The method will return the string which was taken from 
      * STDIN without the end of line character.
      * 
-     * @since 1.0
      */
     public function readLine() : string {
         return KeysMap::readLine($this);

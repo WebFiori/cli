@@ -8,7 +8,6 @@ use WebFiori\Cli\Command;
  * A class that implements a basic help command.
  *
  * @author Ibrahim
- * @version 1.0
  */
 class HelpCommand extends Command {
     /**
@@ -32,7 +31,6 @@ class HelpCommand extends Command {
     /**
      * Execute the command.
      * 
-     * @since 1.0
      */
     public function exec() : int {
         $regCommands = $this->getOwner()->getCommands();

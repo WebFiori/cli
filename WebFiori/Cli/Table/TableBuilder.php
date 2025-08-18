@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class provides a fluent interface for building tables with various
  * styling options, column configurations, and data formatting capabilities.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableBuilder {
     private bool $autoWidth = true;

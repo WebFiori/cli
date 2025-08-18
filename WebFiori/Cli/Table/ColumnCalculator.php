@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class handles intelligent column sizing, responsive width distribution,
  * and terminal width awareness for optimal table layout.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class ColumnCalculator {
     private const MIN_COLUMN_WIDTH = 3;

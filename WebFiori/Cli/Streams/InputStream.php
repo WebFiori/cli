@@ -7,9 +7,7 @@ namespace WebFiori\Cli\Streams;
  *
  * @author Ibrahim
  * 
- * @since 2.3.1
  * 
- * @version 1.0
  */
 interface InputStream {
     /**

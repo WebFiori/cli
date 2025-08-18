@@ -9,8 +9,6 @@ namespace WebFiori\Cli\Table;
  * helps prevent typos and provides better IDE support with autocompletion.
  * 
  * @author Ibrahim
- * @version 1.0.0
- * @since 1.0.0
  */
 class TableOptions {
     /**

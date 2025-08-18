@@ -34,7 +34,6 @@ class FileInputStream implements InputStream {
      *
      * @throws IOException If the method was not able to read the file.
      *
-     * @since 1.0
      */
     public function read(int $bytes = 1) : string {
         try {
@@ -55,7 +54,6 @@ class FileInputStream implements InputStream {
      * @return string The method will return the string which was taken from 
      * the file without the end of line character.
      * 
-     * @since 1.0
      */
     public function readLine() : string {
         return KeysMap::readLine($this);

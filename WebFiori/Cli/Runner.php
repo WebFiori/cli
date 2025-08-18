@@ -163,7 +163,6 @@ class Runner {
      * @return bool If the argument is added, the method will return true.
      * Other than that, the method will return false.
      * 
-     * @since 1.0
      */
     public function addArg(string $name, array $options = []): bool {
         $toAdd = Argument::create($name, $options);

@@ -14,7 +14,6 @@ class KeysMap {
      * 
      * @var array
      * 
-     * @since 1.0
      */
     const KEY_MAP = [
         "\033[A" => 'UP',
@@ -71,7 +70,6 @@ class KeysMap {
      * @return string The method will return the string which was given as input 
      * in the stream.
      * 
-     * @since 1.0
      */
     public static function read(InputStream $stream, $bytes = 1) : string {
         $input = '';
@@ -113,7 +111,6 @@ class KeysMap {
      * the stream. Note that end of line character will be included in the
      * final input.
      * 
-     * @since 1.0
      */
     public static function readLine(InputStream $stream) : string {
         $input = '';

@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class contains all the characters and formatting rules used
  * to render tables in different visual styles.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableStyle {
     /**

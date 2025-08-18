@@ -7,8 +7,7 @@ namespace WebFiori\Cli\Table;
  * This class handles data validation, type detection, and content
  * processing for table rendering.
  * 
- * @author WebFiori Framework
- * @version 1.0.0
+ * @author Ibrahim
  */
 class TableData {
     private array $columnTypes = [];
