@@ -4,8 +4,8 @@ require_once '../../vendor/autoload.php';
 require_once 'TableUsageCommand.php';
 require_once 'BasicTableCommand.php';
 
-use WebFiori\Cli\Runner;
 use WebFiori\Cli\Commands\HelpCommand;
+use WebFiori\Cli\Runner;
 
 // Create CLI runner
 $runner = new Runner();

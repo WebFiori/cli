@@ -11,24 +11,24 @@ class ProgressBarFormat {
      * Default format string
      */
     public const DEFAULT_FORMAT = '[{bar}] {percent}% ({current}/{total})';
-    
+
     /**
      * Format with ETA
      */
     public const ETA_FORMAT = '[{bar}] {percent}% ({current}/{total}) ETA: {eta}';
-    
+
     /**
      * Format with rate
      */
     public const RATE_FORMAT = '[{bar}] {percent}% ({current}/{total}) {rate}/s';
-    
+
     /**
      * Verbose format with all information
      */
     public const VERBOSE_FORMAT = '[{bar}] {percent}% ({current}/{total}) {elapsed} ETA: {eta} {rate}/s {memory}';
-    
+
     private string $format;
-    
+
     /**
      * Creates a new format instance.
      * 
@@ -37,63 +37,7 @@ class ProgressBarFormat {
     public function __construct(string $format = self::DEFAULT_FORMAT) {
         $this->format = $format;
     }
-    
-    /**
-     * Renders the format string with provided values.
-     * 
-     * @param array $values Associative array of placeholder values
-     * @return string Rendered format string
-     */
-    public function render(array $values): string {
-        $output = $this->format;
-        
-        foreach ($values as $placeholder => $value) {
-            $output = str_replace('{' . $placeholder . '}', (string)$value, $output);
-        }
-        
-        return $output;
-    }
-    
-    /**
-     * Gets the format string.
-     * 
-     * @return string
-     */
-    public function getFormat(): string {
-        return $this->format;
-    }
-    
-    /**
-     * Sets the format string.
-     * 
-     * @param string $format
-     * @return ProgressBarFormat
-     */
-    public function setFormat(string $format): ProgressBarFormat {
-        $this->format = $format;
-        return $this;
-    }
-    
-    /**
-     * Gets all placeholders used in the format string.
-     * 
-     * @return array Array of placeholder names
-     */
-    public function getPlaceholders(): array {
-        preg_match_all('/\{([^}]+)\}/', $this->format, $matches);
-        return $matches[1] ?? [];
-    }
-    
-    /**
-     * Checks if the format contains a specific placeholder.
-     * 
-     * @param string $placeholder Placeholder name without braces
-     * @return bool
-     */
-    public function hasPlaceholder(string $placeholder): bool {
-        return strpos($this->format, '{' . $placeholder . '}') !== false;
-    }
-    
+
     /**
      * Formats time duration in human-readable format.
      * 
@@ -104,18 +48,18 @@ class ProgressBarFormat {
         if ($seconds < 0) {
             return '--:--';
         }
-        
+
         $hours = floor($seconds / 3600);
         $minutes = floor(($seconds % 3600) / 60);
         $secs = floor($seconds % 60);
-        
+
         if ($hours > 0) {
             return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
         }
-        
+
         return sprintf('%02d:%02d', $minutes, $secs);
     }
-    
+
     /**
      * Formats memory usage in human-readable format.
      * 
@@ -125,15 +69,15 @@ class ProgressBarFormat {
     public static function formatMemory(int $bytes): string {
         $units = ['B', 'KB', 'MB', 'GB'];
         $unitIndex = 0;
-        
+
         while ($bytes >= 1024 && $unitIndex < count($units) - 1) {
             $bytes /= 1024;
             $unitIndex++;
         }
-        
+
         return sprintf('%.1f%s', $bytes, $units[$unitIndex]);
     }
-    
+
     /**
      * Formats rate in human-readable format.
      * 
@@ -148,5 +92,63 @@ class ProgressBarFormat {
         } else {
             return sprintf('%.0f', $rate);
         }
+    }
+
+    /**
+     * Gets the format string.
+     * 
+     * @return string
+     */
+    public function getFormat(): string {
+        return $this->format;
+    }
+
+    /**
+     * Gets all placeholders used in the format string.
+     * 
+     * @return array Array of placeholder names
+     */
+    public function getPlaceholders(): array {
+        preg_match_all('/\{([^}]+)\}/', $this->format, $matches);
+
+        return $matches[1] ?? [];
+    }
+
+    /**
+     * Checks if the format contains a specific placeholder.
+     * 
+     * @param string $placeholder Placeholder name without braces
+     * @return bool
+     */
+    public function hasPlaceholder(string $placeholder): bool {
+        return strpos($this->format, '{'.$placeholder.'}') !== false;
+    }
+
+    /**
+     * Renders the format string with provided values.
+     * 
+     * @param array $values Associative array of placeholder values
+     * @return string Rendered format string
+     */
+    public function render(array $values): string {
+        $output = $this->format;
+
+        foreach ($values as $placeholder => $value) {
+            $output = str_replace('{'.$placeholder.'}', (string)$value, $output);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Sets the format string.
+     * 
+     * @param string $format
+     * @return ProgressBarFormat
+     */
+    public function setFormat(string $format): ProgressBarFormat {
+        $this->format = $format;
+
+        return $this;
     }
 }

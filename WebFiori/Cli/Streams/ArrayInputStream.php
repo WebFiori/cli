@@ -64,7 +64,6 @@ class ArrayInputStream implements InputStream {
         return $retVal;
     }
 
-
     /**
      * Returns a single line from input array.
      * 

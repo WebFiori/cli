@@ -9,7 +9,7 @@ namespace WebFiori\Cli\Discovery;
 class CommandCache {
     private string $cacheFile;
     private bool $enabled;
-    
+
     /**
      * Creates new cache instance.
      * 
@@ -20,7 +20,16 @@ class CommandCache {
         $this->cacheFile = $cacheFile;
         $this->enabled = $enabled;
     }
-    
+
+    /**
+     * Clear the cache.
+     */
+    public function clear(): void {
+        if (file_exists($this->cacheFile)) {
+            unlink($this->cacheFile);
+        }
+    }
+
     /**
      * Get cached commands if valid.
      * 
@@ -30,25 +39,63 @@ class CommandCache {
         if (!$this->enabled || !file_exists($this->cacheFile)) {
             return null;
         }
-        
+
         $content = file_get_contents($this->cacheFile);
+
         if ($content === false) {
             return null;
         }
-        
+
         $cache = json_decode($content, true);
+
         if (!$cache || !isset($cache['commands'], $cache['files'], $cache['timestamp'])) {
             return null;
         }
-        
+
         // Check if cache is still valid
         if (!$this->isCacheValid($cache)) {
             return null;
         }
-        
+
         return $cache['commands'];
     }
-    
+
+    /**
+     * Get cache file path.
+     * 
+     * @return string
+     */
+    public function getCacheFile(): string {
+        return $this->cacheFile;
+    }
+
+    /**
+     * Check if caching is enabled.
+     * 
+     * @return bool
+     */
+    public function isEnabled(): bool {
+        return $this->enabled;
+    }
+
+    /**
+     * Set cache file path.
+     * 
+     * @param string $cacheFile
+     */
+    public function setCacheFile(string $cacheFile): void {
+        $this->cacheFile = $cacheFile;
+    }
+
+    /**
+     * Enable or disable caching.
+     * 
+     * @param bool $enabled
+     */
+    public function setEnabled(bool $enabled): void {
+        $this->enabled = $enabled;
+    }
+
     /**
      * Store commands in cache.
      * 
@@ -59,34 +106,37 @@ class CommandCache {
         if (!$this->enabled) {
             return;
         }
-        
+
         $this->ensureCacheDirectory();
-        
+
         $fileInfo = [];
+
         foreach ($files as $file) {
             if (file_exists($file)) {
                 $fileInfo[$file] = filemtime($file);
             }
         }
-        
+
         $cache = [
             'timestamp' => time(),
             'commands' => $commands,
             'files' => $fileInfo
         ];
-        
+
         file_put_contents($this->cacheFile, json_encode($cache, JSON_PRETTY_PRINT));
     }
-    
+
     /**
-     * Clear the cache.
+     * Ensure cache directory exists.
      */
-    public function clear(): void {
-        if (file_exists($this->cacheFile)) {
-            unlink($this->cacheFile);
+    private function ensureCacheDirectory(): void {
+        $dir = dirname($this->cacheFile);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
     }
-    
+
     /**
      * Check if cache is valid by comparing file modification times.
      * 
@@ -98,59 +148,14 @@ class CommandCache {
             if (!file_exists($file)) {
                 return false;
             }
-            
+
             $currentMtime = filemtime($file);
+
             if ($currentMtime > $cachedMtime) {
                 return false;
             }
         }
-        
+
         return true;
-    }
-    
-    /**
-     * Ensure cache directory exists.
-     */
-    private function ensureCacheDirectory(): void {
-        $dir = dirname($this->cacheFile);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-    }
-    
-    /**
-     * Check if caching is enabled.
-     * 
-     * @return bool
-     */
-    public function isEnabled(): bool {
-        return $this->enabled;
-    }
-    
-    /**
-     * Enable or disable caching.
-     * 
-     * @param bool $enabled
-     */
-    public function setEnabled(bool $enabled): void {
-        $this->enabled = $enabled;
-    }
-    
-    /**
-     * Get cache file path.
-     * 
-     * @return string
-     */
-    public function getCacheFile(): string {
-        return $this->cacheFile;
-    }
-    
-    /**
-     * Set cache file path.
-     * 
-     * @param string $cacheFile
-     */
-    public function setCacheFile(string $cacheFile): void {
-        $this->cacheFile = $cacheFile;
     }
 }

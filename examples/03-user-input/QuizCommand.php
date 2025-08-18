@@ -1,8 +1,8 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
 use WebFiori\Cli\InputValidator;
+use WebFiori\Cli\Option;
 
 /**
  * Interactive quiz command demonstrating input validation and scoring.
@@ -15,12 +15,12 @@ use WebFiori\Cli\InputValidator;
  * - Results analysis and feedback
  */
 class QuizCommand extends Command {
-    
-    private array $questions = [];
     private array $answers = [];
-    private int $score = 0;
     private string $difficulty = 'medium';
-    
+
+    private array $questions = [];
+    private int $score = 0;
+
     public function __construct() {
         parent::__construct('quiz', [
             '--difficulty' => [
@@ -36,46 +36,81 @@ class QuizCommand extends Command {
             ]
         ], 'Interactive knowledge quiz with scoring and feedback');
     }
-    
+
     public function exec(): int {
         $this->difficulty = $this->getArgValue('--difficulty') ?? 'medium';
         $questionCount = (int)($this->getArgValue('--questions') ?? 10);
-        
+
         // Validate question count
         if ($questionCount < 5 || $questionCount > 20) {
             $this->error('Number of questions must be between 5 and 20');
+
             return 1;
         }
-        
+
         $this->println("🧠 Welcome to the Knowledge Quiz!");
         $this->println("=================================");
         $this->println();
-        
+
         $this->info("📊 Quiz Settings:");
-        $this->println("   • Difficulty: " . ucfirst($this->difficulty));
+        $this->println("   • Difficulty: ".ucfirst($this->difficulty));
         $this->println("   • Questions: $questionCount");
         $this->println();
-        
+
         if (!$this->confirm('Ready to start?', true)) {
             $this->info('Maybe next time! 👋');
+
             return 0;
         }
-        
+
         // Initialize questions
         $this->initializeQuestions();
-        
+
         // Select random questions based on difficulty
         $selectedQuestions = $this->selectQuestions($questionCount);
-        
+
         // Run the quiz
         $this->runQuiz($selectedQuestions);
-        
+
         // Show results
         $this->showResults($questionCount);
-        
+
         return 0;
     }
-    
+
+    /**
+     * Ask a question and get user input.
+     */
+    private function askQuestion(array $question): string {
+        if ($question['type'] === 'multiple') {
+            $choice = $this->select('Your answer:', $question['options']);
+
+            return (string)$choice;
+        } else {
+            return $this->getInput(
+                'Your answer:',
+                null,
+                new InputValidator(function ($input) {
+                    return !empty(trim($input));
+                }, 'Please provide an answer')
+            );
+        }
+    }
+
+    /**
+     * Check if the answer is correct.
+     */
+    private function checkAnswer(array $question, string $userAnswer): bool {
+        if ($question['type'] === 'multiple') {
+            return (int)$userAnswer === $question['correct'];
+        } else {
+            $correctAnswer = strtolower(trim($question['correct']));
+            $userAnswerNormalized = strtolower(trim($userAnswer));
+
+            return $correctAnswer === $userAnswerNormalized;
+        }
+    }
+
     /**
      * Initialize the question bank.
      */
@@ -173,28 +208,7 @@ class QuizCommand extends Command {
             ]
         ];
     }
-    
-    /**
-     * Select questions based on difficulty and count.
-     */
-    private function selectQuestions(int $count): array {
-        $availableQuestions = $this->questions[$this->difficulty];
-        
-        // Add some questions from easier levels if needed
-        if (count($availableQuestions) < $count) {
-            if ($this->difficulty === 'hard') {
-                $availableQuestions = array_merge($availableQuestions, $this->questions['medium']);
-            }
-            if ($this->difficulty !== 'easy') {
-                $availableQuestions = array_merge($availableQuestions, $this->questions['easy']);
-            }
-        }
-        
-        // Shuffle and select
-        shuffle($availableQuestions);
-        return array_slice($availableQuestions, 0, $count);
-    }
-    
+
     /**
      * Run the quiz with selected questions.
      */
@@ -202,18 +216,18 @@ class QuizCommand extends Command {
         $this->println();
         $this->success("🎯 Starting Quiz!");
         $this->println();
-        
+
         foreach ($questions as $index => $question) {
             $questionNumber = $index + 1;
             $totalQuestions = count($questions);
-            
+
             $this->info("Question $questionNumber/$totalQuestions:");
             $this->println($question['question']);
             $this->println();
-            
+
             $userAnswer = $this->askQuestion($question);
             $isCorrect = $this->checkAnswer($question, $userAnswer);
-            
+
             if ($isCorrect) {
                 $this->success("✅ Correct!");
                 $this->score++;
@@ -221,15 +235,15 @@ class QuizCommand extends Command {
                 $this->error("❌ Incorrect!");
                 $this->showCorrectAnswer($question);
             }
-            
+
             $this->answers[] = [
                 'question' => $question['question'],
                 'user_answer' => $userAnswer,
                 'correct' => $isCorrect
             ];
-            
+
             $this->println();
-            
+
             // Show progress
             if ($questionNumber < $totalQuestions) {
                 $this->info("Score so far: $this->score/$questionNumber");
@@ -237,38 +251,30 @@ class QuizCommand extends Command {
             }
         }
     }
-    
+
     /**
-     * Ask a question and get user input.
+     * Select questions based on difficulty and count.
      */
-    private function askQuestion(array $question): string {
-        if ($question['type'] === 'multiple') {
-            $choice = $this->select('Your answer:', $question['options']);
-            return (string)$choice;
-        } else {
-            return $this->getInput(
-                'Your answer:',
-                null,
-                new InputValidator(function($input) {
-                    return !empty(trim($input));
-                }, 'Please provide an answer')
-            );
+    private function selectQuestions(int $count): array {
+        $availableQuestions = $this->questions[$this->difficulty];
+
+        // Add some questions from easier levels if needed
+        if (count($availableQuestions) < $count) {
+            if ($this->difficulty === 'hard') {
+                $availableQuestions = array_merge($availableQuestions, $this->questions['medium']);
+            }
+
+            if ($this->difficulty !== 'easy') {
+                $availableQuestions = array_merge($availableQuestions, $this->questions['easy']);
+            }
         }
+
+        // Shuffle and select
+        shuffle($availableQuestions);
+
+        return array_slice($availableQuestions, 0, $count);
     }
-    
-    /**
-     * Check if the answer is correct.
-     */
-    private function checkAnswer(array $question, string $userAnswer): bool {
-        if ($question['type'] === 'multiple') {
-            return (int)$userAnswer === $question['correct'];
-        } else {
-            $correctAnswer = strtolower(trim($question['correct']));
-            $userAnswerNormalized = strtolower(trim($userAnswer));
-            return $correctAnswer === $userAnswerNormalized;
-        }
-    }
-    
+
     /**
      * Show the correct answer.
      */
@@ -277,10 +283,29 @@ class QuizCommand extends Command {
             $correctOption = $question['options'][$question['correct']];
             $this->info("Correct answer: $correctOption");
         } else {
-            $this->info("Correct answer: " . $question['correct']);
+            $this->info("Correct answer: ".$question['correct']);
         }
     }
-    
+
+    /**
+     * Show detailed question-by-question results.
+     */
+    private function showDetailedResults(): void {
+        $this->println();
+        $this->info("📋 Detailed Results:");
+        $this->println(str_repeat('-', 40));
+
+        foreach ($this->answers as $index => $answer) {
+            $questionNumber = $index + 1;
+            $status = $answer['correct'] ? '✅' : '❌';
+
+            $this->println("$questionNumber. $status ".substr($answer['question'], 0, 50). 
+                          (strlen($answer['question']) > 50 ? '...' : ''));
+        }
+
+        $this->println();
+    }
+
     /**
      * Show quiz results and analysis.
      */
@@ -288,15 +313,15 @@ class QuizCommand extends Command {
         $this->println();
         $this->success("🎉 Quiz Completed!");
         $this->println("==================");
-        
+
         $percentage = round(($this->score / $totalQuestions) * 100, 1);
-        
+
         $this->println("📊 Final Score: $this->score/$totalQuestions ($percentage%)");
-        
+
         // Performance feedback
         $this->println();
         $this->info("📈 Performance Analysis:");
-        
+
         if ($percentage >= 90) {
             $this->success("🏆 Excellent! You're a quiz master!");
             $grade = 'A+';
@@ -313,13 +338,13 @@ class QuizCommand extends Command {
             $this->warning("📖 Keep studying and try again!");
             $grade = 'D';
         }
-        
+
         $this->println("🎓 Grade: $grade");
-        
+
         // Show difficulty-specific feedback
         $this->println();
-        $this->info("💡 Difficulty: " . ucfirst($this->difficulty));
-        
+        $this->info("💡 Difficulty: ".ucfirst($this->difficulty));
+
         switch ($this->difficulty) {
             case 'easy':
                 if ($percentage >= 80) {
@@ -341,34 +366,15 @@ class QuizCommand extends Command {
                 }
                 break;
         }
-        
+
         // Offer to show detailed results
         if ($this->confirm('Show detailed results?', false)) {
             $this->showDetailedResults();
         }
-        
+
         // Ask about retaking
         if ($this->confirm('Take the quiz again?', false)) {
             $this->info('Run the command again to start a new quiz!');
         }
-    }
-    
-    /**
-     * Show detailed question-by-question results.
-     */
-    private function showDetailedResults(): void {
-        $this->println();
-        $this->info("📋 Detailed Results:");
-        $this->println(str_repeat('-', 40));
-        
-        foreach ($this->answers as $index => $answer) {
-            $questionNumber = $index + 1;
-            $status = $answer['correct'] ? '✅' : '❌';
-            
-            $this->println("$questionNumber. $status " . substr($answer['question'], 0, 50) . 
-                          (strlen($answer['question']) > 50 ? '...' : ''));
-        }
-        
-        $this->println();
     }
 }

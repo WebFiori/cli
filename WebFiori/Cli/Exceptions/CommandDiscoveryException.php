@@ -16,7 +16,8 @@ class CommandDiscoveryException extends Exception {
      * @param int $code Error code
      */
     public static function fromErrors(array $errors, int $code = 0): self {
-        $message = "Command discovery failed with the following errors:\n" . implode("\n", $errors);
+        $message = "Command discovery failed with the following errors:\n".implode("\n", $errors);
+
         return new self($message, $code);
     }
 }

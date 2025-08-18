@@ -1,5 +1,4 @@
 <?php
-
 namespace WebFiori\Cli\Commands;
 
 use WebFiori\Cli\Argument;
@@ -24,7 +23,6 @@ class InitAppCommand extends Command {
         if ($entry === null) {
             $entry = $dirName;
         }
-
 
         if (defined('ROOT_DIR')) {
             $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$dirName;
@@ -57,7 +55,6 @@ class InitAppCommand extends Command {
             $file->append("require '../vendor/autoload.php';\n\n");
             $file->append("use WebFiori\\Cli\\Runner;\n");
             $file->append("use WebFiori\\Cli\\Commands\\HelpCommand;\n\n");
-
 
             $file->append("\$runner = new Runner();\n");
             $file->append("//TODO: Register Commands.\n");

@@ -86,7 +86,6 @@ class KeysMap {
         return $input;
     }
 
-
     /**
      * Reads one character from specific input stream and check if the character
      * maps to any control character.

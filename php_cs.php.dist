@@ -11,7 +11,7 @@ return $config->setRules([
         'align_multiline_comment' => [
             'comment_type' => 'phpdocs_only'
         ],
-        'array_indentation' => [],
+        'array_indentation' => true,
         'array_syntax' => [
             'syntax' => 'short'
         ],
@@ -79,11 +79,23 @@ return $config->setRules([
         'concat_space' => [
             'spacing' => 'none'
         ],
-        'braces' => [
-            'allow_single_line_closure' => false,
-            'position_after_functions_and_oop_constructs' => 'same',
-            'position_after_anonymous_constructs' => 'next',
-            'position_after_control_structures' => 'same'
+        'single_space_around_construct' => true,
+        'control_structure_braces' => true,
+        'control_structure_continuation_position' => [
+            'position' => 'same_line'
+        ],
+        'declare_parentheses' => true,
+        'no_multiple_statements_per_line' => true,
+        'braces_position' => [
+            'functions_opening_brace' => 'same_line',
+            'classes_opening_brace' => 'same_line',
+            'anonymous_classes_opening_brace' => 'same_line',
+            'allow_single_line_empty_anonymous_classes' => false,
+            'allow_single_line_anonymous_functions' => false
+        ],
+        'statement_indentation' => true,
+        'no_extra_blank_lines' => [
+            'tokens' => ['extra']
         ],
         'class_definition' => [
             'single_line' => true

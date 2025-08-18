@@ -23,6 +23,11 @@ use WebFiori\Cli\Table\TableTheme;
  */
 abstract class Command {
     /**
+     * An array of aliases for the command.
+     * @var array
+     */
+    private $aliases;
+    /**
      * An associative array that contains extra options that can be added to 
      * the command.
      * @var array
@@ -50,11 +55,6 @@ abstract class Command {
      * 
      */
     private $outputStream;
-    /**
-     * An array of aliases for the command.
-     * @var array
-     */
-    private $aliases;
     private $owner;
     /**
      * Creates new instance of the class.
@@ -306,6 +306,16 @@ abstract class Command {
 
         return $answer;
     }
+
+    /**
+     * Creates and returns a new progress bar instance.
+     * 
+     * @param int $total Total number of steps
+     * @return ProgressBar
+     */
+    public function createProgressBar(int $total = 100): ProgressBar {
+        return new ProgressBar($this->getOutputStream(), $total);
+    }
     /**
      * Display a message that represents an error.
      * 
@@ -392,6 +402,14 @@ abstract class Command {
         return $runner->runCommandAsSub($name, $additionalArgs);
     }
     /**
+     * Returns an array of aliases for the command.
+     * 
+     * @return array An array of aliases.
+     */
+    public function getAliases() : array {
+        return $this->aliases;
+    }
+    /**
      * Returns an object that holds argument info if the command.
      * 
      * @param string $name The name of command argument.
@@ -431,8 +449,7 @@ abstract class Command {
      * @return array An array of strings.
      */
     public function getArgsNames() : array {
-        return array_map(function ($el)
-        {
+        return array_map(function ($el) {
             return $el->getName();
         }, $this->getArgs());
     }
@@ -550,14 +567,6 @@ abstract class Command {
         return $this->commandName;
     }
     /**
-     * Returns an array of aliases for the command.
-     * 
-     * @return array An array of aliases.
-     */
-    public function getAliases() : array {
-        return $this->aliases;
-    }
-    /**
      * Returns the stream at which the command is using to send output.
      * 
      * @return null|OutputStream If the stream is set, it will be returned as 
@@ -621,7 +630,6 @@ abstract class Command {
      */
     public function isArgProvided(string $argName) : bool {
         $argObj = $this->getArg($argName);
-
 
         if ($argObj !== null) {
             return $argObj->getValue() !== null;
@@ -812,8 +820,7 @@ abstract class Command {
      * not null, the method will return the name with the suffix included.
      */
     public function readClassName(string $prompt, ?string $suffix = null, string $errMsg = 'Invalid class name is given.') {
-        return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix)
-        {
+        return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix) {
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));
 
@@ -839,8 +846,7 @@ abstract class Command {
      * @return float
      */
     public function readFloat(string $prompt, ?float $default = null) : float {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val)
-        {
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
             return InputValidator::isFloat($val);
         }, 'Provided value is not a floating number!'));
     }
@@ -859,8 +865,7 @@ abstract class Command {
      * @throws ReflectionException If the method was not able to initiate class instance.
      */
     public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
-        $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input)
-        {
+        $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input) {
             if (InputValidator::isClass($input)) {
                 return true;
             }
@@ -885,8 +890,7 @@ abstract class Command {
      * @return int
      */
     public function readInteger(string $prompt, ?int $default = null) : int {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val)
-        {
+        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
             return InputValidator::isInt($val);
         }, 'Provided value is not an integer!'));
     }
@@ -926,8 +930,7 @@ abstract class Command {
             throw new IOException('Provided default namespace is not valid.');
         }
 
-        return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input)
-        {
+        return $this->getInput($prompt, $defaultNs, new InputValidator(function ($input) {
             if (InputValidator::isValidNamespace($input)) {
                 return true;
             }
@@ -1115,6 +1118,147 @@ abstract class Command {
     public function success(string $message) {
         $this->printMsg($message, 'Success', 'light-green');
     }
+
+    /**
+     * Creates and displays a table with the given data.
+     * 
+     * This method provides a convenient way to display tabular data in CLI applications
+     * using the WebFiori CLI Table feature. It supports various table styles, themes,
+     * column configuration, and data formatting options.
+     * 
+     * @param array $data The data to display. Can be:
+     *                   - Array of arrays (indexed): [['John', 30], ['Jane', 25]]
+     *                   - Array of associative arrays: [['name' => 'John', 'age' => 30]]
+     * @param array $headers Optional headers for the table columns. If not provided
+     *                      and data contains associative arrays, keys will be used as headers.
+     * @param array $options Optional configuration options. Use TableOptions constants for keys:
+     *                      - TableOptions::STYLE: Table style ('bordered', 'simple', 'minimal', 'compact', 'markdown')
+     *                      - TableOptions::THEME: Color theme ('default', 'dark', 'light', 'colorful', 'professional', 'minimal')
+     *                      - TableOptions::TITLE: Table title to display above the table
+     *                      - TableOptions::WIDTH: Maximum table width (auto-detected if not specified)
+     *                      - TableOptions::SHOW_HEADERS: Whether to show column headers (default: true)
+     *                      - TableOptions::COLUMNS: Column-specific configuration
+     *                      - TableOptions::COLORIZE: Column colorization rules
+     *                      - TableOptions::AUTO_WIDTH: Auto-calculate column widths (default: true)
+     *                      - TableOptions::SHOW_ROW_SEPARATORS: Show separators between rows (default: false)
+     *                      - TableOptions::SHOW_HEADER_SEPARATOR: Show separator after headers (default: true)
+     *                      - TableOptions::PADDING: Cell padding configuration
+     *                      - TableOptions::WORD_WRAP: Enable word wrapping (default: false)
+     *                      - TableOptions::ELLIPSIS: Truncation string (default: '...')
+     *                      - TableOptions::SORT: Sort configuration
+     *                      - TableOptions::LIMIT: Limit number of rows displayed
+     *                      - TableOptions::FILTER: Filter function for rows
+     * 
+     * @return Command Returns the same instance for method chaining.
+     * 
+     * @since 1.0.0
+     * 
+     * Example usage:
+     * ```php
+     * use WebFiori\Cli\Table\TableOptions;
+     * 
+     * // Basic table
+     * $this->table([
+     *     ['John Doe', 30, 'Active'],
+     *     ['Jane Smith', 25, 'Inactive']
+     * ], ['Name', 'Age', 'Status']);
+     * 
+     * // Advanced table with constants
+     * $this->table($users, ['Name', 'Status', 'Balance'], [
+     *     TableOptions::STYLE => 'bordered',
+     *     TableOptions::THEME => 'colorful',
+     *     TableOptions::TITLE => 'User Management',
+     *     TableOptions::COLUMNS => [
+     *         'Balance' => ['align' => 'right', 'formatter' => fn($v) => '$' . number_format($v, 2)]
+     *     ],
+     *     TableOptions::COLORIZE => [
+     *         'Status' => fn($v) => match($v) {
+     *             'Active' => ['color' => 'green', 'bold' => true],
+     *             'Inactive' => ['color' => 'red'],
+     *             default => []
+     *         }
+     *     ]
+     * ]);
+     * ```
+     */
+    public function table(array $data, array $headers = [], array $options = []): Command {
+        // Handle empty data
+        if (empty($data)) {
+            $this->info('No data to display in table.');
+
+            return $this;
+        }
+
+        try {
+            // Create table builder instance
+            $tableBuilder = TableBuilder::create();
+
+            // Set headers
+            if (!empty($headers)) {
+                $tableBuilder->setHeaders($headers);
+            }
+
+            // Set data
+            $tableBuilder->setData($data);
+
+            // Apply style (support both constant and string)
+            $style = $options[TableOptions::STYLE] ?? $options['style'] ?? 'bordered';
+            $tableBuilder->useStyle($style);
+
+            // Apply theme (support both constant and string)
+            $theme = $options[TableOptions::THEME] ?? $options['theme'] ?? null;
+
+            if ($theme !== null) {
+                $themeObj = TableTheme::create($theme);
+                $tableBuilder->setTheme($themeObj);
+            }
+
+            // Set title (support both constant and string)
+            $title = $options[TableOptions::TITLE] ?? $options['title'] ?? null;
+
+            if ($title !== null) {
+                $tableBuilder->setTitle($title);
+            }
+
+            // Set width (support both constant and string)
+            $width = $options[TableOptions::WIDTH] ?? $options['width'] ?? $this->getTerminalWidth();
+            $tableBuilder->setMaxWidth($width);
+
+            // Configure headers visibility (support both constant and string)
+            $showHeaders = $options[TableOptions::SHOW_HEADERS] ?? $options['showHeaders'] ?? true;
+            $tableBuilder->showHeaders($showHeaders);
+
+            // Configure columns (support both constant and string)
+            $columns = $options[TableOptions::COLUMNS] ?? $options['columns'] ?? [];
+
+            if (!empty($columns) && is_array($columns)) {
+                foreach ($columns as $columnName => $columnConfig) {
+                    $tableBuilder->configureColumn($columnName, $columnConfig);
+                }
+            }
+
+            // Apply colorization (support both constant and string)
+            $colorize = $options[TableOptions::COLORIZE] ?? $options['colorize'] ?? [];
+
+            if (!empty($colorize) && is_array($colorize)) {
+                foreach ($colorize as $columnName => $colorizer) {
+                    if (is_callable($colorizer)) {
+                        $tableBuilder->colorizeColumn($columnName, $colorizer);
+                    }
+                }
+            }
+
+            // Render and display the table
+            $output = $tableBuilder->render();
+            $this->prints($output);
+        } catch (Exception $e) {
+            $this->error('Failed to display table: '.$e->getMessage());
+        } catch (Error $e) {
+            $this->error('Table display error: '.$e->getMessage());
+        }
+
+        return $this;
+    }
     /**
      * Display a message that represents a warning.
      * 
@@ -1132,6 +1276,28 @@ abstract class Command {
         $this->println($message);
     }
 
+    /**
+     * Executes a callback for each item with a progress bar.
+     * 
+     * @param iterable $items Items to iterate over
+     * @param callable $callback Callback to execute for each item
+     * @param string $message Optional message to display
+     * @return void
+     */
+    public function withProgressBar(iterable $items, callable $callback, string $message = ''): void {
+        $items = is_array($items) ? $items : iterator_to_array($items);
+        $total = count($items);
+
+        $progressBar = $this->createProgressBar($total);
+        $progressBar->start($message);
+
+        foreach ($items as $key => $item) {
+            $callback($item, $key);
+            $progressBar->advance();
+        }
+
+        $progressBar->finish();
+    }
 
     private function _createPassArray($string, array $args) : array {
         $retVal = [$string];
@@ -1241,6 +1407,37 @@ abstract class Command {
 
         return $retVal;
     }
+
+    /**
+     * Get terminal width for responsive table display.
+     * 
+     * @return int Terminal width in characters, defaults to 80 if unable to detect.
+     */
+    private function getTerminalWidth(): int {
+        // Try to get terminal width using tput
+        $width = @exec('tput cols 2>/dev/null');
+
+        if (is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+
+        // Try environment variable
+        $width = getenv('COLUMNS');
+
+        if ($width !== false && is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+
+        // Try using stty
+        $width = @exec('stty size 2>/dev/null | cut -d" " -f2');
+
+        if (is_numeric($width) && $width > 0) {
+            return (int)$width;
+        }
+
+        // Default fallback
+        return 80;
+    }
     private function parseArgsHelper() : bool {
         $options = $this->getArgs();
         $invalidArgsVals = [];
@@ -1299,204 +1496,5 @@ abstract class Command {
 
         ]);
         $this->println($msg);
-    }
-    
-    /**
-     * Creates and returns a new progress bar instance.
-     * 
-     * @param int $total Total number of steps
-     * @return ProgressBar
-     */
-    public function createProgressBar(int $total = 100): ProgressBar {
-        return new ProgressBar($this->getOutputStream(), $total);
-    }
-    
-    /**
-     * Executes a callback for each item with a progress bar.
-     * 
-     * @param iterable $items Items to iterate over
-     * @param callable $callback Callback to execute for each item
-     * @param string $message Optional message to display
-     * @return void
-     */
-    public function withProgressBar(iterable $items, callable $callback, string $message = ''): void {
-        $items = is_array($items) ? $items : iterator_to_array($items);
-        $total = count($items);
-        
-        $progressBar = $this->createProgressBar($total);
-        $progressBar->start($message);
-        
-        foreach ($items as $key => $item) {
-            $callback($item, $key);
-            $progressBar->advance();
-        }
-        
-        $progressBar->finish();
-    }
-    
-    /**
-     * Creates and displays a table with the given data.
-     * 
-     * This method provides a convenient way to display tabular data in CLI applications
-     * using the WebFiori CLI Table feature. It supports various table styles, themes,
-     * column configuration, and data formatting options.
-     * 
-     * @param array $data The data to display. Can be:
-     *                   - Array of arrays (indexed): [['John', 30], ['Jane', 25]]
-     *                   - Array of associative arrays: [['name' => 'John', 'age' => 30]]
-     * @param array $headers Optional headers for the table columns. If not provided
-     *                      and data contains associative arrays, keys will be used as headers.
-     * @param array $options Optional configuration options. Use TableOptions constants for keys:
-     *                      - TableOptions::STYLE: Table style ('bordered', 'simple', 'minimal', 'compact', 'markdown')
-     *                      - TableOptions::THEME: Color theme ('default', 'dark', 'light', 'colorful', 'professional', 'minimal')
-     *                      - TableOptions::TITLE: Table title to display above the table
-     *                      - TableOptions::WIDTH: Maximum table width (auto-detected if not specified)
-     *                      - TableOptions::SHOW_HEADERS: Whether to show column headers (default: true)
-     *                      - TableOptions::COLUMNS: Column-specific configuration
-     *                      - TableOptions::COLORIZE: Column colorization rules
-     *                      - TableOptions::AUTO_WIDTH: Auto-calculate column widths (default: true)
-     *                      - TableOptions::SHOW_ROW_SEPARATORS: Show separators between rows (default: false)
-     *                      - TableOptions::SHOW_HEADER_SEPARATOR: Show separator after headers (default: true)
-     *                      - TableOptions::PADDING: Cell padding configuration
-     *                      - TableOptions::WORD_WRAP: Enable word wrapping (default: false)
-     *                      - TableOptions::ELLIPSIS: Truncation string (default: '...')
-     *                      - TableOptions::SORT: Sort configuration
-     *                      - TableOptions::LIMIT: Limit number of rows displayed
-     *                      - TableOptions::FILTER: Filter function for rows
-     * 
-     * @return Command Returns the same instance for method chaining.
-     * 
-     * @since 1.0.0
-     * 
-     * Example usage:
-     * ```php
-     * use WebFiori\Cli\Table\TableOptions;
-     * 
-     * // Basic table
-     * $this->table([
-     *     ['John Doe', 30, 'Active'],
-     *     ['Jane Smith', 25, 'Inactive']
-     * ], ['Name', 'Age', 'Status']);
-     * 
-     * // Advanced table with constants
-     * $this->table($users, ['Name', 'Status', 'Balance'], [
-     *     TableOptions::STYLE => 'bordered',
-     *     TableOptions::THEME => 'colorful',
-     *     TableOptions::TITLE => 'User Management',
-     *     TableOptions::COLUMNS => [
-     *         'Balance' => ['align' => 'right', 'formatter' => fn($v) => '$' . number_format($v, 2)]
-     *     ],
-     *     TableOptions::COLORIZE => [
-     *         'Status' => fn($v) => match($v) {
-     *             'Active' => ['color' => 'green', 'bold' => true],
-     *             'Inactive' => ['color' => 'red'],
-     *             default => []
-     *         }
-     *     ]
-     * ]);
-     * ```
-     */
-    public function table(array $data, array $headers = [], array $options = []): Command {
-
-        // Handle empty data
-        if (empty($data)) {
-            $this->info('No data to display in table.');
-            return $this;
-        }
-        
-        try {
-            // Create table builder instance
-            $tableBuilder = TableBuilder::create();
-            
-            // Set headers
-            if (!empty($headers)) {
-                $tableBuilder->setHeaders($headers);
-            }
-            
-            // Set data
-            $tableBuilder->setData($data);
-            
-            // Apply style (support both constant and string)
-            $style = $options[TableOptions::STYLE] ?? $options['style'] ?? 'bordered';
-            $tableBuilder->useStyle($style);
-            
-            // Apply theme (support both constant and string)
-            $theme = $options[TableOptions::THEME] ?? $options['theme'] ?? null;
-            if ($theme !== null) {
-                $themeObj = TableTheme::create($theme);
-                $tableBuilder->setTheme($themeObj);
-            }
-            
-            // Set title (support both constant and string)
-            $title = $options[TableOptions::TITLE] ?? $options['title'] ?? null;
-            if ($title !== null) {
-                $tableBuilder->setTitle($title);
-            }
-            
-            // Set width (support both constant and string)
-            $width = $options[TableOptions::WIDTH] ?? $options['width'] ?? $this->getTerminalWidth();
-            $tableBuilder->setMaxWidth($width);
-            
-            // Configure headers visibility (support both constant and string)
-            $showHeaders = $options[TableOptions::SHOW_HEADERS] ?? $options['showHeaders'] ?? true;
-            $tableBuilder->showHeaders($showHeaders);
-            
-            // Configure columns (support both constant and string)
-            $columns = $options[TableOptions::COLUMNS] ?? $options['columns'] ?? [];
-            if (!empty($columns) && is_array($columns)) {
-                foreach ($columns as $columnName => $columnConfig) {
-                    $tableBuilder->configureColumn($columnName, $columnConfig);
-                }
-            }
-            
-            // Apply colorization (support both constant and string)
-            $colorize = $options[TableOptions::COLORIZE] ?? $options['colorize'] ?? [];
-            if (!empty($colorize) && is_array($colorize)) {
-                foreach ($colorize as $columnName => $colorizer) {
-                    if (is_callable($colorizer)) {
-                        $tableBuilder->colorizeColumn($columnName, $colorizer);
-                    }
-                }
-            }
-            
-            // Render and display the table
-            $output = $tableBuilder->render();
-            $this->prints($output);
-            
-        } catch (Exception $e) {
-            $this->error('Failed to display table: ' . $e->getMessage());
-        } catch (Error $e) {
-            $this->error('Table display error: ' . $e->getMessage());
-        }
-        
-        return $this;
-    }
-    
-    /**
-     * Get terminal width for responsive table display.
-     * 
-     * @return int Terminal width in characters, defaults to 80 if unable to detect.
-     */
-    private function getTerminalWidth(): int {
-        // Try to get terminal width using tput
-        $width = @exec('tput cols 2>/dev/null');
-        if (is_numeric($width) && $width > 0) {
-            return (int)$width;
-        }
-        
-        // Try environment variable
-        $width = getenv('COLUMNS');
-        if ($width !== false && is_numeric($width) && $width > 0) {
-            return (int)$width;
-        }
-        
-        // Try using stty
-        $width = @exec('stty size 2>/dev/null | cut -d" " -f2');
-        if (is_numeric($width) && $width > 0) {
-            return (int)$width;
-        }
-        
-        // Default fallback
-        return 80;
     }
 }

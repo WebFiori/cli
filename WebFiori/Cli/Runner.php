@@ -1,5 +1,4 @@
 <?php
-
 namespace WebFiori\Cli;
 
 use Throwable;
@@ -19,7 +18,6 @@ use WebFiori\Cli\Streams\StdOut;
  * @author Ibrahim
  */
 class Runner {
-
     /**
      * The command that will be executed now.
      * 
@@ -34,8 +32,29 @@ class Runner {
      * @var array
      */
     private $afterRunPool;
+
+    /**
+     * An associative array that maps aliases to command names.
+     * 
+     * @var array
+     */
+    private $aliases;
     private $argsV;
+
+    /**
+     * Whether auto-discovery is enabled.
+     * 
+     * @var bool
+     */
+    private $autoDiscoveryEnabled;
     private $beforeStartPool;
+
+    /**
+     * Command discovery instance for auto-registration.
+     * 
+     * @var CommandDiscovery|null
+     */
+    private $commandDiscovery;
     private $commandExitVal;
 
     /**
@@ -47,11 +66,11 @@ class Runner {
     private $commands;
 
     /**
-     * An associative array that maps aliases to command names.
+     * Whether commands have been discovered yet.
      * 
-     * @var array
+     * @var bool
      */
-    private $aliases;
+    private $commandsDiscovered;
 
     /**
      * 
@@ -81,27 +100,6 @@ class Runner {
      * @var OutputStream
      */
     private $outputStream;
-
-    /**
-     * Command discovery instance for auto-registration.
-     * 
-     * @var CommandDiscovery|null
-     */
-    private $commandDiscovery;
-
-    /**
-     * Whether auto-discovery is enabled.
-     * 
-     * @var bool
-     */
-    private $autoDiscoveryEnabled;
-
-    /**
-     * Whether commands have been discovered yet.
-     * 
-     * @var bool
-     */
-    private $commandsDiscovered;
 
     /**
      * Creates new instance of the class.
@@ -199,6 +197,163 @@ class Runner {
     }
 
     /**
+     * Add a directory path to search for commands.
+     * 
+     * @param string $path Directory path to search
+     * @return Runner
+     */
+    public function addDiscoveryPath(string $path): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPath($path);
+
+        return $this;
+    }
+
+    /**
+     * Add multiple discovery paths.
+     * 
+     * @param array $paths Array of directory paths
+     * @return Runner
+     */
+    public function addDiscoveryPaths(array $paths): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPaths($paths);
+
+        return $this;
+    }
+
+    /**
+     * Auto-register commands from a directory (convenience method).
+     * 
+     * @param string $path Directory path to search
+     * @param array $excludePatterns Optional exclude patterns
+     * @return Runner
+     */
+    public function autoRegister(string $path, array $excludePatterns = []): Runner {
+        return $this->addDiscoveryPath($path)
+                        ->excludePatterns($excludePatterns)
+                        ->discoverCommands();
+    }
+
+    /**
+     * Clear discovery cache.
+     * 
+     * @return Runner
+     */
+    public function clearDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Disable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function disableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Disable discovery caching.
+     * 
+     * @return Runner
+     */
+    public function disableDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->setEnabled(false);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Discover and register commands from configured paths.
+     * 
+     * @return Runner
+     */
+    public function discoverCommands(): Runner {
+        if (!$this->autoDiscoveryEnabled || $this->commandsDiscovered) {
+            return $this;
+        }
+
+        $discoveredCommands = $this->commandDiscovery->discover();
+
+        foreach ($discoveredCommands as $command) {
+            // Check if command implements AutoDiscoverable
+            if ($command instanceof AutoDiscoverable && !$command::shouldAutoRegister()) {
+                continue;
+            }
+
+            $this->register($command);
+        }
+
+        $this->commandsDiscovered = true;
+
+        return $this;
+    }
+
+    /**
+     * Enable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function enableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = true;
+
+        if ($this->commandDiscovery === null) {
+            $this->commandDiscovery = new CommandDiscovery();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enable discovery caching.
+     * 
+     * @param string $cacheFile Optional cache file path
+     * @return Runner
+     */
+    public function enableDiscoveryCache(string $cacheFile = 'cache/commands.json'): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->getCache()->setEnabled(true);
+        $this->commandDiscovery->getCache()->setCacheFile($cacheFile);
+
+        return $this;
+    }
+
+    /**
+     * Add a pattern to exclude files/directories from discovery.
+     * 
+     * @param string $pattern Glob pattern to exclude
+     * @return Runner
+     */
+    public function excludePattern(string $pattern): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePattern($pattern);
+
+        return $this;
+    }
+
+    /**
+     * Add multiple exclude patterns.
+     * 
+     * @param array $patterns Array of glob patterns
+     * @return Runner
+     */
+    public function excludePatterns(array $patterns): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePatterns($patterns);
+
+        return $this;
+    }
+
+    /**
      * Returns the command which is being executed.
      * 
      * @return Command|null If a command is requested and currently in execute 
@@ -208,6 +363,23 @@ class Runner {
      */
     public function getActiveCommand() {
         return $this->activeCommand;
+    }
+
+    /**
+     * Resolve alias conflict interactively by prompting the user.
+     * 
+     * @param string $alias The conflicting alias.
+     * @param string $existingCommand The existing command that uses the alias.
+     * @param string $newCommand The new command trying to use the alias.
+     * 
+     * @return string The command name chosen by the user.
+     * /**
+     * Get all registered aliases.
+     * 
+     * @return array An associative array where keys are aliases and values are command names.
+     */
+    public function getAliases(): array {
+        return $this->aliases;
     }
 
     /**
@@ -246,11 +418,22 @@ class Runner {
         // Then check if it's an alias
         if (isset($this->aliases[$name])) {
             $commandName = $this->aliases[$name];
+
             if (isset($this->getCommands()[$commandName])) {
                 return $this->getCommands()[$commandName];
             }
         }
+
         return null;
+    }
+
+    /**
+     * Get the command discovery instance.
+     * 
+     * @return CommandDiscovery|null
+     */
+    public function getCommandDiscovery(): ?CommandDiscovery {
+        return $this->commandDiscovery;
     }
 
     /**
@@ -274,6 +457,15 @@ class Runner {
      */
     public function getDefaultCommand() {
         return $this->defaultCommand;
+    }
+
+    /**
+     * Get discovery cache instance.
+     * 
+     * @return CommandCache|null
+     */
+    public function getDiscoveryCache(): ?CommandCache {
+        return $this->commandDiscovery?->getCache();
     }
 
     /**
@@ -325,6 +517,17 @@ class Runner {
     }
 
     /**
+     * Check if an alias is registered.
+     * 
+     * @param string $alias The alias to check.
+     * 
+     * @return bool True if the alias exists, false otherwise.
+     */
+    public function hasAlias(string $alias): bool {
+        return isset($this->aliases[$alias]);
+    }
+
+    /**
      * Checks if the runner has specific global argument or not given its name.
      * 
      * @param string $name The name of the argument.
@@ -340,6 +543,15 @@ class Runner {
         }
 
         return false;
+    }
+
+    /**
+     * Check if auto-discovery is enabled.
+     * 
+     * @return bool
+     */
+    public function isAutoDiscoveryEnabled(): bool {
+        return $this->autoDiscoveryEnabled;
     }
 
     /**
@@ -394,78 +606,6 @@ class Runner {
     }
 
     /**
-     * Register an alias for a command.
-     * 
-     * @param string $alias The alias to register.
-     * @param string $commandName The name of the command the alias points to.
-     * 
-     * @return Runner The method will return the instance at which the method
-     * is called on
-     */
-    private function registerAlias(string $alias, string $commandName): Runner {
-        // Check for conflicts
-        if (isset($this->aliases[$alias])) {
-            $existingCommand = $this->aliases[$alias];
-
-            if ($this->isInteractive()) {
-                // Interactive mode: prompt user to choose
-                $choice = $this->resolveAliasConflictInteractively($alias, $existingCommand, $commandName);
-                if ($choice === $commandName) {
-                    $this->aliases[$alias] = $commandName;
-                }
-                // If user chose existing command, do nothing
-            } else {
-                // Non-interactive mode: use first-come-first-served (do nothing)
-                $this->printMsg("Warning: Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
-            }
-        } else {
-            // No conflict, register the alias
-            $this->aliases[$alias] = $commandName;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Resolve alias conflict interactively by prompting the user.
-     * 
-     * @param string $alias The conflicting alias.
-     * @param string $existingCommand The existing command that uses the alias.
-     * @param string $newCommand The new command trying to use the alias.
-     * 
-     * @return string The command name chosen by the user.
-      /**
-     * Get all registered aliases.
-     * 
-     * @return array An associative array where keys are aliases and values are command names.
-     */
-    public function getAliases(): array {
-        return $this->aliases;
-    }
-
-    /**
-     * Check if an alias is registered.
-     * 
-     * @param string $alias The alias to check.
-     * 
-     * @return bool True if the alias exists, false otherwise.
-     */
-    public function hasAlias(string $alias): bool {
-        return isset($this->aliases[$alias]);
-    }
-
-    /**
-     * Get the command name for a given alias.
-     * 
-     * @param string $alias The alias to resolve.
-     * 
-     * @return string|null The command name if alias exists, null otherwise.
-     */
-    public function resolveAlias(string $alias): ?string {
-        return $this->aliases[$alias] ?? null;
-    }
-
-    /**
      * Removes an argument from the global args set given its name.
      * 
      * @param string $name The name of the argument that will be removed.
@@ -501,7 +641,19 @@ class Runner {
         $this->commands = [];
         $this->commands = [];
         $this->aliases = [];
+
         return $this;
+    }
+
+    /**
+     * Get the command name for a given alias.
+     * 
+     * @param string $alias The alias to resolve.
+     * 
+     * @return string|null The command name if alias exists, null otherwise.
+     */
+    public function resolveAlias(string $alias): ?string {
+        return $this->aliases[$alias] ?? null;
     }
 
     /**
@@ -544,7 +696,7 @@ class Runner {
 
                     return 0;
                 } else {
-                    $this->printMsg("The command '" . $commandName . "' is not supported.", 'Error:', 'red');
+                    $this->printMsg("The command '".$commandName."' is not supported.", 'Error:', 'red');
                     $this->commandExitVal = -1;
 
                     return -1;
@@ -567,7 +719,7 @@ class Runner {
             $this->printMsg($ex->getFile(), 'At:', 'yellow');
             $this->printMsg($ex->getLine(), 'Line:', 'yellow');
             $this->printMsg("\n", 'Stack Trace:', 'yellow');
-            $this->printMsg("\n" . $ex->getTraceAsString());
+            $this->printMsg("\n".$ex->getTraceAsString());
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
         }
 
@@ -610,7 +762,7 @@ class Runner {
 
         if ($code != 0) {
             if ($this->getActiveCommand() !== null) {
-                $this->getActiveCommand()->warning('Command "' . $commandName . '" exited with code ' . $code . '.');
+                $this->getActiveCommand()->warning('Command "'.$commandName.'" exited with code '.$code.'.');
             }
         }
 
@@ -708,6 +860,19 @@ class Runner {
     }
 
     /**
+     * Set a custom command discovery instance.
+     * 
+     * @param CommandDiscovery $discovery
+     * @return Runner
+     */
+    public function setCommandDiscovery(CommandDiscovery $discovery): Runner {
+        $this->commandDiscovery = $discovery;
+        $this->autoDiscoveryEnabled = true;
+
+        return $this;
+    }
+
+    /**
      * Sets the default command that will be executed in case no command
      * name was provided as argument.
      * 
@@ -723,6 +888,19 @@ class Runner {
         if ($c !== null) {
             $this->defaultCommand = $c;
         }
+
+        return $this;
+    }
+
+    /**
+     * Enable or disable strict mode for discovery.
+     * 
+     * @param bool $strict
+     * @return Runner
+     */
+    public function setDiscoveryStrictMode(bool $strict): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->setStrictMode($strict);
 
         return $this;
     }
@@ -858,6 +1036,40 @@ class Runner {
     }
 
     /**
+     * Register an alias for a command.
+     * 
+     * @param string $alias The alias to register.
+     * @param string $commandName The name of the command the alias points to.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
+     */
+    private function registerAlias(string $alias, string $commandName): Runner {
+        // Check for conflicts
+        if (isset($this->aliases[$alias])) {
+            $existingCommand = $this->aliases[$alias];
+
+            if ($this->isInteractive()) {
+                // Interactive mode: prompt user to choose
+                $choice = $this->resolveAliasConflictInteractively($alias, $existingCommand, $commandName);
+
+                if ($choice === $commandName) {
+                    $this->aliases[$alias] = $commandName;
+                }
+                // If user chose existing command, do nothing
+            } else {
+                // Non-interactive mode: use first-come-first-served (do nothing)
+                $this->printMsg("Warning: Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+            }
+        } else {
+            // No conflict, register the alias
+            $this->aliases[$alias] = $commandName;
+        }
+
+        return $this;
+    }
+
+    /**
      * Run the command line as single run.
      *
      * @return int
@@ -897,208 +1109,9 @@ class Runner {
             if (gettype($argName) == 'integer') {
                 $argV[] = $argVal;
             } else {
-                $argV[] = $argName . '=' . $argVal;
+                $argV[] = $argName.'='.$argVal;
             }
         }
         $this->argsV = $argV;
-    }
-
-    /**
-     * Enable auto-discovery of commands.
-     * 
-     * @return Runner
-     */
-    public function enableAutoDiscovery(): Runner {
-        $this->autoDiscoveryEnabled = true;
-
-        if ($this->commandDiscovery === null) {
-            $this->commandDiscovery = new CommandDiscovery();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Disable auto-discovery of commands.
-     * 
-     * @return Runner
-     */
-    public function disableAutoDiscovery(): Runner {
-        $this->autoDiscoveryEnabled = false;
-        return $this;
-    }
-
-    /**
-     * Add a directory path to search for commands.
-     * 
-     * @param string $path Directory path to search
-     * @return Runner
-     */
-    public function addDiscoveryPath(string $path): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->addSearchPath($path);
-        return $this;
-    }
-
-    /**
-     * Add multiple discovery paths.
-     * 
-     * @param array $paths Array of directory paths
-     * @return Runner
-     */
-    public function addDiscoveryPaths(array $paths): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->addSearchPaths($paths);
-        return $this;
-    }
-
-    /**
-     * Add a pattern to exclude files/directories from discovery.
-     * 
-     * @param string $pattern Glob pattern to exclude
-     * @return Runner
-     */
-    public function excludePattern(string $pattern): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->excludePattern($pattern);
-        return $this;
-    }
-
-    /**
-     * Add multiple exclude patterns.
-     * 
-     * @param array $patterns Array of glob patterns
-     * @return Runner
-     */
-    public function excludePatterns(array $patterns): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->excludePatterns($patterns);
-        return $this;
-    }
-
-    /**
-     * Enable or disable strict mode for discovery.
-     * 
-     * @param bool $strict
-     * @return Runner
-     */
-    public function setDiscoveryStrictMode(bool $strict): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->setStrictMode($strict);
-        return $this;
-    }
-
-    /**
-     * Get the command discovery instance.
-     * 
-     * @return CommandDiscovery|null
-     */
-    public function getCommandDiscovery(): ?CommandDiscovery {
-        return $this->commandDiscovery;
-    }
-
-    /**
-     * Set a custom command discovery instance.
-     * 
-     * @param CommandDiscovery $discovery
-     * @return Runner
-     */
-    public function setCommandDiscovery(CommandDiscovery $discovery): Runner {
-        $this->commandDiscovery = $discovery;
-        $this->autoDiscoveryEnabled = true;
-        return $this;
-    }
-
-    /**
-     * Discover and register commands from configured paths.
-     * 
-     * @return Runner
-     */
-    public function discoverCommands(): Runner {
-        if (!$this->autoDiscoveryEnabled || $this->commandsDiscovered) {
-            return $this;
-        }
-
-        $discoveredCommands = $this->commandDiscovery->discover();
-
-        foreach ($discoveredCommands as $command) {
-            // Check if command implements AutoDiscoverable
-            if ($command instanceof AutoDiscoverable && !$command::shouldAutoRegister()) {
-                continue;
-            }
-
-            $this->register($command);
-        }
-
-        $this->commandsDiscovered = true;
-        return $this;
-    }
-
-    /**
-     * Auto-register commands from a directory (convenience method).
-     * 
-     * @param string $path Directory path to search
-     * @param array $excludePatterns Optional exclude patterns
-     * @return Runner
-     */
-    public function autoRegister(string $path, array $excludePatterns = []): Runner {
-        return $this->addDiscoveryPath($path)
-                        ->excludePatterns($excludePatterns)
-                        ->discoverCommands();
-    }
-
-    /**
-     * Check if auto-discovery is enabled.
-     * 
-     * @return bool
-     */
-    public function isAutoDiscoveryEnabled(): bool {
-        return $this->autoDiscoveryEnabled;
-    }
-
-    /**
-     * Get discovery cache instance.
-     * 
-     * @return CommandCache|null
-     */
-    public function getDiscoveryCache(): ?CommandCache {
-        return $this->commandDiscovery?->getCache();
-    }
-
-    /**
-     * Enable discovery caching.
-     * 
-     * @param string $cacheFile Optional cache file path
-     * @return Runner
-     */
-    public function enableDiscoveryCache(string $cacheFile = 'cache/commands.json'): Runner {
-        $this->enableAutoDiscovery();
-        $this->commandDiscovery->getCache()->setEnabled(true);
-        $this->commandDiscovery->getCache()->setCacheFile($cacheFile);
-        return $this;
-    }
-
-    /**
-     * Disable discovery caching.
-     * 
-     * @return Runner
-     */
-    public function disableDiscoveryCache(): Runner {
-        if ($this->commandDiscovery !== null) {
-            $this->commandDiscovery->getCache()->setEnabled(false);
-        }
-        return $this;
-    }
-
-    /**
-     * Clear discovery cache.
-     * 
-     * @return Runner
-     */
-    public function clearDiscoveryCache(): Runner {
-        if ($this->commandDiscovery !== null) {
-            $this->commandDiscovery->getCache()->clear();
-        }
-        return $this;
     }
 }

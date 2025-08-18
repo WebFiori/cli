@@ -1,5 +1,4 @@
 <?php
-
 namespace WebFiori\Cli\Table;
 
 /**
@@ -12,112 +11,74 @@ namespace WebFiori\Cli\Table;
  * @version 1.0.0
  */
 class TableTheme {
-    
-    /**
-     * Theme name constants for supported table themes.
-     * 
-     * These constants provide type safety and IDE autocompletion when
-     * specifying table themes in configuration.
-     */
-    
-    /**
-     * Default theme with standard colors.
-     * 
-     * @var string
-     */
-    const DEFAULT = 'default';
-    
-    /**
-     * Dark theme optimized for dark terminals.
-     * 
-     * @var string
-     */
-    const DARK = 'dark';
-    
-    /**
-     * Light theme optimized for light terminals.
-     * 
-     * @var string
-     */
-    const LIGHT = 'light';
-    
     /**
      * Colorful theme with vibrant colors and styling.
      * 
      * @var string
      */
     const COLORFUL = 'colorful';
-    
+
     /**
-     * Minimal theme with no colors, just formatting.
+     * Dark theme optimized for dark terminals.
      * 
      * @var string
      */
-    const MINIMAL = 'minimal';
-    
+    const DARK = 'dark';
+
     /**
-     * Professional theme with business-appropriate styling.
+     * Theme name constants for supported table themes.
+     * 
+     * These constants provide type safety and IDE autocompletion when
+     * specifying table themes in configuration.
+     */
+
+    /**
+     * Default theme with standard colors.
      * 
      * @var string
      */
-    const PROFESSIONAL = 'professional';
-    
+    const DEFAULT = 'default';
+
     /**
      * High contrast theme for accessibility.
      * 
      * @var string
      */
     const HIGH_CONTRAST = 'high-contrast';
-    
-    private array $headerColors = [];
-    private array $cellColors = [];
+
+    /**
+     * Light theme optimized for light terminals.
+     * 
+     * @var string
+     */
+    const LIGHT = 'light';
+
+    /**
+     * Minimal theme with no colors, just formatting.
+     * 
+     * @var string
+     */
+    const MINIMAL = 'minimal';
+
+    /**
+     * Professional theme with business-appropriate styling.
+     * 
+     * @var string
+     */
+    const PROFESSIONAL = 'professional';
     private array $alternatingRowColors = [];
-    private bool $useAlternatingRows = false;
-    private array $statusColors = [];
-    private $headerStyler = null;
+    private array $cellColors = [];
     private $cellStyler = null;
-    
+
+    private array $headerColors = [];
+    private $headerStyler = null;
+    private array $statusColors = [];
+    private bool $useAlternatingRows = false;
+
     public function __construct(array $config = []) {
         $this->configure($config);
     }
-    
-    /**
-     * Configure theme with options array.
-     */
-    public function configure(array $config): self {
-        foreach ($config as $key => $value) {
-            match($key) {
-                'headerColors', 'header_colors' => $this->headerColors = $value,
-                'cellColors', 'cell_colors' => $this->cellColors = $value,
-                'alternatingRowColors', 'alternating_row_colors' => $this->alternatingRowColors = $value,
-                'useAlternatingRows', 'use_alternating_rows' => $this->useAlternatingRows = $value,
-                'statusColors', 'status_colors' => $this->statusColors = $value,
-                'headerStyler', 'header_styler' => $this->headerStyler = $value,
-                'cellStyler', 'cell_styler' => $this->cellStyler = $value,
-                default => null
-            };
-        }
-        
-        return $this;
-    }
-    
-    /**
-     * Apply header styling.
-     */
-    public function applyHeaderStyle(string $text): string {
-        // Apply custom header styler if available
-        if ($this->headerStyler !== null) {
-            $text = call_user_func($this->headerStyler, $text);
-        }
-        
-        // Apply header colors
-        if (!empty($this->headerColors)) {
-            $text = $this->applyColors($text, $this->headerColors);
-        }
-        
-        return $text;
-    }
-    
+
     /**
      * 
      * @param string $text
@@ -130,133 +91,40 @@ class TableTheme {
         if ($this->cellStyler !== null) {
             $text = call_user_func($this->cellStyler, $text, $rowIndex, $columnIndex);
         }
-        
+
         // Apply alternating row colors
         if ($this->useAlternatingRows && !empty($this->alternatingRowColors)) {
             $colorIndex = $rowIndex % count($this->alternatingRowColors);
             $colors = $this->alternatingRowColors[$colorIndex];
             $text = $this->applyColors($text, $colors);
         }
-        
+
         // Apply general cell colors
         elseif (!empty($this->cellColors)) {
             $text = $this->applyColors($text, $this->cellColors);
         }
-        
+
         // Apply status-based colors
         return $this->applyStatusColors($text);
     }
-    
+
     /**
-     * Set header colors.
+     * Apply header styling.
      */
-    public function setHeaderColors(array $colors): self {
-        $this->headerColors = $colors;
-        return $this;
+    public function applyHeaderStyle(string $text): string {
+        // Apply custom header styler if available
+        if ($this->headerStyler !== null) {
+            $text = call_user_func($this->headerStyler, $text);
+        }
+
+        // Apply header colors
+        if (!empty($this->headerColors)) {
+            $text = $this->applyColors($text, $this->headerColors);
+        }
+
+        return $text;
     }
-    
-    /**
-     * Set cell colors.
-     */
-    public function setCellColors(array $colors): self {
-        $this->cellColors = $colors;
-        return $this;
-    }
-    
-    /**
-     * Set alternating row colors.
-     */
-    public function setAlternatingRowColors(array $colors): self {
-        $this->alternatingRowColors = $colors;
-        $this->useAlternatingRows = !empty($colors);
-        return $this;
-    }
-    
-    /**
-     * Enable/disable alternating rows.
-     */
-    public function useAlternatingRows(bool $use = true): self {
-        $this->useAlternatingRows = $use;
-        return $this;
-    }
-    
-    /**
-     * Set status-based colors.
-     */
-    public function setStatusColors(array $colors): self {
-        $this->statusColors = $colors;
-        return $this;
-    }
-    
-    /**
-     * Set custom header styler function.
-     */
-    public function setHeaderStyler($styler): self {
-        $this->headerStyler = $styler;
-        return $this;
-    }
-    
-    /**
-     * Set custom cell styler function.
-     */
-    public function setCellStyler($styler): self {
-        $this->cellStyler = $styler;
-        return $this;
-    }
-    
-    /**
-     * Create a default theme.
-     */
-    public static function default(): self {
-        return new self([
-            'headerColors' => ['color' => 'white', 'bold' => true],
-            'cellColors' => [],
-            'useAlternatingRows' => false
-        ]);
-    }
-    
-    /**
-     * Create a dark theme.
-     */
-    public static function dark(): self {
-        return new self([
-            'headerColors' => ['color' => 'light-cyan', 'bold' => true],
-            'cellColors' => ['color' => 'white'],
-            'alternatingRowColors' => [
-                [],
-                ['background' => 'black']
-            ],
-            'useAlternatingRows' => true,
-            'statusColors' => [
-                'success' => ['color' => 'light-green'],
-                'error' => ['color' => 'light-red'],
-                'warning' => ['color' => 'light-yellow'],
-                'info' => ['color' => 'light-blue']
-            ]
-        ]);
-    }
-    
-    /**
-     * Create a light theme.
-     */
-    public static function light(): self {
-        return new self([
-            'headerColors' => ['color' => 'blue', 'bold' => true],
-            'cellColors' => ['color' => 'black'],
-            'alternatingRowColors' => [
-                [],
-                ['background' => 'white']
-            ],
-            'useAlternatingRows' => true,
-            'statusColors' => [
-                'success' => ['color' => 'green'],
-                'error' => ['color' => 'red'],
-                'warning' => ['color' => 'yellow'],
-                'info' => ['color' => 'blue']
-            ]
-        ]);
-    }
-    
+
     /**
      * Create a colorful theme.
      */
@@ -280,7 +148,160 @@ class TableTheme {
             ]
         ]);
     }
-    
+
+    /**
+     * Configure theme with options array.
+     */
+    public function configure(array $config): self {
+        foreach ($config as $key => $value) {
+            match ($key) {
+                'headerColors', 'header_colors' => $this->headerColors = $value,
+                'cellColors', 'cell_colors' => $this->cellColors = $value,
+                'alternatingRowColors', 'alternating_row_colors' => $this->alternatingRowColors = $value,
+                'useAlternatingRows', 'use_alternating_rows' => $this->useAlternatingRows = $value,
+                'statusColors', 'status_colors' => $this->statusColors = $value,
+                'headerStyler', 'header_styler' => $this->headerStyler = $value,
+                'cellStyler', 'cell_styler' => $this->cellStyler = $value,
+                default => null
+            };
+        }
+
+        return $this;
+    }
+
+    /**
+     * Create theme by name.
+     */
+    public static function create(string $name): self {
+        return match (strtolower($name)) {
+            self::DARK => self::dark(),
+            self::LIGHT => self::light(),
+            self::COLORFUL => self::colorful(),
+            self::MINIMAL => self::minimal(),
+            self::PROFESSIONAL => self::professional(),
+            self::HIGH_CONTRAST, 'high-contrast', 'highcontrast' => self::highContrast(),
+            'environment', 'auto' => self::fromEnvironment(),
+            default => self::default()
+        };
+    }
+
+    /**
+     * Create a custom theme with specific colors.
+     */
+    public static function custom(array $config): self {
+        return new self($config);
+    }
+
+    /**
+     * Create a dark theme.
+     */
+    public static function dark(): self {
+        return new self([
+            'headerColors' => ['color' => 'light-cyan', 'bold' => true],
+            'cellColors' => ['color' => 'white'],
+            'alternatingRowColors' => [
+                [],
+                ['background' => 'black']
+            ],
+            'useAlternatingRows' => true,
+            'statusColors' => [
+                'success' => ['color' => 'light-green'],
+                'error' => ['color' => 'light-red'],
+                'warning' => ['color' => 'light-yellow'],
+                'info' => ['color' => 'light-blue']
+            ]
+        ]);
+    }
+
+    /**
+     * Create a default theme.
+     */
+    public static function default(): self {
+        return new self([
+            'headerColors' => ['color' => 'white', 'bold' => true],
+            'cellColors' => [],
+            'useAlternatingRows' => false
+        ]);
+    }
+
+    /**
+     * Create theme from CLI environment.
+     */
+    public static function fromEnvironment(): self {
+        // Detect terminal capabilities and user preferences
+        $supportsColor = self::detectColorSupport();
+        $isDarkTerminal = self::detectDarkTerminal();
+
+        if (!$supportsColor) {
+            return self::minimal();
+        }
+
+        return $isDarkTerminal ? self::dark() : self::light();
+    }
+
+    /**
+     * Get available theme names.
+     */
+    public static function getAvailableThemes(): array {
+        return [
+            self::DEFAULT,
+            self::DARK,
+            self::LIGHT,
+            self::COLORFUL,
+            self::MINIMAL,
+            self::PROFESSIONAL,
+            self::HIGH_CONTRAST
+        ];
+    }
+
+    /**
+     * Create a high contrast theme for accessibility.
+     */
+    public static function highContrast(): self {
+        return new self([
+            'headerColors' => ['color' => 'white', 'background' => 'black', 'bold' => true],
+            'cellColors' => ['color' => 'white', 'background' => 'black'],
+            'useAlternatingRows' => false,
+            'statusColors' => [
+                'success' => ['color' => 'white', 'background' => 'green', 'bold' => true],
+                'error' => ['color' => 'white', 'background' => 'red', 'bold' => true],
+                'warning' => ['color' => 'black', 'background' => 'yellow', 'bold' => true],
+                'info' => ['color' => 'white', 'background' => 'blue', 'bold' => true]
+            ]
+        ]);
+    }
+
+    /**
+     * Check if a theme name is valid.
+     * 
+     * @param string $themeName The theme name to validate
+     * @return bool True if the theme is supported, false otherwise
+     */
+    public static function isValidTheme(string $themeName): bool {
+        return in_array(strtolower($themeName), array_map('strtolower', self::getAvailableThemes()), true);
+    }
+
+    /**
+     * Create a light theme.
+     */
+    public static function light(): self {
+        return new self([
+            'headerColors' => ['color' => 'blue', 'bold' => true],
+            'cellColors' => ['color' => 'black'],
+            'alternatingRowColors' => [
+                [],
+                ['background' => 'white']
+            ],
+            'useAlternatingRows' => true,
+            'statusColors' => [
+                'success' => ['color' => 'green'],
+                'error' => ['color' => 'red'],
+                'warning' => ['color' => 'yellow'],
+                'info' => ['color' => 'blue']
+            ]
+        ]);
+    }
+
     /**
      * Create a minimal theme (no colors).
      */
@@ -291,7 +312,7 @@ class TableTheme {
             'useAlternatingRows' => false
         ]);
     }
-    
+
     /**
      * Create a professional theme.
      */
@@ -311,39 +332,71 @@ class TableTheme {
             ]
         ]);
     }
-    
+
     /**
-     * Create a high contrast theme for accessibility.
+     * Set alternating row colors.
      */
-    public static function highContrast(): self {
-        return new self([
-            'headerColors' => ['color' => 'white', 'background' => 'black', 'bold' => true],
-            'cellColors' => ['color' => 'white', 'background' => 'black'],
-            'useAlternatingRows' => false,
-            'statusColors' => [
-                'success' => ['color' => 'white', 'background' => 'green', 'bold' => true],
-                'error' => ['color' => 'white', 'background' => 'red', 'bold' => true],
-                'warning' => ['color' => 'black', 'background' => 'yellow', 'bold' => true],
-                'info' => ['color' => 'white', 'background' => 'blue', 'bold' => true]
-            ]
-        ]);
+    public function setAlternatingRowColors(array $colors): self {
+        $this->alternatingRowColors = $colors;
+        $this->useAlternatingRows = !empty($colors);
+
+        return $this;
     }
-    
+
     /**
-     * Create theme from CLI environment.
+     * Set cell colors.
      */
-    public static function fromEnvironment(): self {
-        // Detect terminal capabilities and user preferences
-        $supportsColor = self::detectColorSupport();
-        $isDarkTerminal = self::detectDarkTerminal();
-        
-        if (!$supportsColor) {
-            return self::minimal();
-        }
-        
-        return $isDarkTerminal ? self::dark() : self::light();
+    public function setCellColors(array $colors): self {
+        $this->cellColors = $colors;
+
+        return $this;
     }
-    
+
+    /**
+     * Set custom cell styler function.
+     */
+    public function setCellStyler($styler): self {
+        $this->cellStyler = $styler;
+
+        return $this;
+    }
+
+    /**
+     * Set header colors.
+     */
+    public function setHeaderColors(array $colors): self {
+        $this->headerColors = $colors;
+
+        return $this;
+    }
+
+    /**
+     * Set custom header styler function.
+     */
+    public function setHeaderStyler($styler): self {
+        $this->headerStyler = $styler;
+
+        return $this;
+    }
+
+    /**
+     * Set status-based colors.
+     */
+    public function setStatusColors(array $colors): self {
+        $this->statusColors = $colors;
+
+        return $this;
+    }
+
+    /**
+     * Enable/disable alternating rows.
+     */
+    public function useAlternatingRows(bool $use = true): self {
+        $this->useAlternatingRows = $use;
+
+        return $this;
+    }
+
     /**
      * Apply ANSI colors to text.
      */
@@ -351,39 +404,39 @@ class TableTheme {
         if (empty($colors)) {
             return $text;
         }
-        
+
         $codes = [];
-        
+
         // Foreground colors
         if (isset($colors['color'])) {
             $codes[] = $this->getColorCode($colors['color']);
         }
-        
+
         // Background colors
         if (isset($colors['background'])) {
             $codes[] = $this->getColorCode($colors['background'], true);
         }
-        
+
         // Text styles
         if (isset($colors['bold']) && $colors['bold']) {
             $codes[] = '1';
         }
-        
+
         if (isset($colors['underline']) && $colors['underline']) {
             $codes[] = '4';
         }
-        
+
         if (isset($colors['italic']) && $colors['italic']) {
             $codes[] = '3';
         }
-        
+
         if (empty($codes)) {
             return $text;
         }
-        
-        return "\x1b[" . implode(';', $codes) . "m" . $text . "\x1b[0m";
+
+        return "\x1b[".implode(';', $codes)."m".$text."\x1b[0m";
     }
-    
+
     /**
      * Apply status-based colors.
      */
@@ -391,18 +444,62 @@ class TableTheme {
         if (empty($this->statusColors)) {
             return $text;
         }
-        
+
         $lowerText = strtolower(trim($text));
-        
+
         foreach ($this->statusColors as $status => $colors) {
             if (strpos($lowerText, strtolower($status)) !== false) {
                 return $this->applyColors($text, $colors);
             }
         }
-        
+
         return $text;
     }
-    
+
+    /**
+     * Detect if terminal supports colors.
+     */
+    private static function detectColorSupport(): bool {
+        // Check environment variables
+        $term = getenv('TERM');
+        $colorTerm = getenv('COLORTERM');
+
+        if ($colorTerm) {
+            return true;
+        }
+
+        if ($term && (
+            strpos($term, 'color') !== false ||
+            strpos($term, '256') !== false ||
+            strpos($term, 'xterm') !== false
+        )) {
+            return true;
+        }
+
+        // Check if running in a known terminal
+        if (getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Detect if terminal has dark background.
+     */
+    private static function detectDarkTerminal(): bool {
+        // This is a best guess - terminal background detection is limited
+        $termProgram = getenv('TERM_PROGRAM');
+
+        // Some terminals are typically dark by default
+        if ($termProgram && in_array($termProgram, ['iTerm.app', 'Terminal.app'])) {
+            return true;
+        }
+
+        // Default assumption for most terminals
+        return true;
+    }
+
     /**
      * Get ANSI color code.
      */
@@ -423,99 +520,7 @@ class TableTheme {
             'light-magenta' => $background ? '105' : '95',
             'light-cyan' => $background ? '106' : '96',
         ];
-        
+
         return $colors[strtolower($color)] ?? ($background ? '40' : '30');
-    }
-    
-    /**
-     * Detect if terminal supports colors.
-     */
-    private static function detectColorSupport(): bool {
-        // Check environment variables
-        $term = getenv('TERM');
-        $colorTerm = getenv('COLORTERM');
-        
-        if ($colorTerm) {
-            return true;
-        }
-        
-        if ($term && (
-            strpos($term, 'color') !== false ||
-            strpos($term, '256') !== false ||
-            strpos($term, 'xterm') !== false
-        )) {
-            return true;
-        }
-        
-        // Check if running in a known terminal
-        if (getenv('TERM_PROGRAM')) {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Detect if terminal has dark background.
-     */
-    private static function detectDarkTerminal(): bool {
-        // This is a best guess - terminal background detection is limited
-        $termProgram = getenv('TERM_PROGRAM');
-        
-        // Some terminals are typically dark by default
-        if ($termProgram && in_array($termProgram, ['iTerm.app', 'Terminal.app'])) {
-            return true;
-        }
-        
-        // Default assumption for most terminals
-        return true;
-    }
-    
-    /**
-     * Create a custom theme with specific colors.
-     */
-    public static function custom(array $config): self {
-        return new self($config);
-    }
-    
-    /**
-     * Get available theme names.
-     */
-    public static function getAvailableThemes(): array {
-        return [
-            self::DEFAULT,
-            self::DARK,
-            self::LIGHT,
-            self::COLORFUL,
-            self::MINIMAL,
-            self::PROFESSIONAL,
-            self::HIGH_CONTRAST
-        ];
-    }
-    
-    /**
-     * Check if a theme name is valid.
-     * 
-     * @param string $themeName The theme name to validate
-     * @return bool True if the theme is supported, false otherwise
-     */
-    public static function isValidTheme(string $themeName): bool {
-        return in_array(strtolower($themeName), array_map('strtolower', self::getAvailableThemes()), true);
-    }
-    
-    /**
-     * Create theme by name.
-     */
-    public static function create(string $name): self {
-        return match(strtolower($name)) {
-            self::DARK => self::dark(),
-            self::LIGHT => self::light(),
-            self::COLORFUL => self::colorful(),
-            self::MINIMAL => self::minimal(),
-            self::PROFESSIONAL => self::professional(),
-            self::HIGH_CONTRAST, 'high-contrast', 'highcontrast' => self::highContrast(),
-            'environment', 'auto' => self::fromEnvironment(),
-            default => self::default()
-        };
     }
 }

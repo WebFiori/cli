@@ -13,7 +13,6 @@ use WebFiori\Cli\Option;
  * - Return appropriate exit codes
  */
 class HelloCommand extends Command {
-    
     public function __construct() {
         parent::__construct('hello', [
             '--name' => [
@@ -23,7 +22,7 @@ class HelloCommand extends Command {
             ]
         ], 'A simple greeting command that says hello to someone');
     }
-    
+
     /**
      * Execute the hello command.
      * 
@@ -36,14 +35,16 @@ class HelloCommand extends Command {
     public function exec(): int {
         // Get the name argument, with fallback to default
         $name = $this->getArgValue('--name') ?? 'World';
-        
+
         // Trim whitespace and validate
         $name = trim($name);
+
         if (empty($name)) {
             $this->error('Name cannot be empty!');
+
             return 1; // Error exit code
         }
-        
+
         // Special greeting for WebFiori
         if (strtolower($name) === 'webfiori') {
             $this->success("🎉 Hello, $name! Welcome to the CLI world!");
@@ -51,7 +52,7 @@ class HelloCommand extends Command {
         } else {
             // Standard greeting
             $this->println("Hello, $name! 👋");
-            
+
             // Add some personality based on name length
             if (strlen($name) > 10) {
                 $this->info('Wow, that\'s quite a long name!');
@@ -59,10 +60,10 @@ class HelloCommand extends Command {
                 $this->info('Short and sweet!');
             }
         }
-        
+
         // Success message
         $this->println('Have a wonderful day!');
-        
+
         return 0; // Success exit code
     }
 }

@@ -17,7 +17,6 @@ require_once '../../WebFiori/Cli/Table/TableRenderer.php';
 require_once '../../WebFiori/Cli/Table/TableBuilder.php';
 
 use WebFiori\Cli\Table\TableBuilder;
-use WebFiori\Cli\Table\TableTheme;
 
 echo "🚀 WebFiori CLI Table - Simple Usage Examples\n";
 echo "==============================================\n\n";
@@ -32,7 +31,7 @@ $basicTable = TableBuilder::create()
     ->addRow(['Jane Smith', 25, 'Los Angeles'])
     ->addRow(['Bob Johnson', 35, 'Chicago']);
 
-echo $basicTable->render() . "\n\n";
+echo $basicTable->render()."\n\n";
 
 // Example 2: Formatted table with colors
 echo "Example 2: Formatted Table with Colors\n";
@@ -45,16 +44,16 @@ $formattedTable = TableBuilder::create()
     ->addRow(['Keyboard', 89.99, 'Available'])
     ->configureColumn('Price', [
         'align' => 'right',
-        'formatter' => fn($value) => '$' . number_format($value, 2)
+        'formatter' => fn($value) => '$'.number_format($value, 2)
     ])
-    ->colorizeColumn('Status', function($value) {
-        return match($value) {
+    ->colorizeColumn('Status', function ($value) {
+        return match ($value) {
             'Available' => ['color' => 'green', 'bold' => true],
             'Out of Stock' => ['color' => 'red', 'bold' => true],
             default => []
         };
     });
 
-echo $formattedTable->render() . "\n\n";
+echo $formattedTable->render()."\n\n";
 
 echo "✨ Simple examples completed successfully!\n";
