@@ -32,8 +32,8 @@
         }
     },
     "scripts" : {
-        "test": "vendor/bin/phpunit -c tests/phpunit.xml --display-deprecations",
-        "test10": "vendor/bin/phpunit -c tests/phpunit10.xml --display-deprecations",
+        "test": "vendor/bin/phpunit -c tests/phpunit.xml",
+        "test10": "vendor/bin/phpunit -c tests/phpunit10.xml",
         "wfcli":"bin/wfc",
         "check-cs": "bin/ecs check --ansi",
         "fix-cs": "vendor/bin/php-cs-fixer fix --config=php_cs.php.dist",
