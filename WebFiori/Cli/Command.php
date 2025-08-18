@@ -1,12 +1,17 @@
 <?php
 namespace WebFiori\Cli;
 
+use Error;
+use Exception;
 use ReflectionClass;
 use ReflectionException;
 use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\Progress\ProgressBar;
 use WebFiori\Cli\Streams\InputStream;
 use WebFiori\Cli\Streams\OutputStream;
-use WebFiori\Cli\Progress\ProgressBar;
+use WebFiori\Cli\Table\TableBuilder;
+use WebFiori\Cli\Table\TableOptions;
+use WebFiori\Cli\Table\TableTheme;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -1392,33 +1397,7 @@ abstract class Command {
      * ```
      */
     public function table(array $data, array $headers = [], array $options = []): Command {
-        // Include table classes if not already loaded
-        $tableClassPath = __DIR__ . '/Table/';
-        $tableClasses = [
-            'TableOptions.php',
-            'TableStyle.php',
-            'Column.php', 
-            'TableData.php',
-            'ColumnCalculator.php',
-            'TableFormatter.php',
-            'TableTheme.php',
-            'TableRenderer.php',
-            'TableBuilder.php'
-        ];
-        
-        foreach ($tableClasses as $class) {
-            $classFile = $tableClassPath . $class;
-            if (file_exists($classFile)) {
-                require_once $classFile;
-            }
-        }
-        
-        // Check if TableBuilder class is available
-        if (!class_exists('WebFiori\\Cli\\Table\\TableBuilder')) {
-            $this->error('WebFiori CLI Table feature is not available. Please ensure table classes are installed.');
-            return $this;
-        }
-        
+
         // Handle empty data
         if (empty($data)) {
             $this->info('No data to display in table.');
@@ -1427,7 +1406,7 @@ abstract class Command {
         
         try {
             // Create table builder instance
-            $tableBuilder = \WebFiori\Cli\Table\TableBuilder::create();
+            $tableBuilder = TableBuilder::create();
             
             // Set headers
             if (!empty($headers)) {
@@ -1438,32 +1417,32 @@ abstract class Command {
             $tableBuilder->setData($data);
             
             // Apply style (support both constant and string)
-            $style = $options[\WebFiori\Cli\Table\TableOptions::STYLE] ?? $options['style'] ?? 'bordered';
+            $style = $options[TableOptions::STYLE] ?? $options['style'] ?? 'bordered';
             $tableBuilder->useStyle($style);
             
             // Apply theme (support both constant and string)
-            $theme = $options[\WebFiori\Cli\Table\TableOptions::THEME] ?? $options['theme'] ?? null;
+            $theme = $options[TableOptions::THEME] ?? $options['theme'] ?? null;
             if ($theme !== null) {
-                $themeObj = \WebFiori\Cli\Table\TableTheme::create($theme);
+                $themeObj = TableTheme::create($theme);
                 $tableBuilder->setTheme($themeObj);
             }
             
             // Set title (support both constant and string)
-            $title = $options[\WebFiori\Cli\Table\TableOptions::TITLE] ?? $options['title'] ?? null;
+            $title = $options[TableOptions::TITLE] ?? $options['title'] ?? null;
             if ($title !== null) {
                 $tableBuilder->setTitle($title);
             }
             
             // Set width (support both constant and string)
-            $width = $options[\WebFiori\Cli\Table\TableOptions::WIDTH] ?? $options['width'] ?? $this->getTerminalWidth();
+            $width = $options[TableOptions::WIDTH] ?? $options['width'] ?? $this->getTerminalWidth();
             $tableBuilder->setMaxWidth($width);
             
             // Configure headers visibility (support both constant and string)
-            $showHeaders = $options[\WebFiori\Cli\Table\TableOptions::SHOW_HEADERS] ?? $options['showHeaders'] ?? true;
+            $showHeaders = $options[TableOptions::SHOW_HEADERS] ?? $options['showHeaders'] ?? true;
             $tableBuilder->showHeaders($showHeaders);
             
             // Configure columns (support both constant and string)
-            $columns = $options[\WebFiori\Cli\Table\TableOptions::COLUMNS] ?? $options['columns'] ?? [];
+            $columns = $options[TableOptions::COLUMNS] ?? $options['columns'] ?? [];
             if (!empty($columns) && is_array($columns)) {
                 foreach ($columns as $columnName => $columnConfig) {
                     $tableBuilder->configureColumn($columnName, $columnConfig);
@@ -1471,7 +1450,7 @@ abstract class Command {
             }
             
             // Apply colorization (support both constant and string)
-            $colorize = $options[\WebFiori\Cli\Table\TableOptions::COLORIZE] ?? $options['colorize'] ?? [];
+            $colorize = $options[TableOptions::COLORIZE] ?? $options['colorize'] ?? [];
             if (!empty($colorize) && is_array($colorize)) {
                 foreach ($colorize as $columnName => $colorizer) {
                     if (is_callable($colorizer)) {
@@ -1484,9 +1463,9 @@ abstract class Command {
             $output = $tableBuilder->render();
             $this->prints($output);
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Failed to display table: ' . $e->getMessage());
-        } catch (\Error $e) {
+        } catch (Error $e) {
             $this->error('Table display error: ' . $e->getMessage());
         }
         

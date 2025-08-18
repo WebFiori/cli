@@ -23,13 +23,10 @@ class TableFormatter {
     /**
      * Format a header value.
      */
-    public function formatHeader(string $header, Column $column): string {
+    public function formatHeader(string $header): string {
         // Apply any header-specific formatting (but not cell formatters)
-        $formatted = $this->applyHeaderFormatting($header);
+        return $this->applyHeaderFormatting($header);
         
-        // Don't apply column cell formatters to headers
-        // Note: $column parameter reserved for future column-specific header formatting
-        return $formatted;
     }
     
     /**

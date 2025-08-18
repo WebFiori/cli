@@ -183,7 +183,7 @@ class ColumnCalculator {
         }
         
         // Phase 3: Distribute remaining width proportionally
-        $this->distributeRemainingWidth($finalWidths, $idealWidths, $maxWidths, $remainingWidth);
+        $this->distributeRemainingWidth($finalWidths, $maxWidths, $remainingWidth);
         
         return $finalWidths;
     }
@@ -235,7 +235,6 @@ class ColumnCalculator {
      */
     private function distributeRemainingWidth(
         array &$finalWidths,
-        array $idealWidths,
         array $maxWidths,
         int $remainingWidth
     ): void {
@@ -323,7 +322,7 @@ class ColumnCalculator {
         $minRequiredWidth = $this->calculateMinimumTableWidth($columns, $style);
         
         if ($maxWidth < $minRequiredWidth) {
-            return $this->calculateNarrowWidths($data, $columns, $maxWidth, $style);
+            return $this->calculateNarrowWidths($columns, $maxWidth, $style);
         }
         
         return $this->calculateWidths($data, $columns, $maxWidth, $style);
@@ -345,7 +344,6 @@ class ColumnCalculator {
      * Calculate widths for narrow terminals.
      */
     private function calculateNarrowWidths(
-        TableData $data,
         array $columns,
         int $maxWidth,
         TableStyle $style
@@ -373,7 +371,7 @@ class ColumnCalculator {
             $column = new Column($header);
             
             // Auto-configure based on data type
-            $values = $data->getColumnValues($i);
+
             $type = $data->getColumnType($i);
             $stats = $data->getColumnStatistics($i);
             

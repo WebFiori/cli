@@ -8,7 +8,7 @@ namespace WebFiori\Cli\Table;
  * This class handles column-specific settings like width, alignment,
  * formatting, and content processing rules.
  * 
- * @author WebFiori Framework
+ * @author Ibrahim
  * @version 1.0.0
  */
 class Column {

@@ -29,7 +29,7 @@ class TableFormatterTest extends TestCase {
      * @test
      */
     public function testFormatHeader() {
-        $result = $this->formatter->formatHeader('test_header', $this->column);
+        $result = $this->formatter->formatHeader('test_header');
         
         $this->assertEquals('Test Header', $result);
     }
@@ -38,7 +38,7 @@ class TableFormatterTest extends TestCase {
      * @test
      */
     public function testFormatHeaderWithDashes() {
-        $result = $this->formatter->formatHeader('test-header-name', $this->column);
+        $result = $this->formatter->formatHeader('test-header-name');
         
         $this->assertEquals('Test Header Name', $result);
     }

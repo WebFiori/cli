@@ -255,7 +255,7 @@ class TableRenderer {
             $width = $columnWidths[$index];
             
             // Format header text
-            $formattedHeader = $this->formatter->formatHeader($header, $column);
+            $formattedHeader = $this->formatter->formatHeader($header);
             
             // Apply theme colors if available
             if ($this->theme) {
