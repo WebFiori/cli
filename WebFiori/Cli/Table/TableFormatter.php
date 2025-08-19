@@ -190,11 +190,16 @@ class TableFormatter {
     public function formatFileSize(int $bytes, int $precision = 2): string {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
-        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+        for ($i = 0; $bytes >= 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
 
-        return round($bytes, $precision).' '.$units[$i];
+        // For bytes (B), don't show decimal places
+        if ($i === 0) {
+            return round($bytes).' '.$units[$i];
+        }
+
+        return number_format($bytes, $precision).' '.$units[$i];
     }
 
     /**
