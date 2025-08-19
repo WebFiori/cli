@@ -1058,7 +1058,7 @@ class Runner {
                 // If user chose existing command, do nothing
             } else {
                 // Non-interactive mode: use first-come-first-served (do nothing)
-                $this->printMsg("Warning: Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+                $this->printMsg("Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
             }
         } else {
             // No conflict, register the alias
