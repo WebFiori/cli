@@ -91,17 +91,72 @@ class ColumnCalculator {
         // Calculate available width for content
         $availableWidth = $this->calculateAvailableWidth($maxWidth, $columnCount, $style);
 
-        // Get ideal widths for each column
-        $idealWidths = $this->calculateIdealWidths($data, $columns);
+        // First, handle fixed-width columns
+        $fixedWidths = [];
+        $flexibleColumns = [];
+        $usedWidth = 0;
 
-        // Get minimum widths for each column
-        $minWidths = $this->calculateMinimumWidths($data, $columns);
+        foreach ($columns as $index => $column) {
+            if ($column->getWidth() !== null) {
+                $fixedWidths[$index] = $column->getWidth();
+                $usedWidth += $column->getWidth();
+            } else {
+                $flexibleColumns[] = $index;
+            }
+        }
 
-        // Get maximum widths for each column (from configuration)
-        $maxWidths = $this->getConfiguredMaxWidths($columns);
+        // Calculate remaining width for flexible columns
+        $remainingWidth = $availableWidth - $usedWidth;
 
-        // Distribute available width among columns
-        return $this->distributeWidth($idealWidths, $minWidths, $maxWidths, $availableWidth);
+        // If we have flexible columns, calculate their widths
+        if (!empty($flexibleColumns)) {
+            $flexibleIdealWidths = [];
+            $flexibleMinWidths = [];
+            $flexibleMaxWidths = [];
+
+            foreach ($flexibleColumns as $index) {
+                $column = $columns[$index];
+                
+                // Calculate ideal width for this flexible column
+                $headers = $data->getHeaders();
+                $headerWidth = strlen($headers[$index] ?? $column->getName());
+                $values = $data->getColumnValues($index);
+                $contentWidth = $this->calculateContentWidth($values, $column);
+                $idealWidth = max($headerWidth, $contentWidth);
+                
+                $flexibleIdealWidths[] = $idealWidth;
+                
+                // Calculate minimum width
+                $minWidth = $column->getMinWidth() ?? max(self::MIN_COLUMN_WIDTH, min($headerWidth, strlen($column->getEllipsis())));
+                $flexibleMinWidths[] = $minWidth;
+                
+                // Get maximum width
+                $flexibleMaxWidths[] = $column->getMaxWidth();
+            }
+
+            // Distribute remaining width among flexible columns
+            $flexibleWidths = $this->distributeWidth(
+                $flexibleIdealWidths,
+                $flexibleMinWidths,
+                $flexibleMaxWidths,
+                $remainingWidth
+            );
+        }
+
+        // Combine fixed and flexible widths
+        $finalWidths = [];
+        $flexibleIndex = 0;
+
+        for ($i = 0; $i < $columnCount; $i++) {
+            if (isset($fixedWidths[$i])) {
+                $finalWidths[$i] = $fixedWidths[$i];
+            } else {
+                $finalWidths[$i] = $flexibleWidths[$flexibleIndex] ?? self::MIN_COLUMN_WIDTH;
+                $flexibleIndex++;
+            }
+        }
+
+        return $finalWidths;
     }
 
     /**
