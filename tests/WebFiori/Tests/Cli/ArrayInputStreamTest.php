@@ -123,7 +123,6 @@ class ArrayInputStreamTest extends TestCase {
         $this->assertEquals('ontw', $stream->read(4));
         $this->assertEquals('  ', $stream->readLine());
     }
-}
     // ========== ENHANCED ARRAY INPUT STREAM TESTS ==========
 
     /**
@@ -201,3 +200,4 @@ class ArrayInputStreamTest extends TestCase {
         $this->assertEquals(10000, $lineCount);
         $this->assertLessThan(1.0, $arrayTime); // Should complete within 1 second
     }
+}
