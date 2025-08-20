@@ -106,7 +106,6 @@ class FileInputOutputStreamsTest extends TestCase {
         $stream->println('. You are cool.');
         $this->assertEquals("Im Cool. You are cool.\n", $stream2->readLine());
     }
-}
     // ========== ENHANCED FILE STREAM TESTS ==========
 
     /**
@@ -289,3 +288,4 @@ class FileInputOutputStreamsTest extends TestCase {
             }
         }
     }
+}
