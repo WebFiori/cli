@@ -32,7 +32,6 @@ class ArrayOutputStreamTest extends TestCase {
         $stream->reset();
         $this->assertEquals([], $stream->getOutputArray());
     }
-}
     // ========== ENHANCED ARRAY OUTPUT STREAM TESTS ==========
 
     /**
@@ -124,3 +123,4 @@ class ArrayOutputStreamTest extends TestCase {
         $this->assertCount(10000, $arrayOutputStream->getOutputArray());
         $this->assertLessThan(1.0, $outputTime); // Should complete within 1 second
     }
+}
