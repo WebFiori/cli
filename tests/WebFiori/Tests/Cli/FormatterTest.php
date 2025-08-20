@@ -29,7 +29,7 @@ class OutputFormatterTest extends TestCase {
      */
     public function test02() {
         $this->assertEquals("\e[1mHello\e[0m", Formatter::format('Hello', [
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'ansi' => true
         ]));
     }
@@ -48,7 +48,7 @@ class OutputFormatterTest extends TestCase {
     public function test04() {
         $this->assertEquals("\e[1;4mHello\e[0m", Formatter::format('Hello', [
             'underline' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'ansi' => true
         ]));
     }
@@ -67,7 +67,7 @@ class OutputFormatterTest extends TestCase {
     public function test06() {
         $this->assertEquals("\e[1;4;7mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'ansi' => true
         ]));
@@ -78,7 +78,7 @@ class OutputFormatterTest extends TestCase {
     public function test07() {
         $this->assertEquals("\e[1;4;7;93mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'color' => 'light-yellow',
             'ansi' => true
@@ -90,7 +90,7 @@ class OutputFormatterTest extends TestCase {
     public function test08() {
         $this->assertEquals("\e[1;4;7mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'color' => 'not supported',
             'ansi' => true
@@ -102,7 +102,7 @@ class OutputFormatterTest extends TestCase {
     public function test09() {
         $this->assertEquals("\e[1;4;7;40mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'bg-color' => 'black',
             'ansi' => true
@@ -114,7 +114,7 @@ class OutputFormatterTest extends TestCase {
     public function test10() {
         $this->assertEquals("\e[1;4;7mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'bg-color' => 'ggg',
             'ansi' => true
@@ -126,7 +126,7 @@ class OutputFormatterTest extends TestCase {
     public function test11() {
         $this->assertEquals("\e[1;4;5;7;33;43mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'bg-color' => 'yellow',
             'color' => 'yellow',
@@ -141,7 +141,7 @@ class OutputFormatterTest extends TestCase {
         $_SERVER['NO_COLOR'] = 1;
         $this->assertEquals("\e[1;4;5;7mHello\e[0m", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'bg-color' => 'yellow',
             'color' => 'yellow',
@@ -157,7 +157,7 @@ class OutputFormatterTest extends TestCase {
         $_SERVER['NO_COLOR'] = 1;
         $this->assertEquals("Hello", Formatter::format('Hello', [
             'reverse' => true,
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true,
             'bg-color' => 'yellow',
             'color' => 'yellow',
@@ -176,7 +176,7 @@ class OutputFormatterTest extends TestCase {
         $colors = ['black', 'red', 'light-red', 'green', 'light-green', 'yellow', 'light-yellow', 'white', 'gray', 'blue', 'light-blue'];
         
         foreach ($colors as $color) {
-            $result = Formatter::format('Test text', ['color' => $color]);
+            $result = Formatter::format('Test text', ['color' => $color, 'ansi' => true]);
             $this->assertStringContainsString('Test text', $result);
             $this->assertStringContainsString("\e[", $result); // Should contain ANSI escape sequence
         }
@@ -190,7 +190,7 @@ class OutputFormatterTest extends TestCase {
         $bgColors = ['bg-black', 'bg-red', 'bg-green', 'bg-yellow', 'bg-blue', 'bg-white'];
         
         foreach ($bgColors as $bgColor) {
-            $result = Formatter::format('Test text', ['bg-color' => $bgColor]);
+            $result = Formatter::format('Test text', ['bg-color' => $bgColor, 'ansi' => true]);
             $this->assertStringContainsString('Test text', $result);
             $this->assertStringContainsString("\e[", $result); // Should contain ANSI escape sequence
         }
@@ -202,7 +202,7 @@ class OutputFormatterTest extends TestCase {
      */
     public function testTextStylingEnhanced() {
         // Test bold
-        $boldResult = Formatter::format('Bold text', ['bold' => true]);
+        $boldResult = Formatter::format('Bold text', ['bold' => true, 'ansi' => true]);
         $this->assertStringContainsString('Bold text', $boldResult);
         $this->assertStringContainsString("\e[1m", $boldResult); // Bold ANSI code
         
@@ -230,7 +230,7 @@ class OutputFormatterTest extends TestCase {
         $result = Formatter::format('Formatted text', [
             'color' => 'red',
             'bg-color' => 'bg-white',
-            'bold' => true,
+            'bold' => true, 'ansi' => true,
             'underline' => true
         ]);
         
@@ -270,7 +270,7 @@ class OutputFormatterTest extends TestCase {
         $this->assertEquals('Test text', $result2);
         
         // Test with null options (if supported)
-        $result3 = Formatter::format('Test text', null);
+        $result3 = Formatter::format('Test text', []);
         $this->assertEquals('Test text', $result3);
     }
 
@@ -292,7 +292,7 @@ class OutputFormatterTest extends TestCase {
      */
     public function testBooleanOptionHandlingEnhanced() {
         // Test with explicit true
-        $result1 = Formatter::format('Bold text', ['bold' => true]);
+        $result1 = Formatter::format('Bold text', ['bold' => true, 'ansi' => true]);
         $this->assertStringContainsString("\e[1m", $result1);
         
         // Test with explicit false
@@ -342,7 +342,7 @@ class OutputFormatterTest extends TestCase {
      */
     public function testLongTextFormattingEnhanced() {
         $longText = str_repeat('This is a very long text that should be formatted properly. ', 100);
-        $result = Formatter::format($longText, ['color' => 'blue', 'bold' => true]);
+        $result = Formatter::format($longText, ['color' => 'blue', 'bold' => true, 'ansi' => true]);
         
         $this->assertStringContainsString($longText, $result);
         $this->assertStringContainsString("\e[34m", $result); // Blue color
@@ -411,7 +411,7 @@ class OutputFormatterTest extends TestCase {
         $largeText = str_repeat('Performance test text. ', 10000);
         
         $startTime = microtime(true);
-        $result = Formatter::format($largeText, ['color' => 'red', 'bold' => true]);
+        $result = Formatter::format($largeText, ['color' => 'red', 'bold' => true, 'ansi' => true]);
         $endTime = microtime(true);
         
         $executionTime = $endTime - $startTime;

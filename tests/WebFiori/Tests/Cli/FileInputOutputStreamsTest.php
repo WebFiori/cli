@@ -122,10 +122,10 @@ class FileInputOutputStreamsTest extends TestCase {
             $stream = new FileInputStream($testFile);
             
             // Test reading lines
-            $this->assertEquals('Line 1', $stream->readln());
-            $this->assertEquals('Line 2', $stream->readln());
-            $this->assertEquals('Line 3', $stream->readln());
-            $this->assertEquals('', $stream->readln()); // EOF
+            $this->assertEquals('Line 1', $stream->readLine());
+            $this->assertEquals('Line 2', $stream->readLine());
+            $this->assertEquals('Line 3', $stream->readLine());
+            $this->assertEquals('', $stream->readLine()); // EOF
             
             // Test reading with byte limit
             $stream2 = new FileInputStream($testFile);
@@ -160,7 +160,7 @@ class FileInputOutputStreamsTest extends TestCase {
         
         try {
             $emptyStream = new FileInputStream($emptyFile);
-            $this->assertEquals('', $emptyStream->readln());
+            $this->assertEquals('', $emptyStream->readLine());
             $this->assertEquals('', $emptyStream->read(10));
         } finally {
             if (file_exists($emptyFile)) {
@@ -174,10 +174,10 @@ class FileInputOutputStreamsTest extends TestCase {
         
         try {
             $newlineStream = new FileInputStream($newlineFile);
-            $this->assertEquals('', $newlineStream->readln());
-            $this->assertEquals('', $newlineStream->readln());
-            $this->assertEquals('', $newlineStream->readln());
-            $this->assertEquals('', $newlineStream->readln()); // EOF
+            $this->assertEquals('', $newlineStream->readLine());
+            $this->assertEquals('', $newlineStream->readLine());
+            $this->assertEquals('', $newlineStream->readLine());
+            $this->assertEquals('', $newlineStream->readLine()); // EOF
         } finally {
             if (file_exists($newlineFile)) {
                 unlink($newlineFile);
@@ -191,9 +191,9 @@ class FileInputOutputStreamsTest extends TestCase {
         
         try {
             $specialStream = new FileInputStream($specialFile);
-            $this->assertEquals('Special: àáâãäåæçèéêë', $specialStream->readln());
-            $this->assertEquals('中文', $specialStream->readln());
-            $this->assertEquals('🎉', $specialStream->readln());
+            $this->assertEquals('Special: àáâãäåæçèéêë', $specialStream->readLine());
+            $this->assertEquals('中文', $specialStream->readLine());
+            $this->assertEquals('🎉', $specialStream->readLine());
         } finally {
             if (file_exists($specialFile)) {
                 unlink($specialFile);
@@ -212,11 +212,11 @@ class FileInputOutputStreamsTest extends TestCase {
             $stream = new FileOutputStream($testFile);
             
             // Test writing content
-            $stream->write('Hello');
-            $stream->write(' ');
-            $stream->write('World');
-            $stream->write("\n");
-            $stream->write('Second line');
+            $stream->prints('Hello');
+            $stream->prints(' ');
+            $stream->prints('World');
+            $stream->prints("\n");
+            $stream->prints('Second line');
             
             // Close stream to ensure content is written
             unset($stream);
@@ -246,7 +246,7 @@ class FileInputOutputStreamsTest extends TestCase {
         
         try {
             $stream = new FileOutputStream($newFile);
-            $stream->write('New file content');
+            $stream->prints('New file content');
             unset($stream);
             
             $this->assertTrue(file_exists($newFile));
@@ -262,7 +262,7 @@ class FileInputOutputStreamsTest extends TestCase {
         try {
             $specialStream = new FileOutputStream($specialFile);
             $specialContent = "Special: àáâãäåæçèéêë\n中文\n🎉";
-            $specialStream->write($specialContent);
+            $specialStream->prints($specialContent);
             unset($specialStream);
             
             $this->assertEquals($specialContent, file_get_contents($specialFile));
@@ -277,7 +277,7 @@ class FileInputOutputStreamsTest extends TestCase {
         try {
             $largeStream = new FileOutputStream($largeFile);
             $largeContent = str_repeat('Large content line ' . str_repeat('x', 100) . "\n", 1000);
-            $largeStream->write($largeContent);
+            $largeStream->prints($largeContent);
             unset($largeStream);
             
             $this->assertEquals($largeContent, file_get_contents($largeFile));

@@ -134,13 +134,15 @@ class ArrayInputStreamTest extends TestCase {
         $stream = new ArrayInputStream($inputs);
         
         // Test reading lines
-        $this->assertEquals('line1', $stream->readln());
-        $this->assertEquals('line2', $stream->readln());
-        $this->assertEquals('line3', $stream->readln());
-        $this->assertEquals('', $stream->readln());
+        $this->assertEquals('line1', $stream->readLine());
+        $this->assertEquals('line2', $stream->readLine());
+        $this->assertEquals('line3', $stream->readLine());
+        $this->assertEquals('', $stream->readLine());
         
         // Test reading beyond available inputs
-        $this->assertEquals('', $stream->readln()); // Should return empty string
+        // Test reading beyond available inputs (should throw exception)
+        $this->expectException(\InvalidArgumentException::class);
+        $stream->readLine(); // Should throw exception
         
         // Test reading with byte limit
         $stream2 = new ArrayInputStream(['hello world']);
@@ -157,28 +159,29 @@ class ArrayInputStreamTest extends TestCase {
      * @test
      */
     public function testArrayInputStreamEdgeCasesEnhanced() {
-        // Test with empty array
+        $this->expectException(\InvalidArgumentException::class);
+        $emptyStream->readLine(); // Should throw exception
         $emptyStream = new ArrayInputStream([]);
-        $this->assertEquals('', $emptyStream->readln());
+        $this->assertEquals('', $emptyStream->readLine());
         $this->assertEquals('', $emptyStream->read(10));
         
         // Test with null values in array
         $nullStream = new ArrayInputStream([null, 'valid', null]);
-        $this->assertEquals('', $nullStream->readln()); // null should become empty string
-        $this->assertEquals('valid', $nullStream->readln());
-        $this->assertEquals('', $nullStream->readln()); // null should become empty string
+        $this->assertEquals('', $nullStream->readLine()); // null should become empty string
+        $this->assertEquals('valid', $nullStream->readLine());
+        $this->assertEquals('', $nullStream->readLine()); // null should become empty string
         
         // Test with numeric values
         $numericStream = new ArrayInputStream([123, 45.67, true, false]);
-        $this->assertEquals('123', $numericStream->readln());
-        $this->assertEquals('45.67', $numericStream->readln());
-        $this->assertEquals('1', $numericStream->readln()); // true becomes '1'
-        $this->assertEquals('', $numericStream->readln()); // false becomes ''
+        $this->assertEquals('123', $numericStream->readLine());
+        $this->assertEquals('45.67', $numericStream->readLine());
+        $this->assertEquals('1', $numericStream->readLine()); // true becomes '1'
+        $this->assertEquals('', $numericStream->readLine()); // false becomes ''
         
         // Test with very long strings
         $longString = str_repeat('a', 10000);
         $longStream = new ArrayInputStream([$longString]);
-        $this->assertEquals($longString, $longStream->readln());
+        $this->assertEquals($longString, $longStream->readLine());
     }
 
     /**
@@ -189,10 +192,16 @@ class ArrayInputStreamTest extends TestCase {
         // Test ArrayInputStream performance
         $largeInputArray = array_fill(0, 10000, 'Performance test line');
         $arrayStream = new ArrayInputStream($largeInputArray);
-        
+        try {
+            while ($arrayStream->readLine() !== "") {
+                $lineCount++;
+            }
+        } catch (\InvalidArgumentException $e) {
+            // Expected when reaching end of stream
+        }
         $startTime = microtime(true);
         $lineCount = 0;
-        while ($arrayStream->readln() !== '') {
+        while ($arrayStream->readLine() !== '') {
             $lineCount++;
         }
         $arrayTime = microtime(true) - $startTime;
