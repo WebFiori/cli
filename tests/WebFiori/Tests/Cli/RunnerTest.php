@@ -583,3 +583,374 @@ class RunnerTest extends CommandTestCase {
         ], $runner->getOutput());
     }
 }
+    // ========== ENHANCED RUNNER TESTS ==========
+
+    /**
+     * Test Runner initialization and basic properties
+     * @test
+     */
+    public function testRunnerInitializationEnhanced() {
+        $runner = new Runner();
+        
+        // Test initial state
+        $this->assertNull($runner->getActiveCommand());
+        $this->assertNotNull($runner->getInputStream());
+        $this->assertNotNull($runner->getOutputStream());
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+        $this->assertFalse($runner->isInteractive());
+    }
+
+    /**
+     * Test command registration with aliases
+     * @test
+     */
+    public function testCommandRegistrationWithAliasesEnhanced() {
+        $runner = new Runner();
+        $command = new TestCommand('test-cmd', [], 'Test command');
+        
+        // Register command with aliases
+        $result = $runner->register($command, ['tc', 'test']);
+        $this->assertSame($runner, $result); // Should return self for chaining
+        
+        // Test command is registered
+        $this->assertSame($command, $runner->getCommandByName('test-cmd'));
+        
+        // Test aliases are registered
+        $this->assertTrue($runner->hasAlias('tc'));
+        $this->assertTrue($runner->hasAlias('test'));
+        $this->assertEquals('test-cmd', $runner->resolveAlias('tc'));
+        $this->assertEquals('test-cmd', $runner->resolveAlias('test'));
+        
+        // Test getting all aliases
+        $aliases = $runner->getAliases();
+        $this->assertArrayHasKey('tc', $aliases);
+        $this->assertArrayHasKey('test', $aliases);
+        $this->assertEquals('test-cmd', $aliases['tc']);
+        $this->assertEquals('test-cmd', $aliases['test']);
+    }
+
+    /**
+     * Test duplicate command registration
+     * @test
+     */
+    public function testDuplicateCommandRegistrationEnhanced() {
+        $runner = new Runner();
+        $command1 = new TestCommand('test-cmd', [], 'First command');
+        $command2 = new TestCommand('test-cmd', [], 'Second command');
+        
+        // Register first command
+        $runner->register($command1);
+        $this->assertSame($command1, $runner->getCommandByName('test-cmd'));
+        
+        // Register second command with same name (should replace)
+        $runner->register($command2);
+        $this->assertSame($command2, $runner->getCommandByName('test-cmd'));
+    }
+
+    /**
+     * Test global arguments
+     * @test
+     */
+    public function testGlobalArgumentsEnhanced() {
+        $runner = new Runner();
+        
+        // Add global arguments
+        $this->assertTrue($runner->addArg('--global-arg', [
+            'optional' => true,
+            'description' => 'Global argument'
+        ]));
+        
+        // Test duplicate global argument
+        $this->assertFalse($runner->addArg('--global-arg', [])); // Should fail
+        
+        // Test argument exists
+        $this->assertTrue($runner->hasArg('--global-arg'));
+        $this->assertFalse($runner->hasArg('--non-existent'));
+        
+        // Test removing argument
+        $this->assertTrue($runner->removeArgument('--global-arg'));
+        $this->assertFalse($runner->hasArg('--global-arg'));
+        
+        // Test removing non-existent argument
+        $this->assertFalse($runner->removeArgument('--non-existent'));
+    }
+
+    /**
+     * Test arguments vector handling
+     * @test
+     */
+    public function testArgumentsVectorEnhanced() {
+        $runner = new Runner();
+        
+        $argsVector = ['script.php', 'command', '--arg1=value1', '--arg2', 'value2'];
+        $runner->setArgsVector($argsVector);
+        
+        $this->assertEquals($argsVector, $runner->getArgsVector());
+    }
+
+    /**
+     * Test stream handling
+     * @test
+     */
+    public function testStreamHandlingEnhanced() {
+        $runner = new Runner();
+        
+        // Test setting custom streams
+        $customInput = new ArrayInputStream(['test input']);
+        $customOutput = new ArrayOutputStream();
+        
+        $result1 = $runner->setInputStream($customInput);
+        $this->assertSame($runner, $result1); // Should return self
+        $this->assertSame($customInput, $runner->getInputStream());
+        
+        $result2 = $runner->setOutputStream($customOutput);
+        $this->assertSame($runner, $result2); // Should return self
+        $this->assertSame($customOutput, $runner->getOutputStream());
+    }
+
+    /**
+     * Test inputs array handling
+     * @test
+     */
+    public function testInputsArrayHandlingEnhanced() {
+        $runner = new Runner();
+        
+        $inputs = ['input1', 'input2', 'input3'];
+        $result = $runner->setInputs($inputs);
+        $this->assertSame($runner, $result); // Should return self
+        
+        // The inputs should be set as ArrayInputStream
+        $inputStream = $runner->getInputStream();
+        $this->assertInstanceOf(ArrayInputStream::class, $inputStream);
+    }
+
+    /**
+     * Test command execution
+     * @test
+     */
+    public function testCommandExecutionEnhanced() {
+        $runner = new Runner();
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        
+        $runner->register($command);
+        $runner->setOutputStream($output);
+        
+        // Test running command
+        $exitCode = $runner->runCommand($command);
+        $this->assertEquals(0, $exitCode); // TestCommand should return 0
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+        
+        // Test running with arguments
+        $exitCode2 = $runner->runCommand($command, ['--test-arg' => 'value']);
+        $this->assertEquals(0, $exitCode2);
+        
+        // Test running with ANSI
+        $exitCode3 = $runner->runCommand($command, [], true);
+        $this->assertEquals(0, $exitCode3);
+    }
+
+    /**
+     * Test sub-command execution
+     * @test
+     */
+    public function testSubCommandExecutionEnhanced() {
+        $runner = new Runner();
+        $mainCommand = new TestCommand('main-cmd');
+        $subCommand = new TestCommand('sub-cmd');
+        
+        $runner->register($mainCommand);
+        $runner->register($subCommand);
+        
+        // Test running sub-command
+        $exitCode = $runner->runCommandAsSub('sub-cmd');
+        $this->assertEquals(0, $exitCode);
+        
+        // Test running non-existent sub-command
+        $exitCode2 = $runner->runCommandAsSub('non-existent');
+        $this->assertEquals(-1, $exitCode2);
+    }
+
+    /**
+     * Test active command management
+     * @test
+     */
+    public function testActiveCommandManagementEnhanced() {
+        $runner = new Runner();
+        $command = new TestCommand('test-cmd');
+        
+        // Initially no active command
+        $this->assertNull($runner->getActiveCommand());
+        
+        // Set active command
+        $result = $runner->setActiveCommand($command);
+        $this->assertSame($runner, $result); // Should return self
+        $this->assertSame($command, $runner->getActiveCommand());
+        
+        // Clear active command
+        $runner->setActiveCommand(null);
+        $this->assertNull($runner->getActiveCommand());
+    }
+
+    /**
+     * Test callback functionality
+     * @test
+     */
+    public function testCallbacksEnhanced() {
+        $runner = new Runner();
+        $callbackExecuted = false;
+        
+        // Test before start callback
+        $beforeCallback = function() use (&$callbackExecuted) {
+            $callbackExecuted = true;
+        };
+        
+        $result = $runner->setBeforeStart($beforeCallback);
+        $this->assertSame($runner, $result); // Should return self
+        
+        // Test after execution callback
+        $afterCallback = function($exitCode, $command) {
+            // Callback should receive exit code and command
+            $this->assertIsInt($exitCode);
+        };
+        
+        $result2 = $runner->setAfterExecution($afterCallback, ['param1', 'param2']);
+        $this->assertSame($runner, $result2); // Should return self
+    }
+
+    /**
+     * Test output collection
+     * @test
+     */
+    public function testOutputCollectionEnhanced() {
+        $runner = new Runner();
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        
+        $runner->register($command);
+        $runner->setOutputStream($output);
+        
+        // Run command to generate output
+        $runner->runCommand($command);
+        
+        // Test getting output
+        $outputArray = $runner->getOutput();
+        $this->assertIsArray($outputArray);
+        $this->assertNotEmpty($outputArray);
+    }
+
+    /**
+     * Test alias resolution edge cases
+     * @test
+     */
+    public function testAliasResolutionEdgeCasesEnhanced() {
+        $runner = new Runner();
+        
+        // Test resolving non-existent alias
+        $this->assertNull($runner->resolveAlias('non-existent'));
+        
+        // Test resolving actual command name (not alias)
+        $command = new TestCommand('test-cmd');
+        $runner->register($command);
+        $this->assertNull($runner->resolveAlias('test-cmd')); // Should return null for actual command names
+    }
+
+    /**
+     * Test command retrieval edge cases
+     * @test
+     */
+    public function testCommandRetrievalEdgeCasesEnhanced() {
+        $runner = new Runner();
+        
+        // Test getting non-existent command
+        $this->assertNull($runner->getCommandByName('non-existent'));
+        
+        // Test getting command by alias
+        $command = new TestCommand('test-cmd');
+        $runner->register($command, ['tc']);
+        
+        // Should not find command by alias using getCommandByName
+        $this->assertNull($runner->getCommandByName('tc'));
+        $this->assertSame($command, $runner->getCommandByName('test-cmd'));
+    }
+
+    /**
+     * Test argument object handling
+     * @test
+     */
+    public function testArgumentObjectHandlingEnhanced() {
+        $runner = new Runner();
+        
+        // Test adding Argument object
+        $arg = new Argument('--test-arg');
+        $arg->setDescription('Test argument');
+        
+        $result = $runner->addArgument($arg);
+        $this->assertTrue($result);
+        $this->assertTrue($runner->hasArg('--test-arg'));
+        
+        // Test adding duplicate Argument object
+        $arg2 = new Argument('--test-arg');
+        $result2 = $runner->addArgument($arg2);
+        $this->assertFalse($result2); // Should fail for duplicate
+    }
+
+    /**
+     * Test interactive mode detection
+     * @test
+     */
+    public function testInteractiveModeDetectionEnhanced() {
+        $runner = new Runner();
+        
+        // Initially not interactive
+        $this->assertFalse($runner->isInteractive());
+        
+        // Set args vector with -i flag
+        $runner->setArgsVector(['script.php', '-i']);
+        // Note: The actual interactive detection might depend on the start() method implementation
+    }
+
+    /**
+     * Test command discovery methods (if available)
+     * @test
+     */
+    public function testCommandDiscoveryMethodsEnhanced() {
+        $runner = new Runner();
+        
+        // Test auto-discovery state
+        $this->assertFalse($runner->isAutoDiscoveryEnabled()); // Default should be false
+        
+        // Test enabling auto-discovery
+        $result = $runner->enableAutoDiscovery();
+        $this->assertSame($runner, $result);
+        $this->assertTrue($runner->isAutoDiscoveryEnabled());
+        
+        // Test disabling auto-discovery
+        $result2 = $runner->disableAutoDiscovery();
+        $this->assertSame($runner, $result2);
+        $this->assertFalse($runner->isAutoDiscoveryEnabled());
+        
+        // Test exclude patterns
+        $result5 = $runner->excludePattern('*Test*');
+        $this->assertSame($runner, $result5);
+        
+        $result6 = $runner->excludePatterns(['*Test*', '*Mock*']);
+        $this->assertSame($runner, $result6);
+        
+        // Test discovery cache
+        $result7 = $runner->enableDiscoveryCache('test-cache.json');
+        $this->assertSame($runner, $result7);
+        
+        $result8 = $runner->disableDiscoveryCache();
+        $this->assertSame($runner, $result8);
+        
+        $result9 = $runner->clearDiscoveryCache();
+        $this->assertSame($runner, $result9);
+        
+        // Test strict mode
+        $result10 = $runner->setDiscoveryStrictMode(true);
+        $this->assertSame($runner, $result10);
+        
+        $result11 = $runner->setDiscoveryStrictMode(false);
+        $this->assertSame($runner, $result11);
+    }

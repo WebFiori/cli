@@ -107,3 +107,185 @@ class FileInputOutputStreamsTest extends TestCase {
         $this->assertEquals("Im Cool. You are cool.\n", $stream2->readLine());
     }
 }
+    // ========== ENHANCED FILE STREAM TESTS ==========
+
+    /**
+     * Test FileInputStream functionality
+     * @test
+     */
+    public function testFileInputStreamFunctionalityEnhanced() {
+        // Create test file
+        $testFile = sys_get_temp_dir() . '/webfiori_test_input.txt';
+        $testContent = "Line 1\nLine 2\nLine 3\n";
+        file_put_contents($testFile, $testContent);
+        
+        try {
+            $stream = new FileInputStream($testFile);
+            
+            // Test reading lines
+            $this->assertEquals('Line 1', $stream->readln());
+            $this->assertEquals('Line 2', $stream->readln());
+            $this->assertEquals('Line 3', $stream->readln());
+            $this->assertEquals('', $stream->readln()); // EOF
+            
+            // Test reading with byte limit
+            $stream2 = new FileInputStream($testFile);
+            $this->assertEquals('Line ', $stream2->read(5));
+            $this->assertEquals('1', $stream2->read(1));
+            
+            // Test reading entire file
+            $stream3 = new FileInputStream($testFile);
+            $entireContent = '';
+            while (($chunk = $stream3->read(1024)) !== '') {
+                $entireContent .= $chunk;
+            }
+            $this->assertEquals($testContent, $entireContent);
+        } finally {
+            // Cleanup
+            if (file_exists($testFile)) {
+                unlink($testFile);
+            }
+        }
+    }
+
+    /**
+     * Test FileInputStream edge cases
+     * @test
+     */
+    public function testFileInputStreamEdgeCasesEnhanced() {
+        $tempDir = sys_get_temp_dir();
+        
+        // Test with empty file
+        $emptyFile = $tempDir . '/webfiori_empty.txt';
+        file_put_contents($emptyFile, '');
+        
+        try {
+            $emptyStream = new FileInputStream($emptyFile);
+            $this->assertEquals('', $emptyStream->readln());
+            $this->assertEquals('', $emptyStream->read(10));
+        } finally {
+            if (file_exists($emptyFile)) {
+                unlink($emptyFile);
+            }
+        }
+        
+        // Test with file containing only newlines
+        $newlineFile = $tempDir . '/webfiori_newlines.txt';
+        file_put_contents($newlineFile, "\n\n\n");
+        
+        try {
+            $newlineStream = new FileInputStream($newlineFile);
+            $this->assertEquals('', $newlineStream->readln());
+            $this->assertEquals('', $newlineStream->readln());
+            $this->assertEquals('', $newlineStream->readln());
+            $this->assertEquals('', $newlineStream->readln()); // EOF
+        } finally {
+            if (file_exists($newlineFile)) {
+                unlink($newlineFile);
+            }
+        }
+        
+        // Test with file containing special characters
+        $specialFile = $tempDir . '/webfiori_special.txt';
+        $specialContent = "Special: àáâãäåæçèéêë\n中文\n🎉\n";
+        file_put_contents($specialFile, $specialContent);
+        
+        try {
+            $specialStream = new FileInputStream($specialFile);
+            $this->assertEquals('Special: àáâãäåæçèéêë', $specialStream->readln());
+            $this->assertEquals('中文', $specialStream->readln());
+            $this->assertEquals('🎉', $specialStream->readln());
+        } finally {
+            if (file_exists($specialFile)) {
+                unlink($specialFile);
+            }
+        }
+    }
+
+    /**
+     * Test FileOutputStream functionality
+     * @test
+     */
+    public function testFileOutputStreamFunctionalityEnhanced() {
+        $testFile = sys_get_temp_dir() . '/webfiori_test_output.txt';
+        
+        try {
+            $stream = new FileOutputStream($testFile);
+            
+            // Test writing content
+            $stream->write('Hello');
+            $stream->write(' ');
+            $stream->write('World');
+            $stream->write("\n");
+            $stream->write('Second line');
+            
+            // Close stream to ensure content is written
+            unset($stream);
+            
+            // Verify file content
+            $this->assertTrue(file_exists($testFile));
+            $content = file_get_contents($testFile);
+            $this->assertEquals("Hello World\nSecond line", $content);
+        } finally {
+            // Cleanup
+            if (file_exists($testFile)) {
+                unlink($testFile);
+            }
+        }
+    }
+
+    /**
+     * Test FileOutputStream edge cases
+     * @test
+     */
+    public function testFileOutputStreamEdgeCasesEnhanced() {
+        $tempDir = sys_get_temp_dir();
+        
+        // Test writing to new file
+        $newFile = $tempDir . '/webfiori_new_output.txt';
+        $this->assertFalse(file_exists($newFile));
+        
+        try {
+            $stream = new FileOutputStream($newFile);
+            $stream->write('New file content');
+            unset($stream);
+            
+            $this->assertTrue(file_exists($newFile));
+            $this->assertEquals('New file content', file_get_contents($newFile));
+        } finally {
+            if (file_exists($newFile)) {
+                unlink($newFile);
+            }
+        }
+        
+        // Test writing special characters
+        $specialFile = $tempDir . '/webfiori_special_output.txt';
+        try {
+            $specialStream = new FileOutputStream($specialFile);
+            $specialContent = "Special: àáâãäåæçèéêë\n中文\n🎉";
+            $specialStream->write($specialContent);
+            unset($specialStream);
+            
+            $this->assertEquals($specialContent, file_get_contents($specialFile));
+        } finally {
+            if (file_exists($specialFile)) {
+                unlink($specialFile);
+            }
+        }
+        
+        // Test writing large content
+        $largeFile = $tempDir . '/webfiori_large_output.txt';
+        try {
+            $largeStream = new FileOutputStream($largeFile);
+            $largeContent = str_repeat('Large content line ' . str_repeat('x', 100) . "\n", 1000);
+            $largeStream->write($largeContent);
+            unset($largeStream);
+            
+            $this->assertEquals($largeContent, file_get_contents($largeFile));
+            $this->assertGreaterThan(100000, filesize($largeFile)); // Should be large file
+        } finally {
+            if (file_exists($largeFile)) {
+                unlink($largeFile);
+            }
+        }
+    }
