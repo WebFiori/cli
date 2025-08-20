@@ -167,9 +167,6 @@ class OutputFormatterTest extends TestCase {
         $_SERVER['NO_COLOR'] = null;
     }
     
-}
-    // ========== ENHANCED FORMATTER TESTS ==========
-
     /**
      * Test basic color formatting
      * @test
@@ -443,3 +440,4 @@ class OutputFormatterTest extends TestCase {
         $result4 = Formatter::format(false, ['color' => 'yellow']);
         $this->assertIsString($result4);
     }
+}

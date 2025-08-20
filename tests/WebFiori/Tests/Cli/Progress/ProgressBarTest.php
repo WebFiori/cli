@@ -313,9 +313,6 @@ class ProgressBarTest extends TestCase {
         $firstOutput = $output[0];
         $this->assertStringContainsString('Loading...', $firstOutput);
     }
-}
-    // ========== ENHANCED PROGRESS BAR TESTS ==========
-
     /**
      * Test ProgressBar initialization with different parameters
      * @test
@@ -707,3 +704,4 @@ class ProgressBarTest extends TestCase {
         $this->assertStringContainsString('25%', $outputString);
         $this->assertStringContainsString('25/100', $outputString);
     }
+}

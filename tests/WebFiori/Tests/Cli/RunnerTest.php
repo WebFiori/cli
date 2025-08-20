@@ -582,9 +582,6 @@ class RunnerTest extends CommandTestCase {
 
         ], $runner->getOutput());
     }
-}
-    // ========== ENHANCED RUNNER TESTS ==========
-
     /**
      * Test Runner initialization and basic properties
      * @test
@@ -954,3 +951,4 @@ class RunnerTest extends CommandTestCase {
         $result11 = $runner->setDiscoveryStrictMode(false);
         $this->assertSame($runner, $result11);
     }
+}
