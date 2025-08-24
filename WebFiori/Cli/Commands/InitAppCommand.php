@@ -1,16 +1,15 @@
 <?php
-
 namespace WebFiori\Cli\Commands;
 
 use WebFiori\Cli\Argument;
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\File\File;
 /**
  * A class which is used to initialize a new CLI application.
  *
  * @author Ibrahim
  */
-class InitAppCommand extends CLICommand {
+class InitAppCommand extends Command {
     public function __construct() {
         parent::__construct('init', [
             new Argument('--dir', 'The name of application root directory.'),
@@ -24,7 +23,6 @@ class InitAppCommand extends CLICommand {
         if ($entry === null) {
             $entry = $dirName;
         }
-
 
         if (defined('ROOT_DIR')) {
             $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$dirName;
@@ -55,9 +53,8 @@ class InitAppCommand extends CLICommand {
             $file->append("namespace $dirName;\n\n");
             $file->append("//Entry point of your application.\n\n");
             $file->append("require '../vendor/autoload.php';\n\n");
-            $file->append("use webfiori\cli\Runner;\n");
-            $file->append("use webfiori\cli\commands\HelpCommand;\n\n");
-
+            $file->append("use WebFiori\\Cli\\Runner;\n");
+            $file->append("use WebFiori\\Cli\\Commands\\HelpCommand;\n\n");
 
             $file->append("\$runner = new Runner();\n");
             $file->append("//TODO: Register Commands.\n");

@@ -1,7 +1,7 @@
 <?php
 namespace WebFiori\Cli;
 
-use webfiori\cli\streams\InputStream;
+use WebFiori\Cli\Streams\InputStream;
 /**
  * A utility class which can be used to map control characters to string values.
  *
@@ -14,7 +14,6 @@ class KeysMap {
      * 
      * @var array
      * 
-     * @since 1.0
      */
     const KEY_MAP = [
         "\033[A" => 'UP',
@@ -71,7 +70,6 @@ class KeysMap {
      * @return string The method will return the string which was given as input 
      * in the stream.
      * 
-     * @since 1.0
      */
     public static function read(InputStream $stream, $bytes = 1) : string {
         $input = '';
@@ -85,7 +83,6 @@ class KeysMap {
 
         return $input;
     }
-
 
     /**
      * Reads one character from specific input stream and check if the character
@@ -114,7 +111,6 @@ class KeysMap {
      * the stream. Note that end of line character will be included in the
      * final input.
      * 
-     * @since 1.0
      */
     public static function readLine(InputStream $stream) : string {
         $input = '';

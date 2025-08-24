@@ -100,7 +100,6 @@ class Argument {
             $arg->addAllowedValue($val);
         }
 
-
         if (isset($options[Option::DEFAULT]) && gettype($options[Option::DEFAULT]) == 'string') {
             $arg->setDefault($options[Option::DEFAULT]);
         }

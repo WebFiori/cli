@@ -10,7 +10,6 @@ namespace WebFiori\Cli;
 class Formatter {
     /**
      * An associative array that contains color codes and names.
-     * @since 1.0
      */
     const COLORS = [
         'black' => 30,
@@ -73,7 +72,6 @@ class Formatter {
      * </ul>
      * @return string The string after applying the formatting to it.
      * 
-     * @since 1.0
      */
     public static function format(string $string, array $formatOptions = []) : string {
         $validatedOptions = self::validateOutputOptions($formatOptions);

@@ -1,10 +1,10 @@
 <?php
 namespace WebFiori\Tests\Cli\TestCommands;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 
 
-class Command03 extends CLICommand {
+class Command03 extends Command {
     public function __construct() {
         parent::__construct('run-another');
     }

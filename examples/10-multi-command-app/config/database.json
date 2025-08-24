@@ -1,0 +1,12 @@
+{
+    "database": {
+        "type": "json",
+        "path": "./data",
+        "backup_enabled": true,
+        "auto_migrate": true,
+        "validation": {
+            "strict_mode": true,
+            "required_fields": ["id", "created_at", "updated_at"]
+        }
+    }
+}
