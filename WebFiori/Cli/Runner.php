@@ -2,6 +2,7 @@
 namespace WebFiori\Cli;
 
 use Throwable;
+use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\Discovery\AutoDiscoverable;
 use WebFiori\Cli\Discovery\CommandCache;
 use WebFiori\Cli\Discovery\CommandDiscovery;
@@ -131,6 +132,8 @@ class Runner {
             }
             $r->checkIsInteractive();
         });
+        $this->register(new HelpCommand(), ['-h']);
+        $this->setDefaultCommand('help');
     }
 
     /**
@@ -589,6 +592,19 @@ class Runner {
      * 
      */
     public function register(Command $cliCommand, array $aliases = []): Runner {
+        if ($cliCommand->getName() != 'help') {
+            $helpCommand = $this->getCommandByName('help');
+            $cliCommand->addArg($helpCommand->getName(), [
+                Option::OPTIONAL => true,
+                Option::DESCRIPTION => 'Display command help.'
+            ]);
+            
+            foreach ($helpCommand->getAliases() as $alias) {
+                $cliCommand->addArg($alias, [
+                    Option::OPTIONAL => true
+                ]);
+            }
+        }
         $this->commands[$cliCommand->getName()] = $cliCommand;
 
         // Register aliases
@@ -1028,8 +1044,11 @@ class Runner {
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
 
         if (in_array('--ansi', $argsArr)) {
-            return array_diff($argsArr, ['--ansi']);
+            $argsArr = array_diff($argsArr, ['--ansi']);
         }
+
+        // Preprocess help patterns
+        $argsArr = $this->preprocessHelpPattern($argsArr);
 
         return $argsArr;
     }
@@ -1092,6 +1111,9 @@ class Runner {
             $argsArr = $tempArgs;
         }
 
+
+        // Preprocess help patterns for non-interactive mode
+        $argsArr = $this->preprocessHelpPattern($argsArr);
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
 
@@ -1112,5 +1134,35 @@ class Runner {
             }
         }
         $this->argsV = $argV;
+    }
+    /**
+     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
+     * 
+     * @param array $args The arguments array to preprocess
+     * @return array The preprocessed arguments array
+     */
+    private function preprocessHelpPattern(array $args): array {
+        error_log("DEBUG: preprocessHelpPattern called with: " . json_encode($args));
+        
+        if (count($args) >= 2) {
+            $lastArg = end($args);
+            
+            // Check if the last argument is 'help' or '-h'
+            if ($lastArg === 'help' || $lastArg === '-h') {
+                $commandName = $args[0];
+                
+                // Check if the first argument is a valid command name
+                if ($this->getCommandByName($commandName) !== null) {
+                    error_log("DEBUG: Found valid command '$commandName' with help pattern");
+                    // Remove 'help' or '-h' from the end
+                    array_pop($args);
+                    // Add it as a proper argument flag
+                    $args[] = $lastArg;
+                    error_log("DEBUG: Preprocessed result: " . json_encode($args));
+                }
+            }
+        }
+        
+        return $args;
     }
 }

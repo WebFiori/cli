@@ -951,4 +951,133 @@ class RunnerTest extends CommandTestCase {
         $result11 = $runner->setDiscoveryStrictMode(false);
         $this->assertSame($runner, $result11);
     }
+    /**
+     * Test command help pattern in interactive mode.
+     * @test
+     */
+    public function testCommandHelpInteractive() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
+        $runner->setInputs([
+            'super-hero help',
+            'exit'
+        ]);
+        $runner->start();
+        
+        $output = $runner->getOutput();
+        
+        // Should show help for super-hero command
+        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains("    Supported Arguments:\n", $output);
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+    }
+
+    /**
+     * Test command -h pattern in interactive mode.
+     * @test
+     */
+    public function testCommandDashHInteractive() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
+        $runner->setInputs([
+            'super-hero -h',
+            'exit'
+        ]);
+        $runner->start();
+        
+        $output = $runner->getOutput();
+        
+        // Should show help for super-hero command
+        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains("    Supported Arguments:\n", $output);
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+    }
+
+    /**
+     * Test command help pattern in non-interactive mode.
+     * @test
+     */
+    public function testCommandHelpNonInteractive() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->setInputs([]);
+
+        $runner->setArgsVector([
+            'entry.php',
+            'super-hero',
+            'help'
+        ]);
+        $runner->start();
+        
+        $output = $runner->getOutput();
+        
+        // Should show help for super-hero command
+        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains("    Supported Arguments:\n", $output);
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+    }
+
+    /**
+     * Test command -h pattern in non-interactive mode.
+     * @test
+     */
+    public function testCommandDashHNonInteractive() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+        $runner->setInputs([]);
+
+        $runner->setArgsVector([
+            'entry.php',
+            'super-hero',
+            '-h'
+        ]);
+        $runner->start();
+        
+        $output = $runner->getOutput();
+        
+        // Should show help for super-hero command
+        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains("    Supported Arguments:\n", $output);
+        $this->assertEquals(0, $runner->getLastCommandExitStatus());
+    }
+
+    /**
+     * Test that invalid command with help doesn't trigger help.
+     * @test
+     */
+    public function testInvalidCommandHelp() {
+        $runner = new Runner();
+        $runner->register(new Command00());
+        $runner->register(new HelpCommand());
+
+        $runner->setArgsVector([
+            'entry.php',
+            '-i',
+        ]);
+        $runner->setInputs([
+            'invalid-command help',
+            'exit'
+        ]);
+        $runner->start();
+        
+        $output = $runner->getOutput();
+        
+        // Should show error for invalid command, not help
+        $this->assertContains("The command 'invalid-command' is not supported.\n", $output);
+        $this->assertEquals(-1, $runner->getLastCommandExitStatus());
+    }
 }

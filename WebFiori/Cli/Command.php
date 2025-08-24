@@ -349,8 +349,20 @@ abstract class Command {
             }
         }
 
-        if ($this->parseArgsHelper() && $this->checkIsArgsSetHelper()) {
-            $retVal = $this->exec();
+        if ($this->parseArgsHelper()) {
+            // Check for help first, before validating required arguments
+            if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
+                $help = $runner->getCommandByName('help');
+                $help->setArgValue('--command-name', $this->getName());
+                $help->setOwner($runner);
+                $help->setOutputStream($runner->getOutputStream());
+                $this->removeArgument('help');
+                
+                return $help->exec();
+            } else if ($this->checkIsArgsSetHelper()) {
+                $retVal = $this->exec();
+            }
+            
         }
 
         if ($runner !== null) {
@@ -469,7 +481,8 @@ abstract class Command {
         if ($arg !== null) {
             $runner = $this->getOwner();
 
-            if ($arg->getValue() !== null && !($runner !== null && $runner->isInteractive())) {
+            // Always return the set value if it exists, regardless of interactive mode
+            if ($arg->getValue() !== null) {
                 return $arg->getValue();
             }
 
