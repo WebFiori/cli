@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Discovery;
+namespace WebFiori\CLI\Discovery;
 
 /**
  * Interface for commands that can control their auto-discovery behavior.

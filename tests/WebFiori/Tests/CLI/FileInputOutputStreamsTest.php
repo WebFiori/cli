@@ -2,9 +2,9 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Exceptions\IOException;
-use WebFiori\Cli\Streams\FileInputStream;
-use WebFiori\Cli\Streams\FileOutputStream;
+use WebFiori\CLI\Exceptions\IOException;
+use WebFiori\CLI\Streams\FileInputStream;
+use WebFiori\CLI\Streams\FileOutputStream;
 use const DS;
 use const ROOT_DIR;
 
@@ -304,7 +304,7 @@ class FileInputOutputStreamsTest extends TestCase {
             $emptyStream = new FileInputStream($emptyFile);
             
             // Reading from empty file should throw IOException
-            $this->expectException(\WebFiori\Cli\Exceptions\IOException::class);
+            $this->expectException(\WebFiori\CLI\Exceptions\IOException::class);
             $emptyStream->read(1);
         } finally {
             if (file_exists($emptyFile)) {

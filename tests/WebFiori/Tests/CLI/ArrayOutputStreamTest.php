@@ -2,7 +2,7 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\CLI\Streams\ArrayOutputStream;
 /**
  * Description of ArrayInputStreamTest
  *

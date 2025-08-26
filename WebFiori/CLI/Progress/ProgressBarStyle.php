@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Progress;
+namespace WebFiori\CLI\Progress;
 
 /**
  * Defines visual styles for progress bars.

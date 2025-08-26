@@ -1,7 +1,7 @@
 <?php
 
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Option;
 
 /**
  * User profile command that demonstrates comprehensive argument validation.

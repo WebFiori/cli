@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli;
+namespace WebFiori\CLI;
 
 use ReflectionClass;
 use Throwable;

@@ -2,9 +2,9 @@
 
 namespace WebFiori\Tests\Cli;
 
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Streams\ArrayOutputStream;
-use WebFiori\Cli\Streams\StdIn;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Streams\ArrayOutputStream;
+use WebFiori\CLI\Streams\StdIn;
 
 class TestCommand extends Command {
     public function __construct($commandName, $args = array(), $description = '') {

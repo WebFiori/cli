@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\Tests\Cli\Discovery;
+namespace WebFiori\Tests\CLI\Discovery;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Exceptions\CommandDiscoveryException;
+use WebFiori\CLI\Exceptions\CommandDiscoveryException;
 
 /**
  * Test cases for CommandDiscoveryException class.

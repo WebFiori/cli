@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Progress;
+namespace WebFiori\CLI\Progress;
 
 /**
  * Handles format string parsing and rendering for progress bars.

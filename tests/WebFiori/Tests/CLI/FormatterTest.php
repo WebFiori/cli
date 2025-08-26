@@ -2,7 +2,7 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Formatter;
+use WebFiori\CLI\Formatter;
 /**
  * Description of OutputFormatterTest
  *

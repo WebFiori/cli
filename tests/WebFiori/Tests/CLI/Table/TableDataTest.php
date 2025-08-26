@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\WebFiori\Cli\Table;
+namespace tests\WebFiori\CLI\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Table\TableData;
+use WebFiori\CLI\Table\TableData;
 
 /**
  * Unit tests for TableData class.

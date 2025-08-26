@@ -1,9 +1,9 @@
 <?php
-namespace WebFiori\Cli\Discovery;
+namespace WebFiori\CLI\Discovery;
 
 use ReflectionClass;
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Exceptions\CommandDiscoveryException;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Exceptions\CommandDiscoveryException;
 
 /**
  * Utility class for extracting command metadata.

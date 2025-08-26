@@ -1,7 +1,7 @@
 <?php
-namespace WebFiori\Tests\Cli\TestCommands;
+namespace WebFiori\Tests\CLI\TestCommands;
 
-use WebFiori\Cli\Command;
+use WebFiori\CLI\Command;
 use Exception;
 
 

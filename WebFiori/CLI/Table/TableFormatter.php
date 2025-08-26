@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Table;
+namespace WebFiori\CLI\Table;
 
 /**
  * TableFormatter - Content-specific formatting logic for table cells.

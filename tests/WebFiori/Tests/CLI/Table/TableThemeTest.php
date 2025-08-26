@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\WebFiori\Cli\Table;
+namespace tests\WebFiori\CLI\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Table\TableTheme;
+use WebFiori\CLI\Table\TableTheme;
 
 /**
  * Unit tests for TableTheme class.

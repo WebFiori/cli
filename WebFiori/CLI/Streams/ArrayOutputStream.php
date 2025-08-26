@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Streams;
+namespace WebFiori\CLI\Streams;
 
 /**
  * A stream that uses array as its source of output.

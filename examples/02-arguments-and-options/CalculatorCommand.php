@@ -1,7 +1,7 @@
 <?php
 
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Option;
 
 /**
  * Calculator command that demonstrates various argument types and validation.

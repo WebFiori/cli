@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Table;
+namespace WebFiori\CLI\Table;
 
 /**
  * TableData - Data container and processor for table content.

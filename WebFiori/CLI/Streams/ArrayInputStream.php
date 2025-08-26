@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Streams;
+namespace WebFiori\CLI\Streams;
 
 use InvalidArgumentException;
 /**

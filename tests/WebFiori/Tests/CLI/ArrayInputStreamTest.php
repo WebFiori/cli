@@ -3,7 +3,7 @@ namespace WebFiori\Tests\Cli;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\CLI\Streams\ArrayInputStream;
 /**
  * Description of ArrayInputStreamTest
  *

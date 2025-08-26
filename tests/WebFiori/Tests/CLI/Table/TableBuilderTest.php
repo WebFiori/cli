@@ -1,12 +1,12 @@
 <?php
 
-namespace tests\WebFiori\Cli\Table;
+namespace tests\WebFiori\CLI\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Table\TableBuilder;
-use WebFiori\Cli\Table\TableStyle;
-use WebFiori\Cli\Table\TableTheme;
-use WebFiori\Cli\Table\Column;
+use WebFiori\CLI\Table\TableBuilder;
+use WebFiori\CLI\Table\TableStyle;
+use WebFiori\CLI\Table\TableTheme;
+use WebFiori\CLI\Table\Column;
 
 /**
  * Unit tests for TableBuilder class.

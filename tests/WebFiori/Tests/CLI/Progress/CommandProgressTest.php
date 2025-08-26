@@ -1,10 +1,10 @@
 <?php
-namespace WebFiori\Tests\Cli\Progress;
+namespace WebFiori\Tests\CLI\Progress;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Progress\ProgressBar;
-use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Progress\ProgressBar;
+use WebFiori\CLI\Streams\ArrayOutputStream;
 
 /**
  * Test cases for Command progress bar integration.

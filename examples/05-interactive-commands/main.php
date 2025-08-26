@@ -11,8 +11,8 @@
  * - Dynamic command flows and error recovery
  */
 
-use WebFiori\Cli\Commands\HelpCommand;
-use WebFiori\Cli\Runner;
+use WebFiori\CLI\Commands\HelpCommand;
+use WebFiori\CLI\Runner;
 
 // Load dependencies
 require_once '../../vendor/autoload.php';

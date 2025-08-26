@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Streams;
+namespace WebFiori\CLI\Streams;
 
 /**
  * An interface that can be used to implement input streams at which CLI

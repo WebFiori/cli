@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Streams;
+namespace WebFiori\CLI\Streams;
 
 use WebFiori\File\Exceptions\FileException;
 use WebFiori\File\File;

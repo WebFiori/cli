@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\WebFiori\Cli\Table;
+namespace tests\WebFiori\CLI\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Table\Column;
+use WebFiori\CLI\Table\Column;
 
 /**
  * Unit tests for Column class.

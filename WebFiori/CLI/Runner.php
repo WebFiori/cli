@@ -1,17 +1,17 @@
 <?php
-namespace WebFiori\Cli;
+namespace WebFiori\CLI;
 
 use Throwable;
-use WebFiori\Cli\Commands\HelpCommand;
-use WebFiori\Cli\Discovery\AutoDiscoverable;
-use WebFiori\Cli\Discovery\CommandCache;
-use WebFiori\Cli\Discovery\CommandDiscovery;
-use WebFiori\Cli\Streams\ArrayInputStream;
-use WebFiori\Cli\Streams\ArrayOutputStream;
-use WebFiori\Cli\Streams\InputStream;
-use WebFiori\Cli\Streams\OutputStream;
-use WebFiori\Cli\Streams\StdIn;
-use WebFiori\Cli\Streams\StdOut;
+use WebFiori\CLI\Commands\HelpCommand;
+use WebFiori\CLI\Discovery\AutoDiscoverable;
+use WebFiori\CLI\Discovery\CommandCache;
+use WebFiori\CLI\Discovery\CommandDiscovery;
+use WebFiori\CLI\Streams\ArrayInputStream;
+use WebFiori\CLI\Streams\ArrayOutputStream;
+use WebFiori\CLI\Streams\InputStream;
+use WebFiori\CLI\Streams\OutputStream;
+use WebFiori\CLI\Streams\StdIn;
+use WebFiori\CLI\Streams\StdOut;
 
 /**
  * The core class which is used to manage command line related operations.

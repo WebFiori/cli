@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Tests\Cli\Discovery\TestCommands;
+namespace WebFiori\Tests\CLI\Discovery\TestCommands;
 
 /**
  * A regular class that is not a command.

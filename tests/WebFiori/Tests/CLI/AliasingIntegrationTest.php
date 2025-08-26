@@ -1,13 +1,13 @@
 <?php
 namespace WebFiori\Tests\Cli;
 
-use WebFiori\Cli\CommandTestCase;
-use WebFiori\Cli\Runner;
-use WebFiori\Cli\Commands\HelpCommand;
-use WebFiori\Cli\Streams\ArrayInputStream;
-use WebFiori\Cli\Streams\ArrayOutputStream;
-use WebFiori\Tests\Cli\TestCommands\AliasTestCommand;
-use WebFiori\Tests\Cli\TestCommands\NoAliasCommand;
+use WebFiori\CLI\CommandTestCase;
+use WebFiori\CLI\Runner;
+use WebFiori\CLI\Commands\HelpCommand;
+use WebFiori\CLI\Streams\ArrayInputStream;
+use WebFiori\CLI\Streams\ArrayOutputStream;
+use WebFiori\Tests\CLI\TestCommands\AliasTestCommand;
+use WebFiori\Tests\CLI\TestCommands\NoAliasCommand;
 
 /**
  * Integration tests for command aliasing functionality.

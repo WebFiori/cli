@@ -2,7 +2,7 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\InputValidator;
+use WebFiori\CLI\InputValidator;
 
 
 class InputValidatorTest extends TestCase {

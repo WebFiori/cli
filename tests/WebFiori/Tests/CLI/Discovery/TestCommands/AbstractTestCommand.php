@@ -1,7 +1,7 @@
 <?php
-namespace WebFiori\Tests\Cli\Discovery\TestCommands;
+namespace WebFiori\Tests\CLI\Discovery\TestCommands;
 
-use WebFiori\Cli\Command;
+use WebFiori\CLI\Command;
 
 /**
  * An abstract test command that should not be discovered.

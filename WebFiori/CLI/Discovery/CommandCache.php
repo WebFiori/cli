@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Cli\Discovery;
+namespace WebFiori\CLI\Discovery;
 
 /**
  * Handles caching of discovered commands.

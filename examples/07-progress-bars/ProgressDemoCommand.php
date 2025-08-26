@@ -1,9 +1,9 @@
 <?php
 
-use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
-use WebFiori\Cli\Progress\ProgressBarFormat;
-use WebFiori\Cli\Progress\ProgressBarStyle;
+use WebFiori\CLI\Command;
+use WebFiori\CLI\Option;
+use WebFiori\CLI\Progress\ProgressBarFormat;
+use WebFiori\CLI\Progress\ProgressBarStyle;
 
 /**
  * Comprehensive progress bar demonstration command.

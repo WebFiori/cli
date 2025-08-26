@@ -3,8 +3,8 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Argument;
-use WebFiori\Cli\Runner;
+use WebFiori\CLI\Argument;
+use WebFiori\CLI\Runner;
 
 /**
  * Description of CommandArgumentTest

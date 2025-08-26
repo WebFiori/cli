@@ -1,13 +1,13 @@
 <?php
-namespace WebFiori\Tests\Cli\Discovery;
+namespace WebFiori\Tests\CLI\Discovery;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Exceptions\CommandDiscoveryException;
-use WebFiori\Cli\Discovery\CommandMetadata;
-use WebFiori\Tests\Cli\Discovery\TestCommands\TestCommand;
-use WebFiori\Tests\Cli\Discovery\TestCommands\HiddenCommand;
-use WebFiori\Tests\Cli\Discovery\TestCommands\AbstractTestCommand;
-use WebFiori\Tests\Cli\Discovery\TestCommands\NotACommand;
+use WebFiori\CLI\Exceptions\CommandDiscoveryException;
+use WebFiori\CLI\Discovery\CommandMetadata;
+use WebFiori\Tests\CLI\Discovery\TestCommands\TestCommand;
+use WebFiori\Tests\CLI\Discovery\TestCommands\HiddenCommand;
+use WebFiori\Tests\CLI\Discovery\TestCommands\AbstractTestCommand;
+use WebFiori\Tests\CLI\Discovery\TestCommands\NotACommand;
 
 /**
  * Test cases for CommandMetadata class.
@@ -74,7 +74,7 @@ class CommandMetadataTest extends TestCase {
      */
     public function testExtractCommandNameFromClassName() {
         // Create a temporary command class without annotations
-        $tempClass = new class extends \WebFiori\Cli\Command {
+        $tempClass = new class extends \WebFiori\CLI\Command {
             public function __construct() {
                 parent::__construct('temp', [], 'Temp command');
             }

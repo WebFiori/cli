@@ -1,7 +1,7 @@
 <?php
-namespace WebFiori\Cli\Progress;
+namespace WebFiori\CLI\Progress;
 
-use WebFiori\Cli\Streams\OutputStream;
+use WebFiori\CLI\Streams\OutputStream;
 
 /**
  * A progress bar implementation for CLI applications.

@@ -1,12 +1,12 @@
 <?php
-namespace WebFiori\Tests\Cli\Discovery;
+namespace WebFiori\Tests\CLI\Discovery;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\Discovery\CommandCache;
-use WebFiori\Cli\Discovery\CommandDiscovery;
-use WebFiori\Cli\Exceptions\CommandDiscoveryException;
-use WebFiori\Tests\Cli\Discovery\TestCommands\TestCommand;
-use WebFiori\Tests\Cli\Discovery\TestCommands\AutoDiscoverableCommand;
+use WebFiori\CLI\Discovery\CommandCache;
+use WebFiori\CLI\Discovery\CommandDiscovery;
+use WebFiori\CLI\Exceptions\CommandDiscoveryException;
+use WebFiori\Tests\CLI\Discovery\TestCommands\TestCommand;
+use WebFiori\Tests\CLI\Discovery\TestCommands\AutoDiscoverableCommand;
 
 /**
  * Test cases for CommandDiscovery class.
@@ -108,7 +108,7 @@ class CommandDiscoveryTest extends TestCase {
         
         // Should not include abstract commands or non-commands
         foreach ($commands as $command) {
-            $this->assertInstanceOf(\WebFiori\Cli\Command::class, $command);
+            $this->assertInstanceOf(\WebFiori\CLI\Command::class, $command);
         }
     }
     
