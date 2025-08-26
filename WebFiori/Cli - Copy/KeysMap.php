@@ -118,6 +118,12 @@ class KeysMap {
 
         while ($char != 'LF') {
             $char = self::readAndTranslate($stream);
+            
+            // Handle EOF - if we get an empty string, we've reached end of file
+            if ($char === '') {
+                break;
+            }
+            
             self::appendChar($char, $input);
         }
 
@@ -129,11 +135,9 @@ class KeysMap {
         } else if ($ch == 'ESC') {
             $input .= "\e";
         } else if ($ch == "CR") {
-            // Do nothing?
-            $input .= "\r";
+            // Do nothing - don't add CR to input
         } else if ($ch == "LF") {
-            // Do nothing?
-            $input .= "\n";
+            // Do nothing - don't add LF to input (readLine should not include line ending)
         } else if ($ch == 'DOWN') {
             // read history;
             //$input .= ' ';

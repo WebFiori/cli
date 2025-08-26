@@ -37,8 +37,22 @@ class FileInputStream implements InputStream {
      */
     public function read(int $bytes = 1) : string {
         try {
-            $this->file->read($this->seek, $this->seek + $bytes);
-            $this->seek += $bytes;
+            // Check if we're at or past EOF
+            $fileSize = $this->file->getSize();
+            if ($this->seek >= $fileSize) {
+                return '';
+            }
+            
+            // Adjust bytes to read if we would go past EOF
+            $remainingBytes = $fileSize - $this->seek;
+            $bytesToRead = min($bytes, $remainingBytes);
+            
+            if ($bytesToRead <= 0) {
+                return '';
+            }
+            
+            $this->file->read($this->seek, $this->seek + $bytesToRead);
+            $this->seek += $bytesToRead;
 
             $result = $this->file->getRawData();
             
@@ -48,6 +62,10 @@ class FileInputStream implements InputStream {
             
             return $result;
         } catch (FileException $ex) {
+            // Handle EOF gracefully - if we're trying to read past EOF, return empty string
+            if (strpos($ex->getMessage(), 'Reached end of file') !== false) {
+                return '';
+            }
             throw new IOException('Unable to read '.$bytes.' byte(s) due to an error: "'.$ex->getMessage().'"', $ex->getCode(), $ex);
         }
     }
