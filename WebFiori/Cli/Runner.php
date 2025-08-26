@@ -1144,8 +1144,6 @@ class Runner {
      * @return array The preprocessed arguments array
      */
     private function preprocessHelpPattern(array $args): array {
-        error_log("DEBUG: preprocessHelpPattern called with: " . json_encode($args));
-        
         if (count($args) >= 2) {
             $lastArg = end($args);
             
@@ -1155,12 +1153,10 @@ class Runner {
                 
                 // Check if the first argument is a valid command name
                 if ($this->getCommandByName($commandName) !== null) {
-                    error_log("DEBUG: Found valid command '$commandName' with help pattern");
                     // Remove 'help' or '-h' from the end
                     array_pop($args);
                     // Add it as a proper argument flag
                     $args[] = $lastArg;
-                    error_log("DEBUG: Preprocessed result: " . json_encode($args));
                 }
             }
         }

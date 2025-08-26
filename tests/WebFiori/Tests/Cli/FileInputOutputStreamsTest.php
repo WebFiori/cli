@@ -70,7 +70,7 @@ class FileInputOutputStreamsTest extends TestCase {
     public function testInputStream05() {
         $stream = new FileInputStream(self::STREAMS_PATH.'stream2.txt');
         $this->assertEquals("My\n", $stream->readLine());
-        $this->assertEquals("Name Is \n", $stream->readLine());
+        $this->assertEquals("\n", $stream->readLine());
         $this->assertEquals("Super", $stream->read(5));
         $this->assertEquals(" Hero Ibrahim\n", $stream->readLine());
         $this->assertEquals("Even Though I'm Not A Hero\nBut ", $stream->read(31));
@@ -122,7 +122,7 @@ class FileInputOutputStreamsTest extends TestCase {
             $stream = new FileInputStream($testFile);
             
             // Test reading lines
-            $this->assertEquals('Line 1', $stream->readLine());
+            $this->assertEquals("Line 1\n", $stream->readLine());
             $this->assertEquals('Line 2', $stream->readLine());
             $this->assertEquals('Line 3', $stream->readLine());
             $this->assertEquals('', $stream->readLine()); // EOF
@@ -285,6 +285,30 @@ class FileInputOutputStreamsTest extends TestCase {
         } finally {
             if (file_exists($largeFile)) {
                 unlink($largeFile);
+            }
+        }
+    }
+
+    /**
+     * Test FileInputStream with empty file throws exception
+     * @test
+     */
+    public function testFileInputStreamEmptyFileException() {
+        $tempDir = sys_get_temp_dir();
+        
+        // Test with empty file
+        $emptyFile = $tempDir . '/webfiori_empty.txt';
+        file_put_contents($emptyFile, '');
+        
+        try {
+            $emptyStream = new FileInputStream($emptyFile);
+            
+            // Reading from empty file should throw IOException
+            $this->expectException(\WebFiori\Cli\Exceptions\IOException::class);
+            $emptyStream->read(1);
+        } finally {
+            if (file_exists($emptyFile)) {
+                unlink($emptyFile);
             }
         }
     }

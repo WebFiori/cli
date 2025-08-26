@@ -216,8 +216,9 @@ class RunnerDiscoveryTest extends TestCase {
         
         $this->assertInstanceOf(Runner::class, $result);
         
-        // Should not have discovered any commands
+        // Should not have discovered any commands (except default help command)
         $commands = $this->runner->getCommands();
-        $this->assertEmpty($commands);
+        $expectedCommands = ['help' => $this->runner->getCommandByName('help')];
+        $this->assertEquals($expectedCommands, $commands);
     }
 }

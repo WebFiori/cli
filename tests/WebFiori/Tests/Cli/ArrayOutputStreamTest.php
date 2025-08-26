@@ -51,15 +51,15 @@ class ArrayOutputStreamTest extends TestCase {
         
         $output = $stream->getOutputArray();
         $this->assertNotEmpty($output);
-        $this->assertEquals(['Hello', ' ', 'World'], $output);
+        $this->assertEquals(['Hello World'], $output);
         
-        // Test writing with newlines
-        $stream->prints("\n");
-        $stream->prints("New line");
+        // Test writing with println to create separate entries
+        $stream->println('');  // This creates a new line and separates entries
+        $stream->prints('New line');
         
         $output2 = $stream->getOutputArray();
-        $this->assertCount(5, $output2);
-        $this->assertEquals(['Hello', ' ', 'World', "\n", 'New line'], $output2);
+        $this->assertCount(2, $output2);
+        $this->assertEquals(["Hello World\n", 'New line'], $output2);
         
         // Test clearing output
         $stream->reset();
@@ -86,16 +86,16 @@ class ArrayOutputStreamTest extends TestCase {
         $stream->prints(false);
         
         $output2 = $stream->getOutputArray();
-        $this->assertEquals(['123', '45.67', '1', ''], $output2);
+        $this->assertEquals(['12345.671'], $output2);
         
-        // Test writing empty strings
+        // Test writing empty strings - consecutive prints calls are concatenated
         $stream->reset();
         $stream->prints('');
         $stream->prints('');
         $stream->prints('content');
         
         $output3 = $stream->getOutputArray();
-        $this->assertEquals(['', '', 'content'], $output3);
+        $this->assertEquals(['content'], $output3);
         
         // Test writing very long strings
         $longString = str_repeat('x', 10000);

@@ -45,10 +45,11 @@ class RunnerTest extends CommandTestCase {
     public function testRunner00() {
         $runner = new Runner();
         $this->assertEquals([], $runner->getOutput());
-        $this->assertEquals([], $runner->getCommands());
+        // Help command is automatically registered
+        $this->assertEquals(['help'], array_keys($runner->getCommands()));
         $this->assertFalse($runner->addArg(' '));
         $this->assertFalse($runner->addArg(' invalid name '));
-        $this->assertNull($runner->getDefaultCommand());
+        $this->assertEquals('help', $runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
         
         $argObj = new Argument('--ansi');
@@ -81,7 +82,8 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $runner->setDefaultCommand('super-hero');
-        $this->assertNull($runner->getDefaultCommand());
+        // Since 'super-hero' is not registered, default remains 'help'
+        $this->assertEquals('help', $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'do-it',
@@ -98,13 +100,15 @@ class RunnerTest extends CommandTestCase {
     public function testRunner02() {
         $runner = new Runner();
         $runner->setDefaultCommand('super-hero');
-        $this->assertNull($runner->getDefaultCommand());
+        // Since 'super-hero' is not registered, default remains 'help'
+        $this->assertEquals('help', $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
-        $this->assertEquals([
-            "Info: No command was specified to run.\n"
-        ], $runner->getOutput());
+        // Since default command is 'help', it will show help output instead of "No command" message
+        $output = $runner->getOutput();
+        $this->assertNotEmpty($output);
+        $this->assertStringContainsString('Usage:', $output[0]);
     }
     /**
      * @test

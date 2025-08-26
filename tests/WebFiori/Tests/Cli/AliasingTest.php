@@ -304,7 +304,9 @@ class AliasingTest extends CommandTestCase {
         $runner->register($command, []);
         
         $aliases = $runner->getAliases();
-        $this->assertEmpty($aliases);
+        // Account for default help alias that's automatically registered
+        $expectedAliases = ['-h' => 'help'];
+        $this->assertEquals($expectedAliases, $aliases);
     }
 
     /**
@@ -366,7 +368,8 @@ class AliasingTest extends CommandTestCase {
         $runner->register($command, $manyAliases);
         
         $aliases = $runner->getAliases();
-        $this->assertCount(100, $aliases);
+        // Account for default help alias (100 + 1 = 101)
+        $this->assertCount(101, $aliases);
         
         // Test a few random aliases
         $this->assertEquals('no-alias', $aliases['alias1']);
@@ -392,7 +395,9 @@ class AliasingTest extends CommandTestCase {
         
         // Should work exactly as before
         $this->assertSame($command, $runner->getCommandByName('no-alias'));
-        $this->assertEmpty($runner->getAliases());
+        // Account for default help alias
+        $expectedAliases = ['-h' => 'help'];
+        $this->assertEquals($expectedAliases, $runner->getAliases());
         
         // Command execution should work
         $output = $this->executeSingleCommand($command, ['no-alias']);
