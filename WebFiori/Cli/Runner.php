@@ -656,8 +656,10 @@ class Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
-        $this->commands = [];
         $this->aliases = [];
+        
+        // Re-register help command after reset
+        $this->register(new HelpCommand());
 
         return $this;
     }
