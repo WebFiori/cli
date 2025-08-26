@@ -13,6 +13,8 @@ use WebFiori\Tests\Cli\TestCommands\Command00;
 use WebFiori\Tests\Cli\TestCommands\Command01;
 use WebFiori\Tests\Cli\TestCommands\WithExceptionCommand;
 use WebFiori\Tests\Cli\TestCommands\Command03;
+use const DS;
+use const ROOT_DIR;
 
 
 /**
@@ -49,7 +51,7 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals(['help'], array_keys($runner->getCommands()));
         $this->assertFalse($runner->addArg(' '));
         $this->assertFalse($runner->addArg(' invalid name '));
-        $this->assertEquals('help', $runner->getDefaultCommand());
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
         
         $argObj = new Argument('--ansi');
@@ -63,9 +65,9 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals(1, count($runner->getArgs()));
         $this->assertFalse($runner->hasArg('--ansi'));
         $runner->register(new Command00());
-        $this->assertEquals(1, count($runner->getCommands()));
+        $this->assertEquals(2, count($runner->getCommands())); // help + super-hero
         $runner->register(new Command00());
-        $this->assertEquals(1, count($runner->getCommands()));
+        $this->assertEquals(2, count($runner->getCommands())); // Still 2, no duplicates
         $runner->setDefaultCommand('super-hero');
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(null, [
@@ -82,8 +84,8 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $runner->setDefaultCommand('super-hero');
-        // Since 'super-hero' is not registered, default remains 'help'
-        $this->assertEquals('help', $runner->getDefaultCommand());
+        // Since 'super-hero' is not registered, default remains the help command
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'do-it',
@@ -100,12 +102,12 @@ class RunnerTest extends CommandTestCase {
     public function testRunner02() {
         $runner = new Runner();
         $runner->setDefaultCommand('super-hero');
-        // Since 'super-hero' is not registered, default remains 'help'
-        $this->assertEquals('help', $runner->getDefaultCommand());
+        // Since 'super-hero' is not registered, default remains the help command
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
-        // Since default command is 'help', it will show help output instead of "No command" message
+        // Since default command is help, it will show help output instead of "No command" message
         $output = $runner->getOutput();
         $this->assertNotEmpty($output);
         $this->assertStringContainsString('Usage:', $output[0]);
@@ -146,7 +148,7 @@ class RunnerTest extends CommandTestCase {
     public function testRunner05() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand again - it's already automatically registered
         $runner->removeArgument('--ansi');
         $runner->setDefaultCommand('help');
         $runner->setInputs([]);
@@ -156,8 +158,8 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    super-hero:     A command to display hero's name.\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n"
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
     /**
@@ -171,11 +173,11 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    super-hero:     A command to display hero's name.\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n"
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    super-hero:     A command to display hero's name.\n"
         ], $this->executeMultiCommand([], [], [
-            new Command00(),
-            new HelpCommand()
+            new Command00()
+            // Don't register HelpCommand - it's automatically registered
         ], 'help'));
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -197,7 +199,8 @@ class RunnerTest extends CommandTestCase {
             "\e[1;93mGlobal Arguments:\e[0m\n",
             "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
-            "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
+            "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
     /**
@@ -214,7 +217,8 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals([
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
             "\e[1;94m    Supported Arguments:\e[0m\n",
-            "\e[1;33m                         name:\e[0m The name of the hero\n"
+            "\e[1;33m                         name:\e[0m The name of the hero\n",
+            "\e[1;33m                         help:\e[0m[Optional] Display command help.\n"
         ], $runner->getOutput());
     }
     /**
@@ -225,7 +229,7 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         $runner->removeArgument('--ansi');
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->setDefaultCommand('help');
         $runner->setInputs([]);
         $runner->start();
@@ -233,8 +237,8 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    super-hero:     A command to display hero's name.\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
@@ -244,7 +248,7 @@ class RunnerTest extends CommandTestCase {
     public function testRunner10() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->setInputs([]);
         $runner->setArgsVector([
             'entry.php',
@@ -255,7 +259,8 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals([
             "    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
-            "                         name: The name of the hero\n"
+            "                         name: The name of the hero\n",
+            "                         help:[Optional] Display command help.\n"
         ], $runner->getOutput());
     }
     /**
@@ -271,7 +276,7 @@ class RunnerTest extends CommandTestCase {
                 '--ansi'
             ]);
             $r->register(new Command00());
-            $r->register(new HelpCommand());
+            // Don't register HelpCommand - it's automatically registered
             $r->setInputs([]);
         });
         $runner->start();
@@ -287,7 +292,7 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         
         $runner->setArgsVector([
             'entry.php',
@@ -311,7 +316,7 @@ class RunnerTest extends CommandTestCase {
         
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
 
         $runner->setArgsVector([
             'entry.php',
@@ -330,8 +335,8 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    super-hero:     A command to display hero's name.\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    super-hero:     A command to display hero's name.\n",
             ">> ",
         ], $runner->getOutput());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
@@ -343,7 +348,7 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
 
         $runner->setArgsVector([
             'entry.php',
@@ -361,6 +366,7 @@ class RunnerTest extends CommandTestCase {
             ">>     super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
+            "                         help:[Optional] Display command help.\n",
             ">> Hello hero Ibrahim\n",
             ">> "
         ], $runner->getOutput());
@@ -371,7 +377,7 @@ class RunnerTest extends CommandTestCase {
     public function testRunner15() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->register(new WithExceptionCommand());
         $runner->setAfterExecution(function (Runner $r) {
             $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
@@ -399,7 +405,7 @@ class RunnerTest extends CommandTestCase {
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
-            "[1;33mAt:[0m ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
+            "[1;33mAt:[0m ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."Cli".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 13\n",
             "[1;33mStack Trace:[0m \n\n",
             null,
@@ -465,7 +471,7 @@ class RunnerTest extends CommandTestCase {
     public function testRunner19() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->register(new WithExceptionCommand());
         $runner->setArgsVector([
             'entry.php',
@@ -491,7 +497,7 @@ class RunnerTest extends CommandTestCase {
     public function testRunner20() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->register(new WithExceptionCommand());
         $runner->setArgsVector([
             'entry.php',
@@ -502,9 +508,10 @@ class RunnerTest extends CommandTestCase {
         ]);
         $runner->start();
         //$this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "[1;34mInfo:[0m No command was specified to run.\n",
-        ], $runner->getOutput());
+        // Since help command is now the default, it will show help output instead of "No command" message
+        $output = $runner->getOutput();
+        $this->assertNotEmpty($output);
+        $this->assertStringContainsString('Usage:', $output[0]);
     }
     /**
      * @test
@@ -523,7 +530,7 @@ class RunnerTest extends CommandTestCase {
 
         ], $runner->getOutput());
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->register(new WithExceptionCommand());
         $runner->setAfterExecution(function (Runner $r) {
             $r->getActiveCommand()->println('Command Exit Status: '.$r->getLastCommandExitStatus());
@@ -542,7 +549,7 @@ class RunnerTest extends CommandTestCase {
             "Error: An exception was thrown.\n",
             "Exception Message: Call to undefined method WebFiori\\Tests\Cli\\TestCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
-            "At: ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
+            "At: ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."Cli".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "Line: 13\n",
             "Stack Trace: \n\n",
             null,
@@ -962,7 +969,7 @@ class RunnerTest extends CommandTestCase {
     public function testCommandHelpInteractive() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
 
         $runner->setArgsVector([
             'entry.php',
@@ -989,7 +996,7 @@ class RunnerTest extends CommandTestCase {
     public function testCommandDashHInteractive() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
 
         $runner->setArgsVector([
             'entry.php',
@@ -1016,7 +1023,7 @@ class RunnerTest extends CommandTestCase {
     public function testCommandHelpNonInteractive() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->setInputs([]);
 
         $runner->setArgsVector([
@@ -1041,7 +1048,7 @@ class RunnerTest extends CommandTestCase {
     public function testCommandDashHNonInteractive() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
         $runner->setInputs([]);
 
         $runner->setArgsVector([
@@ -1066,7 +1073,7 @@ class RunnerTest extends CommandTestCase {
     public function testInvalidCommandHelp() {
         $runner = new Runner();
         $runner->register(new Command00());
-        $runner->register(new HelpCommand());
+        // Don't register HelpCommand - it's automatically registered
 
         $runner->setArgsVector([
             'entry.php',
