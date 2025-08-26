@@ -421,6 +421,26 @@ abstract class Command {
     public function getAliases() : array {
         return $this->aliases;
     }
+    
+    /**
+     * Sets the aliases for the command.
+     * 
+     * @param array $aliases An array of aliases.
+     */
+    public function setAliases(array $aliases): void {
+        $this->aliases = $aliases;
+    }
+    
+    /**
+     * Adds an alias to the command.
+     * 
+     * @param string $alias The alias to add.
+     */
+    public function addAlias(string $alias): void {
+        if (!in_array($alias, $this->aliases)) {
+            $this->aliases[] = $alias;
+        }
+    }
     /**
      * Returns an object that holds argument info if the command.
      * 

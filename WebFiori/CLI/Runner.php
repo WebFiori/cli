@@ -609,6 +609,11 @@ class Runner {
         }
         $this->commands[$cliCommand->getName()] = $cliCommand;
 
+        // Add provided aliases to the command's internal aliases
+        foreach ($aliases as $alias) {
+            $cliCommand->addAlias($alias);
+        }
+
         // Register aliases
         foreach ($aliases as $alias) {
             $this->registerAlias($alias, $cliCommand->getName());

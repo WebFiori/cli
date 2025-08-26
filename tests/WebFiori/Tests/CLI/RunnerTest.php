@@ -991,7 +991,7 @@ class RunnerTest extends CommandTestCase {
         $output = $runner->getOutput();
         
         // Should show help for super-hero command
-        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains(">>     super-hero:     A command to display hero's name.\n", $output);
         $this->assertContains("    Supported Arguments:\n", $output);
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
@@ -1018,7 +1018,7 @@ class RunnerTest extends CommandTestCase {
         $output = $runner->getOutput();
         
         // Should show help for super-hero command
-        $this->assertContains("    super-hero:     A command to display hero's name.\n", $output);
+        $this->assertContains(">>     super-hero:     A command to display hero's name.\n", $output);
         $this->assertContains("    Supported Arguments:\n", $output);
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
     }
