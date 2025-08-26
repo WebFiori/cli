@@ -394,18 +394,24 @@ class RunnerTest extends CommandTestCase {
         ]);
         $runner->start();
         $output = $runner->getOutput();
-        $output[12] = null;
+        // Null out the stack trace content as it can vary
+        for ($i = 13; $i < count($output) - 2; $i++) {
+            if ($output[$i] !== null && strpos($output[$i], 'Command Exit Status: -1') === false && strpos($output[$i], '>> ') === false) {
+                $output[$i] = null;
+            }
+        }
         $this->assertEquals([
             "[1;34m>>[0m Running in interactive mode.\n",
             "[1;34m>>[0m Type command name or 'exit' to close.\n",
             "[1;34m>>[0m [1;33m    super-hero[0m:         A command to display hero's name.\n",
             "[1;94m    Supported Arguments:[0m\n",
             "[1;33m                         name:[0m The name of the hero\n",
+            "[1;33m                         help:[0m[Optional] Display command help.\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\CLI\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
-            "[1;33mAt:[0m ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."Cli".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
+            "[1;33mAt:[0m ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."CLI".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 13\n",
             "[1;33mStack Trace:[0m \n\n",
             null,
@@ -549,7 +555,7 @@ class RunnerTest extends CommandTestCase {
             "Error: An exception was thrown.\n",
             "Exception Message: Call to undefined method WebFiori\\Tests\Cli\\TestCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
-            "At: ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."Cli".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
+            "At: ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."CLI".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "Line: 13\n",
             "Stack Trace: \n\n",
             null,
