@@ -219,7 +219,8 @@ class RunnerTest extends CommandTestCase {
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
             "\e[1;94m    Supported Arguments:\e[0m\n",
             "\e[1;33m                         name:\e[0m The name of the hero\n",
-            "\e[1;33m                         help:\e[0m[Optional] Display command help.\n"
+            "\e[1;33m                         help:\e[0m[Optional] Display command help.\n",
+            "\e[1;33m                           -h:\e[0m[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
