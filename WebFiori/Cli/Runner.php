@@ -594,15 +594,17 @@ class Runner {
     public function register(Command $cliCommand, array $aliases = []): Runner {
         if ($cliCommand->getName() != 'help') {
             $helpCommand = $this->getCommandByName('help');
-            $cliCommand->addArg($helpCommand->getName(), [
-                Option::OPTIONAL => true,
-                Option::DESCRIPTION => 'Display command help.'
-            ]);
-            
-            foreach ($helpCommand->getAliases() as $alias) {
-                $cliCommand->addArg($alias, [
-                    Option::OPTIONAL => true
+            if ($helpCommand !== null) {
+                $cliCommand->addArg($helpCommand->getName(), [
+                    Option::OPTIONAL => true,
+                    Option::DESCRIPTION => 'Display command help.'
                 ]);
+                
+                foreach ($helpCommand->getAliases() as $alias) {
+                    $cliCommand->addArg($alias, [
+                        Option::OPTIONAL => true
+                    ]);
+                }
             }
         }
         $this->commands[$cliCommand->getName()] = $cliCommand;
