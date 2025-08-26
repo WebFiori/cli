@@ -122,7 +122,7 @@ class FileInputOutputStreamsTest extends TestCase {
             $stream = new FileInputStream($testFile);
             
             // Test reading lines
-            $this->assertEquals("Line 1\n", $stream->readLine());
+            $this->assertEquals('Line 1', $stream->readLine());
             $this->assertEquals('Line 2', $stream->readLine());
             $this->assertEquals('Line 3', $stream->readLine());
             $this->assertEquals('', $stream->readLine()); // EOF
