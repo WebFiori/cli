@@ -694,6 +694,7 @@ class ProgressBarTest extends TestCase {
     public function testFormatPlaceholdersEnhanced() {
         $output = new ArrayOutputStream();
         $bar = new ProgressBar($output, 100);
+        $bar->setUpdateThrottle(0); // Disable throttling for testing
         
         // Test format with placeholders
         $format = 'Progress: [{bar}] {percent}% ({current}/{total})';
