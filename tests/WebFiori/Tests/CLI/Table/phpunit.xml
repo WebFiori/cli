@@ -27,7 +27,7 @@
             <directory suffix=".php">../../../../WebFiori/Cli/Table</directory>
         </include>
         <exclude>
-            <file>../../../../WebFiori/Cli/Table/README.md</file>
+            <file>../../../../WebFiori/CLI/Table/README.md</file>
         </exclude>
         <report>
             <html outputDirectory="coverage-html"/>

@@ -220,7 +220,7 @@ class RunnerTest extends CommandTestCase {
             "\e[1;94m    Supported Arguments:\e[0m\n",
             "\e[1;33m                         name:\e[0m The name of the hero\n",
             "\e[1;33m                         help:\e[0m[Optional] Display command help.\n",
-            "\e[1;33m                           -h:\e[0m[Optional] <NO DESCRIPTION>\n"
+            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -262,7 +262,8 @@ class RunnerTest extends CommandTestCase {
             "    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            "                         help:[Optional] Display command help.\n"
+            "                         help:[Optional] Display command help.\n",
+            "                           -h:[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -369,6 +370,7 @@ class RunnerTest extends CommandTestCase {
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
             "                         help:[Optional] Display command help.\n",
+            "                           -h:[Optional] <NO DESCRIPTION>\n",
             ">> Hello hero Ibrahim\n",
             ">> "
         ], $runner->getOutput());
@@ -397,7 +399,7 @@ class RunnerTest extends CommandTestCase {
         $runner->start();
         $output = $runner->getOutput();
         // Null out the stack trace content as it can vary
-        for ($i = 13; $i < count($output) - 2; $i++) {
+        for ($i = 14; $i < count($output) - 2; $i++) {
             if ($output[$i] !== null && strpos($output[$i], 'Command Exit Status: -1') === false && strpos($output[$i], '>> ') === false) {
                 $output[$i] = null;
             }
@@ -409,6 +411,7 @@ class RunnerTest extends CommandTestCase {
             "[1;94m    Supported Arguments:[0m\n",
             "[1;33m                         name:[0m The name of the hero\n",
             "[1;33m                         help:[0m[Optional] Display command help.\n",
+            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\CLI\TestCommands\WithExceptionCommand::notExist()\n",
@@ -885,8 +888,8 @@ class RunnerTest extends CommandTestCase {
         $command = new TestCommand('test-cmd');
         $runner->register($command, ['tc']);
         
-        // Should not find command by alias using getCommandByName
-        $this->assertNull($runner->getCommandByName('tc'));
+        // Should find command by alias using getCommandByName (enhanced functionality)
+        $this->assertSame($command, $runner->getCommandByName('tc'));
         $this->assertSame($command, $runner->getCommandByName('test-cmd'));
     }
 

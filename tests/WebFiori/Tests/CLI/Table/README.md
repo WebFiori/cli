@@ -233,7 +233,7 @@ public function testSpecificFunctionality() {
 
 - **PHPUnit Documentation** - [https://phpunit.de/documentation.html](https://phpunit.de/documentation.html)
 - **WebFiori CLI Guide** - Main project documentation
-- **Table Feature Documentation** - `WebFiori/Cli/Table/README.md`
+- **Table Feature Documentation** - `WebFiori/CLI/Table/README.md`
 - **Example Usage** - `examples/15-table-display/`
 
 ---

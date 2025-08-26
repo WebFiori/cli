@@ -18,8 +18,8 @@ class TableFormatterTest extends TestCase {
     private Column $column;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../WebFiori/Cli/Table/Column.php';
-        require_once __DIR__ . '/../../../../WebFiori/Cli/Table/TableFormatter.php';
+        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/Column.php';
+        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableFormatter.php';
         
         $this->formatter = new TableFormatter();
         $this->column = new Column('Test');

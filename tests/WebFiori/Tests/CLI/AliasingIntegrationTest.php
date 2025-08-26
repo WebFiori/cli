@@ -227,8 +227,9 @@ class AliasingIntegrationTest extends CommandTestCase {
         $this->assertFalse($runner->hasAlias('test'));
         $this->assertFalse($runner->hasAlias('extra'));
         
-        // Re-register with different aliases
-        $runner->register($command, ['new-alias']);
+        // Re-register with different aliases using a fresh command instance
+        $freshCommand = new AliasTestCommand();
+        $runner->register($freshCommand, ['new-alias']);
         $this->assertTrue($runner->hasAlias('test')); // Built-in alias
         $this->assertTrue($runner->hasAlias('new-alias')); // New runtime alias
         $this->assertFalse($runner->hasAlias('extra')); // Old runtime alias should be gone

@@ -18,7 +18,7 @@ class TableDataTest extends TestCase {
     private array $sampleRows;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../WebFiori/Cli/Table/TableData.php';
+        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableData.php';
         
         $this->sampleHeaders = ['Name', 'Age', 'City', 'Active'];
         $this->sampleRows = [
