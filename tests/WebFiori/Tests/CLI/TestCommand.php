@@ -1,6 +1,6 @@
 <?php
 
-namespace WebFiori\Tests\Cli;
+namespace WebFiori\Tests\CLI;
 
 use WebFiori\CLI\Command;
 use WebFiori\CLI\Streams\ArrayOutputStream;
