@@ -664,6 +664,7 @@ class ProgressBarTest extends TestCase {
         $output = new ArrayOutputStream();
         $bar = new ProgressBar($output, 10);
         $bar->setWidth(20);
+        $bar->setUpdateThrottle(0); // Disable throttling for testing
         
         // Test rendering at different progress levels
         $bar->start('Starting...');
