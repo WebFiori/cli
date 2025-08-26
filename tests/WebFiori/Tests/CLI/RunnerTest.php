@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Tests\Cli;
+namespace WebFiori\Tests\CLI;
 
 use WebFiori\CLI\Argument;
 use WebFiori\CLI\Commands\HelpCommand;
@@ -13,6 +13,7 @@ use WebFiori\Tests\CLI\TestCommands\Command00;
 use WebFiori\Tests\CLI\TestCommands\Command01;
 use WebFiori\Tests\CLI\TestCommands\WithExceptionCommand;
 use WebFiori\Tests\CLI\TestCommands\Command03;
+use WebFiori\Tests\CLI\TestCommand;
 use const DS;
 use const ROOT_DIR;
 
@@ -553,7 +554,7 @@ class RunnerTest extends CommandTestCase {
         $output[6] = null;
         $this->assertEquals([
             "Error: An exception was thrown.\n",
-            "Exception Message: Call to undefined method WebFiori\\Tests\Cli\\TestCommands\WithExceptionCommand::notExist()\n",
+            "Exception Message: Call to undefined method WebFiori\\Tests\CLI\\TestCommands\WithExceptionCommand::notExist()\n",
             "Code: 0\n",
             "At: ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."CLI".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "Line: 13\n",
