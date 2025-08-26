@@ -1095,7 +1095,7 @@ class RunnerTest extends CommandTestCase {
         $output = $runner->getOutput();
         
         // Should show error for invalid command, not help
-        $this->assertContains("The command 'invalid-command' is not supported.\n", $output);
+        $this->assertContains(">> Error: The command 'invalid-command' is not supported.\n", $output);
         $this->assertEquals(-1, $runner->getLastCommandExitStatus());
     }
 }
