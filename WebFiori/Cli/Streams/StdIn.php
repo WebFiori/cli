@@ -25,14 +25,7 @@ class StdIn implements InputStream {
         $input = '';
 
         while (strlen($input) < $bytes) {
-            $rawChar = fgetc(STDIN);
-            
-            // Handle EOF
-            if ($rawChar === false) {
-                break;
-            }
-            
-            $char = KeysMap::map($rawChar);
+            $char = KeysMap::map(fgetc(STDIN));
 
             if ($char == 'BACKSPACE' && strlen($input) > 0) {
                 $input = substr($input, 0, strlen($input) - 1);
