@@ -15,6 +15,7 @@
         "terminal"
     ],
     "require": {
+        "php": "^8.1",
         "webfiori/file":"2.0.*"
     },
     "require-dev": {
