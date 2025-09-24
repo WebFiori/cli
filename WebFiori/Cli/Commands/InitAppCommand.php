@@ -33,7 +33,7 @@ class InitAppCommand extends Command {
         if (defined('ROOT_DIR')) {
             $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$dirName;
         } else {
-            $appPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('vendor\WebFiori\Cli\bin')).$dirName;
+            $appPath = getcwd().DIRECTORY_SEPARATOR.$dirName;
         }
 
         try {
