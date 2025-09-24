@@ -1,11 +1,11 @@
 <?php
-namespace WebFiori\Tests\CLI\Discovery;
+namespace WebFiori\Tests\Cli\Discovery;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Discovery\CommandCache;
-use WebFiori\CLI\Discovery\CommandDiscovery;
-use WebFiori\CLI\Runner;
-use WebFiori\Tests\CLI\Discovery\TestCommands\TestCommand;
+use WebFiori\Cli\Discovery\CommandCache;
+use WebFiori\Cli\Discovery\CommandDiscovery;
+use WebFiori\Cli\Runner;
+use WebFiori\Tests\Cli\Discovery\TestCommands\TestCommand;
 
 /**
  * Test cases for Runner discovery integration.

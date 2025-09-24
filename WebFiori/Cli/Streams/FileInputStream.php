@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\CLI\Streams;
+namespace WebFiori\Cli\Streams;
 
-use WebFiori\CLI\Exceptions\IOException;
-use WebFiori\CLI\KeysMap;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\KeysMap;
 use WebFiori\File\Exceptions\FileException;
 use WebFiori\File\File;
 /**

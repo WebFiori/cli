@@ -2,9 +2,9 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Exceptions\IOException;
-use WebFiori\CLI\Streams\FileInputStream;
-use WebFiori\CLI\Streams\FileOutputStream;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\Streams\FileInputStream;
+use WebFiori\Cli\Streams\FileOutputStream;
 use const DS;
 use const ROOT_DIR;
 

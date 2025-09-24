@@ -1,12 +1,12 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Table\ColumnCalculator;
-use WebFiori\CLI\Table\TableData;
-use WebFiori\CLI\Table\TableStyle;
-use WebFiori\CLI\Table\Column;
+use WebFiori\Cli\Table\ColumnCalculator;
+use WebFiori\Cli\Table\TableData;
+use WebFiori\Cli\Table\TableStyle;
+use WebFiori\Cli\Table\Column;
 
 /**
  * Unit tests for ColumnCalculator class.
@@ -22,10 +22,10 @@ class ColumnCalculatorTest extends TestCase {
     private array $columns;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/Column.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableData.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableStyle.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/ColumnCalculator.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/Column.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableData.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableStyle.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/ColumnCalculator.php';
         
         $this->calculator = new ColumnCalculator();
         

@@ -9,7 +9,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace WebFiori\CLI;
+namespace WebFiori\Cli;
 
 use PHPUnit\Framework\TestCase;
 

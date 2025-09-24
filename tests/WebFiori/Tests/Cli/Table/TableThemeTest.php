@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Table\TableTheme;
+use WebFiori\Cli\Table\TableTheme;
 
 /**
  * Unit tests for TableTheme class.
@@ -15,7 +15,7 @@ class TableThemeTest extends TestCase {
     private TableTheme $theme;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableTheme.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableTheme.php';
         
         $this->theme = new TableTheme();
     }

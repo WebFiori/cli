@@ -21,14 +21,14 @@ require_once 'TableRendererTest.php';
 
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\TextUI\TestRunner;
-use tests\WebFiori\CLI\Table\TableBuilderTest;
-use tests\WebFiori\CLI\Table\TableStyleTest;
-use tests\WebFiori\CLI\Table\ColumnTest;
-use tests\WebFiori\CLI\Table\TableDataTest;
-use tests\WebFiori\CLI\Table\TableFormatterTest;
-use tests\WebFiori\CLI\Table\TableThemeTest;
-use tests\WebFiori\CLI\Table\ColumnCalculatorTest;
-use tests\WebFiori\CLI\Table\TableRendererTest;
+use tests\WebFiori\Cli\Table\TableBuilderTest;
+use tests\WebFiori\Cli\Table\TableStyleTest;
+use tests\WebFiori\Cli\Table\ColumnTest;
+use tests\WebFiori\Cli\Table\TableDataTest;
+use tests\WebFiori\Cli\Table\TableFormatterTest;
+use tests\WebFiori\Cli\Table\TableThemeTest;
+use tests\WebFiori\Cli\Table\ColumnCalculatorTest;
+use tests\WebFiori\Cli\Table\TableRendererTest;
 
 echo "🧪 WebFiori CLI Table Feature - Unit Test Suite\n";
 echo "===============================================\n\n";

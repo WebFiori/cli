@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestSuite;
 

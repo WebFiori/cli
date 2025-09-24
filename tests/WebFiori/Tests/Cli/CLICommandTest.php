@@ -2,12 +2,12 @@
 namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Argument;
-use WebFiori\CLI\Exceptions\IOException;
-use WebFiori\CLI\InputValidator;
-use WebFiori\CLI\Runner;
-use WebFiori\CLI\Streams\ArrayInputStream;
-use WebFiori\CLI\Streams\ArrayOutputStream;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\InputValidator;
+use WebFiori\Cli\Runner;
+use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\Cli\Streams\ArrayOutputStream;
 use WebFiori\Tests\TestStudent;
 
 

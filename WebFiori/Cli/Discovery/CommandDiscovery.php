@@ -1,11 +1,11 @@
 <?php
-namespace WebFiori\CLI\Discovery;
+namespace WebFiori\Cli\Discovery;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
-use WebFiori\CLI\Command;
-use WebFiori\CLI\Exceptions\CommandDiscoveryException;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 
 /**
  * Discovers CLI commands automatically from specified directories.

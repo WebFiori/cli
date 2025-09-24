@@ -1,11 +1,11 @@
 <?php
-namespace WebFiori\Tests\CLI\Progress;
+namespace WebFiori\Tests\Cli\Progress;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Progress\ProgressBar;
-use WebFiori\CLI\Progress\ProgressBarFormat;
-use WebFiori\CLI\Progress\ProgressBarStyle;
-use WebFiori\CLI\Streams\ArrayOutputStream;
+use WebFiori\Cli\Progress\ProgressBar;
+use WebFiori\Cli\Progress\ProgressBarFormat;
+use WebFiori\Cli\Progress\ProgressBarStyle;
+use WebFiori\Cli\Streams\ArrayOutputStream;
 
 /**
  * Test cases for ProgressBar class.

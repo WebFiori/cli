@@ -1,7 +1,7 @@
 <?php
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\Option;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Option;
 
 /**
  * A simple hello world command that demonstrates basic CLI functionality.

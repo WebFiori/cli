@@ -1,9 +1,9 @@
 <?php
 namespace WebFiori\Tests\Cli;
 
-use WebFiori\CLI\Commands\InitAppCommand;
+use WebFiori\Cli\Commands\InitAppCommand;
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Runner;
+use WebFiori\Cli\Runner;
 
 /**
  * Description of InitAppCommandTest

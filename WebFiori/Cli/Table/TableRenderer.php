@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI\Table;
+namespace WebFiori\Cli\Table;
 
 /**
  * TableRenderer - Handles the actual rendering logic for tables.

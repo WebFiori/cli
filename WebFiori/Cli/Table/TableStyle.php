@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI\Table;
+namespace WebFiori\Cli\Table;
 
 /**
  * TableStyle - Defines visual styling for tables.

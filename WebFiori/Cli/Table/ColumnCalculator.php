@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI\Table;
+namespace WebFiori\Cli\Table;
 
 /**
  * ColumnCalculator - Advanced width calculation algorithms for table columns.

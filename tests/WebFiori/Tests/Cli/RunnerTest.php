@@ -1,19 +1,19 @@
 <?php
 namespace WebFiori\Tests\CLI;
 
-use WebFiori\CLI\Argument;
-use WebFiori\CLI\Commands\HelpCommand;
-use WebFiori\CLI\CommandTestCase;
-use WebFiori\CLI\Runner;
-use WebFiori\CLI\Streams\ArrayInputStream;
-use WebFiori\CLI\Streams\ArrayOutputStream;
-use WebFiori\CLI\Streams\StdIn;
-use WebFiori\CLI\Streams\StdOut;
-use WebFiori\Tests\CLI\TestCommands\Command00;
-use WebFiori\Tests\CLI\TestCommands\Command01;
-use WebFiori\Tests\CLI\TestCommands\WithExceptionCommand;
-use WebFiori\Tests\CLI\TestCommands\Command03;
-use WebFiori\Tests\CLI\TestCommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Commands\HelpCommand;
+use WebFiori\Cli\CommandTestCase;
+use WebFiori\Cli\Runner;
+use WebFiori\Cli\Streams\ArrayInputStream;
+use WebFiori\Cli\Streams\ArrayOutputStream;
+use WebFiori\Cli\Streams\StdIn;
+use WebFiori\Cli\Streams\StdOut;
+use WebFiori\Tests\Cli\TestCommands\Command00;
+use WebFiori\Tests\Cli\TestCommands\Command01;
+use WebFiori\Tests\Cli\TestCommands\WithExceptionCommand;
+use WebFiori\Tests\Cli\TestCommands\Command03;
+use WebFiori\Tests\Cli\TestCommand;
 use const DS;
 use const ROOT_DIR;
 
@@ -52,7 +52,7 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals(['help'], array_keys($runner->getCommands()));
         $this->assertFalse($runner->addArg(' '));
         $this->assertFalse($runner->addArg(' invalid name '));
-        $this->assertInstanceOf(\WebFiori\CLI\Commands\HelpCommand::class, $runner->getDefaultCommand());
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $this->assertNull($runner->getActiveCommand());
         
         $argObj = new Argument('--ansi');
@@ -86,7 +86,7 @@ class RunnerTest extends CommandTestCase {
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
         $runner->setDefaultCommand('super-hero');
         // Since 'super-hero' is not registered, default remains the help command
-        $this->assertInstanceOf(\WebFiori\CLI\Commands\HelpCommand::class, $runner->getDefaultCommand());
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(-1, $runner->runCommand(null, [
             'do-it',
@@ -104,7 +104,7 @@ class RunnerTest extends CommandTestCase {
         $runner = new Runner();
         $runner->setDefaultCommand('super-hero');
         // Since 'super-hero' is not registered, default remains the help command
-        $this->assertInstanceOf(\WebFiori\CLI\Commands\HelpCommand::class, $runner->getDefaultCommand());
+        $this->assertInstanceOf(\WebFiori\Cli\Commands\HelpCommand::class, $runner->getDefaultCommand());
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
@@ -414,7 +414,7 @@ class RunnerTest extends CommandTestCase {
             "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
-            "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\CLI\TestCommands\WithExceptionCommand::notExist()\n",
+            "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
             "[1;33mAt:[0m ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."CLI".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 13\n",

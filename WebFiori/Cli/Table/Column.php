@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI\Table;
+namespace WebFiori\Cli\Table;
 
 /**
  * Column - Represents individual column configuration.

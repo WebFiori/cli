@@ -16,7 +16,7 @@ require_once '../../WebFiori/Cli/Table/TableTheme.php';
 require_once '../../WebFiori/Cli/Table/TableRenderer.php';
 require_once '../../WebFiori/Cli/Table/TableBuilder.php';
 
-use WebFiori\CLI\Table\TableBuilder;
+use WebFiori\Cli\Table\TableBuilder;
 
 echo "🚀 WebFiori CLI Table - Simple Usage Examples\n";
 echo "==============================================\n\n";

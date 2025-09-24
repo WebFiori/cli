@@ -13,8 +13,8 @@
  * - Basic application structure
  */
 
-use WebFiori\CLI\Commands\HelpCommand;
-use WebFiori\CLI\Runner;
+use WebFiori\Cli\Commands\HelpCommand;
+use WebFiori\Cli\Runner;
 
 // Load the WebFiori CLI library
 require_once '../../vendor/autoload.php';

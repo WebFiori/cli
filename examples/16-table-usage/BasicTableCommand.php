@@ -2,10 +2,10 @@
 
 require_once '../../vendor/autoload.php';
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\Table\TableOptions;
-use WebFiori\CLI\Table\TableStyle;
-use WebFiori\CLI\Table\TableTheme;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Table\TableOptions;
+use WebFiori\Cli\Table\TableStyle;
+use WebFiori\Cli\Table\TableTheme;
 
 /**
  * Basic table usage command demonstrating simple table creation

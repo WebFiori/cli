@@ -11,8 +11,8 @@
  * - Error handling and user feedback
  */
 
-use WebFiori\CLI\Commands\HelpCommand;
-use WebFiori\CLI\Runner;
+use WebFiori\Cli\Commands\HelpCommand;
+use WebFiori\Cli\Runner;
 
 // Load dependencies
 require_once '../../vendor/autoload.php';

@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\CLI\Commands;
+namespace WebFiori\Cli\Commands;
 
-use WebFiori\CLI\Argument;
-use WebFiori\CLI\Command;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 
 /**
  * A class that implements a basic help command.

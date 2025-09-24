@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI;
+namespace WebFiori\Cli;
 
 /**
  * A class that holds the options which are used to configure command line argument.

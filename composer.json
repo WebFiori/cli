@@ -24,7 +24,7 @@
     },
     "autoload" :{
         "psr-4":{
-            "WebFiori\\CLI\\":"WebFiori/CLI"
+            "WebFiori\\Cli\\":"WebFiori/Cli"
         }
     },
     "autoload-dev" :{

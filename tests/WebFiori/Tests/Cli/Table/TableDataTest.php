@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Table\TableData;
+use WebFiori\Cli\Table\TableData;
 
 /**
  * Unit tests for TableData class.
@@ -18,7 +18,7 @@ class TableDataTest extends TestCase {
     private array $sampleRows;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableData.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableData.php';
         
         $this->sampleHeaders = ['Name', 'Age', 'City', 'Active'];
         $this->sampleRows = [

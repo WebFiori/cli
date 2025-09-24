@@ -1,17 +1,17 @@
 <?php
-namespace WebFiori\CLI;
+namespace WebFiori\Cli;
 
 use Error;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
-use WebFiori\CLI\Exceptions\IOException;
-use WebFiori\CLI\Progress\ProgressBar;
-use WebFiori\CLI\Streams\InputStream;
-use WebFiori\CLI\Streams\OutputStream;
-use WebFiori\CLI\Table\TableBuilder;
-use WebFiori\CLI\Table\TableOptions;
-use WebFiori\CLI\Table\TableTheme;
+use WebFiori\Cli\Exceptions\IOException;
+use WebFiori\Cli\Progress\ProgressBar;
+use WebFiori\Cli\Streams\InputStream;
+use WebFiori\Cli\Streams\OutputStream;
+use WebFiori\Cli\Table\TableBuilder;
+use WebFiori\Cli\Table\TableOptions;
+use WebFiori\Cli\Table\TableTheme;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -1187,7 +1187,7 @@ abstract class Command {
      * 
      * Example usage:
      * ```php
-     * use WebFiori\CLI\Table\TableOptions;
+     * use WebFiori\Cli\Table\TableOptions;
      * 
      * // Basic table
      * $this->table([

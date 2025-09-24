@@ -12,10 +12,10 @@ require_once '../../WebFiori/Cli/Table/TableTheme.php';
 require_once '../../WebFiori/Cli/Table/TableRenderer.php';
 require_once '../../WebFiori/Cli/Table/TableBuilder.php';
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\Table\Column;
-use WebFiori\CLI\Table\TableBuilder;
-use WebFiori\CLI\Table\TableTheme;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Table\Column;
+use WebFiori\Cli\Table\TableBuilder;
+use WebFiori\Cli\Table\TableTheme;
 
 /**
  * TableDemoCommand - Demonstrates the WebFiori CLI Table feature.

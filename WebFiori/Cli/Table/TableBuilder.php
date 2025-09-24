@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI\Table;
+namespace WebFiori\Cli\Table;
 
 /**
  * TableBuilder - Main interface for creating and configuring tables.

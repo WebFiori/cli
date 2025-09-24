@@ -1,12 +1,12 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Table\TableBuilder;
-use WebFiori\CLI\Table\TableStyle;
-use WebFiori\CLI\Table\TableTheme;
-use WebFiori\CLI\Table\Column;
+use WebFiori\Cli\Table\TableBuilder;
+use WebFiori\Cli\Table\TableStyle;
+use WebFiori\Cli\Table\TableTheme;
+use WebFiori\Cli\Table\Column;
 
 /**
  * Unit tests for TableBuilder class.
@@ -20,14 +20,14 @@ class TableBuilderTest extends TestCase {
     
     protected function setUp(): void {
         // Include required classes
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableStyle.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/Column.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableData.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/ColumnCalculator.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableFormatter.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableTheme.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableRenderer.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableBuilder.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableStyle.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/Column.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableData.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/ColumnCalculator.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableFormatter.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableTheme.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableRenderer.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableBuilder.php';
         
         $this->table = new TableBuilder();
     }

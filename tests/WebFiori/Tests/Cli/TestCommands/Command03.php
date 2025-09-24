@@ -1,7 +1,7 @@
 <?php
-namespace WebFiori\Tests\CLI\TestCommands;
+namespace WebFiori\Tests\Cli\TestCommands;
 
-use WebFiori\CLI\Command;
+use WebFiori\Cli\Command;
 
 
 class Command03 extends Command {

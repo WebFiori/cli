@@ -1,13 +1,13 @@
 <?php
 
-namespace tests\WebFiori\CLI\Table;
+namespace tests\WebFiori\Cli\Table;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Table\TableRenderer;
-use WebFiori\CLI\Table\TableData;
-use WebFiori\CLI\Table\TableStyle;
-use WebFiori\CLI\Table\TableTheme;
-use WebFiori\CLI\Table\Column;
+use WebFiori\Cli\Table\TableRenderer;
+use WebFiori\Cli\Table\TableData;
+use WebFiori\Cli\Table\TableStyle;
+use WebFiori\Cli\Table\TableTheme;
+use WebFiori\Cli\Table\Column;
 
 /**
  * Unit tests for TableRenderer class.
@@ -22,13 +22,13 @@ class TableRendererTest extends TestCase {
     private array $columns;
     
     protected function setUp(): void {
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/Column.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableData.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableStyle.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableTheme.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/ColumnCalculator.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableFormatter.php';
-        require_once __DIR__ . '/../../../../../WebFiori/CLI/Table/TableRenderer.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/Column.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableData.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableStyle.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableTheme.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/ColumnCalculator.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableFormatter.php';
+        require_once __DIR__ . '/../../../../../WebFiori/Cli/Table/TableRenderer.php';
         
         $style = TableStyle::default();
         $theme = TableTheme::default();

@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\Tests\CLI\Discovery;
+namespace WebFiori\Tests\Cli\Discovery;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Discovery\CommandCache;
+use WebFiori\Cli\Discovery\CommandCache;
 
 /**
  * Test cases for CommandCache class.

@@ -4,25 +4,25 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <file>../WebFiori/CLI/Command.php</file>
-            <file>../WebFiori/CLI/CommandArgument.php</file>
-            <file>../WebFiori/CLI/Formatter.php</file>
-            <file>../WebFiori/CLI/KeysMap.php</file>
-            <file>../WebFiori/CLI/Runner.php</file>
-            <file>../WebFiori/CLI/CommandTestCase.php</file>
-            <file>../WebFiori/CLI/InputValidator.php</file>
-            <file>../WebFiori/CLI/Streams/ArrayInputStream.php</file>
-            <file>../WebFiori/CLI/Streams/ArrayOutputStream.php</file>
-            <file>../WebFiori/CLI/Streams/FileInputStream.php</file>
-            <file>../WebFiori/CLI/Streams/FileOutputStream.php</file>
-            <file>../WebFiori/CLI/Discovery/CommandDiscovery.php</file>
-            <file>../WebFiori/CLI/Discovery/CommandMetadata.php</file>
-            <file>../WebFiori/CLI/Discovery/CommandCache.php</file>
-            <file>../WebFiori/CLI/Discovery/AutoDiscoverable.php</file>
-            <file>../WebFiori/CLI/Exceptions/CommandDiscoveryException.php</file>
-            <file>../WebFiori/CLI/Progress/ProgressBar.php</file>
-            <file>../WebFiori/CLI/Progress/ProgressBarStyle.php</file>
-            <file>../WebFiori/CLI/Progress/ProgressBarFormat.php</file>
+            <file>../WebFiori/Cli/Command.php</file>
+            <file>../WebFiori/Cli/CommandArgument.php</file>
+            <file>../WebFiori/Cli/Formatter.php</file>
+            <file>../WebFiori/Cli/KeysMap.php</file>
+            <file>../WebFiori/Cli/Runner.php</file>
+            <file>../WebFiori/Cli/CommandTestCase.php</file>
+            <file>../WebFiori/Cli/InputValidator.php</file>
+            <file>../WebFiori/Cli/Streams/ArrayInputStream.php</file>
+            <file>../WebFiori/Cli/Streams/ArrayOutputStream.php</file>
+            <file>../WebFiori/Cli/Streams/FileInputStream.php</file>
+            <file>../WebFiori/Cli/Streams/FileOutputStream.php</file>
+            <file>../WebFiori/Cli/Discovery/CommandDiscovery.php</file>
+            <file>../WebFiori/Cli/Discovery/CommandMetadata.php</file>
+            <file>../WebFiori/Cli/Discovery/CommandCache.php</file>
+            <file>../WebFiori/Cli/Discovery/AutoDiscoverable.php</file>
+            <file>../WebFiori/Cli/Exceptions/CommandDiscoveryException.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBar.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarStyle.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarFormat.php</file>
         </whitelist>
     </filter>
     <logging>
@@ -30,7 +30,7 @@
     </logging>
     <testsuites>
         <testsuite name="Tests">
-            <directory>./WebFiori/Tests/CLI</directory>
+            <directory>./WebFiori/Tests/Cli</directory>
         </testsuite>
     </testsuites>
 </phpunit>

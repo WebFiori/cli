@@ -1,8 +1,8 @@
 <?php
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\InputValidator;
-use WebFiori\CLI\Option;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\InputValidator;
+use WebFiori\Cli\Option;
 
 /**
  * Interactive quiz command demonstrating input validation and scoring.

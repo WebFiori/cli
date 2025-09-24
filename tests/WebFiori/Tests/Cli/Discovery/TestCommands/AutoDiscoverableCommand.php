@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\Tests\CLI\Discovery\TestCommands;
+namespace WebFiori\Tests\Cli\Discovery\TestCommands;
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\Discovery\AutoDiscoverable;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Discovery\AutoDiscoverable;
 
 /**
  * A test command that implements AutoDiscoverable.

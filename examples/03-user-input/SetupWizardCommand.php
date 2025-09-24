@@ -1,8 +1,8 @@
 <?php
 
-use WebFiori\CLI\Command;
-use WebFiori\CLI\InputValidator;
-use WebFiori\CLI\Option;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\InputValidator;
+use WebFiori\Cli\Option;
 
 /**
  * Setup wizard command demonstrating multi-step interactive workflows.

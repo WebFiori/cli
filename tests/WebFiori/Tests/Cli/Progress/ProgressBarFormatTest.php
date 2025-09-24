@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\Tests\CLI\Progress;
+namespace WebFiori\Tests\Cli\Progress;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\CLI\Progress\ProgressBarFormat;
+use WebFiori\Cli\Progress\ProgressBarFormat;
 
 /**
  * Test cases for ProgressBarFormat class.

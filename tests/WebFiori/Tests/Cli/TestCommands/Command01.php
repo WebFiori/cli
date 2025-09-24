@@ -1,8 +1,8 @@
 <?php
-namespace WebFiori\Tests\CLI\TestCommands;
+namespace WebFiori\Tests\Cli\TestCommands;
 
-use WebFiori\CLI\Argument;
-use WebFiori\CLI\Command;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 
 
 

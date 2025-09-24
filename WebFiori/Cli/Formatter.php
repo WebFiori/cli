@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\CLI;
+namespace WebFiori\Cli;
 
 /**
  * The responsibility of this class is to format the output of running
