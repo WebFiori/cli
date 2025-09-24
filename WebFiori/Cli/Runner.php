@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace WebFiori\Cli;
 
 use Throwable;
@@ -363,7 +365,7 @@ class Runner {
      * no command is active, the method will return null.
      * 
      */
-    public function getActiveCommand() {
+    public function getActiveCommand(): ?Command {
         return $this->activeCommand;
     }
 
@@ -411,7 +413,7 @@ class Runner {
      * @return Command|null If the command is registered, it is returned
      * as an object. Other than that, null is returned.
      */
-    public function getCommandByName(string $name) {
+    public function getCommandByName(string $name): ?Command {
         // First check if it's a direct command name
         if (isset($this->getCommands()[$name])) {
             return $this->getCommands()[$name];
@@ -457,7 +459,7 @@ class Runner {
      * @return Command|null If set, it will be returned as object.
      * Other than that, null is returned.
      */
-    public function getDefaultCommand() {
+    public function getDefaultCommand(): ?Command {
         return $this->defaultCommand;
     }
 
@@ -734,9 +736,9 @@ class Runner {
         } catch (Throwable $ex) {
             $this->printMsg('An exception was thrown.', 'Error:', 'red');
             $this->printMsg($ex->getMessage(), 'Exception Message:', 'yellow');
-            $this->printMsg($ex->getCode(), 'Code:', 'yellow');
+            $this->printMsg((string)$ex->getCode(), 'Code:', 'yellow');
             $this->printMsg($ex->getFile(), 'At:', 'yellow');
-            $this->printMsg($ex->getLine(), 'Line:', 'yellow');
+            $this->printMsg((string)$ex->getLine(), 'Line:', 'yellow');
             $this->printMsg("\n", 'Stack Trace:', 'yellow');
             $this->printMsg("\n".$ex->getTraceAsString());
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
@@ -1015,19 +1017,19 @@ class Runner {
         }
     }
 
-    private function checkIsInteractive() {
+    private function checkIsInteractive(): void {
         foreach ($this->getArgsVector() as $arg) {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
 
-    private function invokeAfterExc() {
+    private function invokeAfterExc(): void {
         foreach ($this->afterRunPool as $funcArr) {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
     }
 
-    private function printMsg(string $msg, ?string $prefix = null, ?string $color = null) {
+    private function printMsg(string $msg, ?string $prefix = null, ?string $color = null): void {
         if ($prefix !== null) {
             $prefix = Formatter::format($prefix, [
                 'color' => $color,
@@ -1042,7 +1044,7 @@ class Runner {
         }
     }
 
-    private function readInteractive() {
+    private function readInteractive(): array {
         $input = trim($this->getInputStream()->readLine());
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
@@ -1130,7 +1132,7 @@ class Runner {
         return $this->runCommand(null, $argsArr, $this->isAnsi);
     }
 
-    private function setArgV(array $args) {
+    private function setArgV(array $args): void {
         $argV = [];
 
         foreach ($args as $argName => $argVal) {

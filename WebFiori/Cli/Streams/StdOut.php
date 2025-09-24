@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 /**
@@ -9,7 +10,7 @@ namespace WebFiori\Cli\Streams;
  * 
  */
 class StdOut implements OutputStream {
-    public function println(string $str, ...$_) {
+    public function println(string $str, ...$_): void {
         $toPass = [
             $this->asString($str)."\e[0m\e[k\n"
         ];
@@ -20,7 +21,7 @@ class StdOut implements OutputStream {
         call_user_func_array([$this, 'prints'], $toPass);
     }
 
-    public function prints(string $str, ...$_) {
+    public function prints(string $str, ...$_): void {
         $arrayToPass = [
             STDOUT,
             $str

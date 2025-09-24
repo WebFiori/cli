@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 use InvalidArgumentException;
@@ -100,7 +101,7 @@ class ArrayInputStream implements InputStream {
     /**
      * Resets the stream position to the beginning.
      */
-    public function reset() {
+    public function reset(): void {
         $this->currentLine = 0;
         $this->currentLineByte = 0;
         $this->hasReachedEnd = false;
@@ -112,11 +113,11 @@ class ArrayInputStream implements InputStream {
      * 
      * @return bool True if at end of stream, false otherwise.
      */
-    public function isEOF() {
+    public function isEOF(): bool {
         return $this->currentLine >= count($this->inputsArr);
     }
     
-    private function checkLineValidity() {
+    private function checkLineValidity(): bool {
         if ($this->currentLine >= count($this->inputsArr)) {
             return false;
         }

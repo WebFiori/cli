@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 use WebFiori\File\Exceptions\FileException;
@@ -32,7 +33,7 @@ class FileOutputStream implements OutputStream {
      * 
      * @param array $_ Any extra arguments to supply to the output.
      */
-    public function println(string $str, ...$_) {
+    public function println(string $str, ...$_): void {
         $toPass = [
             $str."\n"
         ];
@@ -55,7 +56,7 @@ class FileOutputStream implements OutputStream {
      *
      * @throws FileException If the method was not able to send output.
      */
-    public function prints(string $str, ...$_) {
+    public function prints(string $str, ...$_): void {
         $arrayToPass = [
             $str
         ];
@@ -77,7 +78,7 @@ class FileOutputStream implements OutputStream {
      * Removes the file that represents output stream and re-create it.
      * @throws FileException
      */
-    public function reset() {
+    public function reset(): void {
         $this->file->remove();
         $this->file->create(true);
     }

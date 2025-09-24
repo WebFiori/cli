@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace WebFiori\Cli;
 
 use Error;
@@ -160,7 +162,7 @@ abstract class Command {
      * be converted to the string 'n'.</li>
      * </ul>
      */
-    public function addArgs(array $arr) {
+    public function addArgs(array $arr): void {
         $this->commandArgs = [];
 
         foreach ($arr as $optionName => $options) {
@@ -247,7 +249,7 @@ abstract class Command {
      * ANSI escape codes.
      * 
      */
-    public function clearLine() {
+    public function clearLine(): void {
         $this->prints("\e[2K");
         $this->prints("\r");
     }
@@ -325,7 +327,7 @@ abstract class Command {
      * @param string $message The message that will be shown.
      * 
      */
-    public function error(string $message) {
+    public function error(string $message): void {
         $this->printMsg($message, 'Error', 'light-red');
     }
     /**
@@ -404,7 +406,7 @@ abstract class Command {
      * @return int The method will return an integer that represent exit status
      * code of the command after execution.
      */
-    public function execSubCommand(string $name, $additionalArgs = []) : int {
+    public function execSubCommand(string $name, array $additionalArgs = []) : int {
         $runner = $this->getOwner();
 
         if ($runner === null) {
@@ -449,7 +451,7 @@ abstract class Command {
      * @return Argument|null If the command has an argument with the
      * given name, it will be returned. Other than that, null is returned.
      */
-    public function getArg(string $name) {
+    public function getArg(string $name): ?Argument {
         foreach ($this->getArgs() as $arg) {
             if ($arg->getName() == $name) {
                 return $arg;
@@ -494,7 +496,7 @@ abstract class Command {
      * return its value as string. If it is not set, the method will return null.
      * 
      */
-    public function getArgValue(string $optionName) {
+    public function getArgValue(string $optionName): ?string {
         $trimmedOptName = trim($optionName);
         $arg = $this->getArg($trimmedOptName);
 
@@ -548,7 +550,7 @@ abstract class Command {
      * beginning or the end, they will be trimmed.
      *
      */
-    public function getInput(string $prompt, ?string $default = null, ?InputValidator $validator = null) {
+    public function getInput(string $prompt, ?string $default = null, ?InputValidator $validator = null): ?string {
         $trimmed = trim($prompt);
 
         if (strlen($trimmed) > 0) {
@@ -616,7 +618,7 @@ abstract class Command {
      * will return an instance that can be used to access runner's properties.
      * If not called through a runner, null is returned.
      */
-    public function getOwner() {
+    public function getOwner(): ?Runner {
         return $this->owner;
     }
     /**
@@ -647,7 +649,7 @@ abstract class Command {
      * @param string $message The message that will be shown.
      * 
      */
-    public function info(string $message) {
+    public function info(string $message): void {
         $this->printMsg($message, 'Info', 'blue');
     }
     /**
@@ -680,7 +682,7 @@ abstract class Command {
      * value is 1.
      * 
      */
-    public function moveCursorDown(int $lines = 1) {
+    public function moveCursorDown(int $lines = 1): void {
         if ($lines >= 1) {
             $this->prints("\e[".$lines."B");
         }
@@ -695,7 +697,7 @@ abstract class Command {
      * value is 1.
      * 
      */
-    public function moveCursorLeft(int $numberOfCols = 1) {
+    public function moveCursorLeft(int $numberOfCols = 1): void {
         if ($numberOfCols >= 1) {
             $this->prints("\e[".$numberOfCols."D");
         }
@@ -710,7 +712,7 @@ abstract class Command {
      * value is 1.
      * 
      */
-    public function moveCursorRight(int $numberOfCols = 1) {
+    public function moveCursorRight(int $numberOfCols = 1): void {
         if ($numberOfCols >= 1) {
             $this->prints("\e[".$numberOfCols."C");
         }
@@ -730,7 +732,7 @@ abstract class Command {
      * to. If not specified, 0 is used.
      * 
      */
-    public function moveCursorTo(int $line = 0, int $col = 0) {
+    public function moveCursorTo(int $line = 0, int $col = 0): void {
         if ($line > -1 && $col > -1) {
             $this->prints("\e[".$line.";".$col."H");
         }
@@ -745,7 +747,7 @@ abstract class Command {
      * value is 1.
      * 
      */
-    public function moveCursorUp(int $lines = 1) {
+    public function moveCursorUp(int $lines = 1): void {
         if ($lines >= 1) {
             $this->prints("\e[".$lines."A");
         }
@@ -760,7 +762,7 @@ abstract class Command {
      * @param array $array The array that will be printed.
      * 
      */
-    public function printList(array $array) {
+    public function printList(array $array): void {
         for ($x = 0 ; $x < count($array) ; $x++) {
             $this->prints("- ", [
                 'color' => 'green'
@@ -811,7 +813,7 @@ abstract class Command {
      * for available options, check the method Command::formatOutput().
      * 
      */
-    public function prints(string $str, ...$_) {
+    public function prints(string $str, ...$_): void {
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -852,7 +854,7 @@ abstract class Command {
      * @return string A string that represents a valid class name. If suffix is
      * not null, the method will return the name with the suffix included.
      */
-    public function readClassName(string $prompt, ?string $suffix = null, string $errMsg = 'Invalid class name is given.') {
+    public function readClassName(string $prompt, ?string $suffix = null, string $errMsg = 'Invalid class name is given.'): ?string {
         return $this->getInput($prompt, null, new InputValidator(function (&$className, $suffix) {
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));
@@ -879,9 +881,11 @@ abstract class Command {
      * @return float
      */
     public function readFloat(string $prompt, ?float $default = null) : float {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+        $defaultStr = $default !== null ? (string)$default : null;
+        $result = $this->getInput($prompt, $defaultStr, new InputValidator(function ($val) {
             return InputValidator::isFloat($val);
         }, 'Provided value is not a floating number!'));
+        return (float)$result;
     }
 
     /**
@@ -897,7 +901,7 @@ abstract class Command {
      *
      * @throws ReflectionException If the method was not able to initiate class instance.
      */
-    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', $constructorArgs = []) {
+    public function readInstance(string $prompt, string $errMsg = 'Invalid Class!', array $constructorArgs = []): ?object {
         $clazzNs = $this->getInput($prompt, null, new InputValidator(function ($input) {
             if (InputValidator::isClass($input)) {
                 return true;
@@ -923,9 +927,11 @@ abstract class Command {
      * @return int
      */
     public function readInteger(string $prompt, ?int $default = null) : int {
-        return $this->getInput($prompt, $default, new InputValidator(function ($val) {
+        $defaultStr = $default !== null ? (string)$default : null;
+        $result = $this->getInput($prompt, $defaultStr, new InputValidator(function ($val) {
             return InputValidator::isInt($val);
         }, 'Provided value is not an integer!'));
+        return (int)$result;
     }
     /**
      * Reads one line from input stream.
@@ -958,7 +964,7 @@ abstract class Command {
      *
      * @throws IOException If given default namespace does not represent a namespace.
      */
-    public function readNamespace(string $prompt, ?string $defaultNs = null, string $errMsg = 'Invalid Namespace!') {
+    public function readNamespace(string $prompt, ?string $defaultNs = null, string $errMsg = 'Invalid Namespace!'): ?string {
         if ($defaultNs !== null && !InputValidator::isValidNamespace($defaultNs)) {
             throw new IOException('Provided default namespace is not valid.');
         }
@@ -1015,7 +1021,7 @@ abstract class Command {
      * the user. If choices array is empty, null is returned.
      * 
      */
-    public function select(string $prompt, array $choices, int $defaultIndex = -1) {
+    public function select(string $prompt, array $choices, int $defaultIndex = -1): ?string {
         if (count($choices) != 0) {
             do {
                 $this->println($prompt, [
@@ -1094,7 +1100,7 @@ abstract class Command {
      * @param InputStream $stream An instance that implements an input stream.
      * 
      */
-    public function setInputStream(InputStream $stream) {
+    public function setInputStream(InputStream $stream): void {
         $this->inputStream = $stream;
     }
     /**
@@ -1127,7 +1133,7 @@ abstract class Command {
      * @param OutputStream $stream An instance that implements output stream.
      * 
      */
-    public function setOutputStream(OutputStream $stream) {
+    public function setOutputStream(OutputStream $stream): void {
         $this->outputStream = $stream;
     }
     /**
@@ -1137,7 +1143,7 @@ abstract class Command {
      * 
      * @param Runner $owner
      */
-    public function setOwner(?Runner $owner = null) {
+    public function setOwner(?Runner $owner = null): void {
         $this->owner = $owner;
     }
     /**
@@ -1148,7 +1154,7 @@ abstract class Command {
      * @param string $message The message that will be displayed.
      * 
      */
-    public function success(string $message) {
+    public function success(string $message): void {
         $this->printMsg($message, 'Success', 'light-green');
     }
 
@@ -1300,7 +1306,7 @@ abstract class Command {
      * @param string $message The message that will be shown.
      * 
      */
-    public function warning(string $message) {
+    public function warning(string $message): void {
         $this->prints('Warning: ', [
             'color' => 'light-yellow',
             'bold' => true
@@ -1342,7 +1348,7 @@ abstract class Command {
 
         return $retVal;
     }
-    private function checkIsArgsSetHelper() {
+    private function checkIsArgsSetHelper(): bool {
         $missingMandatory = [];
 
         foreach ($this->commandArgs as $argObj) {
@@ -1368,7 +1374,7 @@ abstract class Command {
 
         return true;
     }
-    private function checkSelectedChoice($choices, $defaultIndex, $input) {
+    private function checkSelectedChoice(array $choices, int $defaultIndex, string $input): ?string {
         $retVal = null;
 
         if (in_array($input, $choices)) {
@@ -1380,7 +1386,7 @@ abstract class Command {
             $retVal = $this->getDefaultChoiceHelper($choices, $defaultIndex);
         } else if (InputValidator::isInt($input)) {
             //Selected option is an index. Search for it and return its value.
-            $retVal = $this->getChoiceAtIndex($choices, $input);
+            $retVal = $this->getChoiceAtIndex($choices, (int)$input);
         }
 
         if ($retVal === null) {
@@ -1389,7 +1395,7 @@ abstract class Command {
 
         return $retVal;
     }
-    private function getChoiceAtIndex(array $choices, int $input) {
+    private function getChoiceAtIndex(array $choices, int $input): ?string {
         $index = 0;
 
         foreach ($choices as $choice) {
@@ -1401,7 +1407,7 @@ abstract class Command {
 
         return null;
     }
-    private function getDefaultChoiceHelper(array $choices, int $defaultIndex) {
+    private function getDefaultChoiceHelper(array $choices, int $defaultIndex): ?string {
         $index = 0;
 
         foreach ($choices as $choice) {
@@ -1505,7 +1511,7 @@ abstract class Command {
 
         return true;
     }
-    private function printChoices($choices, $default) {
+    private function printChoices(array $choices, int $default): void {
         $index = 0;
 
         foreach ($choices as $choiceTxt) {

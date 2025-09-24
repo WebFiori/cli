@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli;
 
 /**
@@ -124,7 +125,7 @@ class Formatter {
 
         return $mannerStr;
     }
-    private static function getFormattedOutput($outputString, $formatOptions) {
+    private static function getFormattedOutput(string $outputString, array $formatOptions): string {
         $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
@@ -133,7 +134,7 @@ class Formatter {
 
         return $outputString;
     }
-    private static function validateOutputOptions($formatArr) {
+    private static function validateOutputOptions(array $formatArr): array {
         $noColor = 'NO_COLOR';
 
         if (!isset($formatArr['bold'])) {

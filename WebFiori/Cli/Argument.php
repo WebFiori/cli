@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace WebFiori\Cli;
 
 /**
@@ -187,7 +189,7 @@ class Argument {
      * terminal but its value is not set, the returned value will be empty 
      * string.
      */
-    public function getValue() {
+    public function getValue(): ?string {
         return $this->value;
     }
     /**
@@ -202,7 +204,7 @@ class Argument {
     /**
      * Reset the value of the argument and set it to null.
      */
-    public function resetValue() {
+    public function resetValue(): void {
         $this->value = null;
     }
     /**
@@ -211,7 +213,7 @@ class Argument {
      * @param string $default A string that will be set as default value if the
      * argument is not provided in terminal. Note that the value will be trimmed.
      */
-    public function setDefault(string $default) {
+    public function setDefault(string $default): void {
         $this->default = trim($default);
     }
     /**
@@ -221,7 +223,7 @@ class Argument {
      * 
      * @param string $desc A string that represents the description of the argument.
      */
-    public function setDescription(string $desc) {
+    public function setDescription(string $desc): void {
         $this->description = trim($desc);
     }
     /**
@@ -229,7 +231,7 @@ class Argument {
      * 
      * @param bool $optional True to make it optional. False to make it mandatory.
      */
-    public function setIsOptional(bool $optional) {
+    public function setIsOptional(bool $optional): void {
         $this->isOptional = $optional;
     }
     /**
