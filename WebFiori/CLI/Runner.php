@@ -609,17 +609,12 @@ class Runner {
         }
         $this->commands[$cliCommand->getName()] = $cliCommand;
 
-        // Add provided aliases to the command's internal aliases
-        foreach ($aliases as $alias) {
-            $cliCommand->addAlias($alias);
-        }
-
-        // Register aliases
+        // Register runtime aliases
         foreach ($aliases as $alias) {
             $this->registerAlias($alias, $cliCommand->getName());
         }
 
-        // Register aliases from command itself
+        // Register built-in aliases from command itself
         foreach ($cliCommand->getAliases() as $alias) {
             $this->registerAlias($alias, $cliCommand->getName());
         }
@@ -1086,7 +1081,10 @@ class Runner {
                 // If user chose existing command, do nothing
             } else {
                 // Non-interactive mode: use first-come-first-served (do nothing)
-                $this->printMsg("Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+                // Suppress warning if both existing and new command are 'help' (expected duplicate registration)
+                if (!($existingCommand === 'help' && $commandName === 'help')) {
+                    $this->printMsg("Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+                }
             }
         } else {
             // No conflict, register the alias

@@ -775,6 +775,7 @@ class RunnerTest extends CommandTestCase {
      */
     public function testSubCommandExecutionEnhanced() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $mainCommand = new TestCommand('main-cmd');
         $subCommand = new TestCommand('sub-cmd');
         

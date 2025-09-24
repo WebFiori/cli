@@ -3,7 +3,6 @@ namespace WebFiori\Tests\Cli;
 
 use WebFiori\CLI\CommandTestCase;
 use WebFiori\CLI\Runner;
-use WebFiori\CLI\Commands\HelpCommand;
 use WebFiori\CLI\Streams\ArrayInputStream;
 use WebFiori\CLI\Streams\ArrayOutputStream;
 use WebFiori\Tests\CLI\TestCommands\AliasTestCommand;
@@ -24,10 +23,9 @@ class AliasingIntegrationTest extends CommandTestCase {
         $runner->setOutputStream(new ArrayOutputStream());
         
         $aliasCommand = new AliasTestCommand();
-        $helpCommand = new HelpCommand();
+        // Don't register HelpCommand - it's automatically registered by Runner constructor
         
         $runner->register($aliasCommand);
-        $runner->register($helpCommand);
         
         // Test help for command via direct name (not alias, as help might not resolve aliases)
         $runner->setArgsVector(['script.php', 'help', '--command-name=alias-test']);
@@ -51,10 +49,9 @@ class AliasingIntegrationTest extends CommandTestCase {
         $runner->setOutputStream(new ArrayOutputStream());
         
         $command = new AliasTestCommand(); // Has aliases: 'test', 'at'
-        $helpCommand = new HelpCommand();
+        // Don't register HelpCommand - it's automatically registered by Runner constructor
         
         $runner->register($command, ['extra-alias']); // Add runtime alias
-        $runner->register($helpCommand);
         
         // Get general help
         $runner->setArgsVector(['script.php', 'help']);
@@ -75,21 +72,22 @@ class AliasingIntegrationTest extends CommandTestCase {
     public function testAliasResolutionPerformance() {
         $runner = new Runner();
         
-        // Create many commands with aliases
-        $commands = [];
+        // Create one command with many aliases to avoid conflicts
+        $command = new NoAliasCommand();
+        $aliases = [];
         for ($i = 1; $i <= 50; $i++) {
-            $command = new NoAliasCommand();
-            $aliases = ["alias$i", "a$i", "cmd$i"];
-            $runner->register($command, $aliases);
-            $commands[] = $command;
+            $aliases[] = "perf_alias$i";
+            $aliases[] = "perf_a$i";
+            $aliases[] = "perf_cmd$i";
         }
+        $runner->register($command, $aliases);
         
         // Test resolution performance
         $start = microtime(true);
         for ($i = 1; $i <= 50; $i++) {
-            $this->assertEquals('no-alias', $runner->resolveAlias("alias$i"));
-            $this->assertEquals('no-alias', $runner->resolveAlias("a$i"));
-            $this->assertEquals('no-alias', $runner->resolveAlias("cmd$i"));
+            $this->assertEquals('no-alias', $runner->resolveAlias("perf_alias$i"));
+            $this->assertEquals('no-alias', $runner->resolveAlias("perf_a$i"));
+            $this->assertEquals('no-alias', $runner->resolveAlias("perf_cmd$i"));
         }
         $end = microtime(true);
         
@@ -195,6 +193,7 @@ class AliasingIntegrationTest extends CommandTestCase {
      */
     public function testDuplicateAliasesInSameRegistration() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $command = new NoAliasCommand();
         
         // Register with duplicate aliases
@@ -207,6 +206,11 @@ class AliasingIntegrationTest extends CommandTestCase {
         $this->assertArrayHasKey('unique', $aliases);
         $this->assertArrayHasKey('another', $aliases);
         $this->assertEquals('no-alias', $aliases['dup']);
+        
+        // Check output contains expected warning
+        $output = $runner->getOutputStream()->getOutputArray();
+        $expectedOutput = ["Warning: Alias 'dup' already exists for command 'no-alias'. Ignoring new alias for 'no-alias'.\n"];
+        $this->assertEquals($expectedOutput, $output);
     }
 
     /**

@@ -1047,6 +1047,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1068,6 +1069,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1089,6 +1091,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear02() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1110,6 +1113,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear03() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1131,6 +1135,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear05() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1152,6 +1157,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear06() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1173,6 +1179,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1197,6 +1204,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1221,6 +1229,8 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command);
@@ -1242,6 +1252,8 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command, [
@@ -1614,6 +1626,7 @@ class CLICommandTest extends TestCase {
     public function testOwnerRelationshipMethodEnhanced() {
         $command = new TestCommand('test-cmd');
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         
         // Initially no owner
         $this->assertNull($command->getOwner());
@@ -1634,6 +1647,7 @@ class CLICommandTest extends TestCase {
     public function testSubCommandExecutionMethodEnhanced() {
         $command = new TestCommand('main-cmd');
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $subCommand = new TestCommand('sub-cmd');
         
         $runner->register($command);
