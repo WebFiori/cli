@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
+<phpunit stderr="true" colors="true" bootstrap="bootstrap.php" displayDetailsOnTestsThatTriggerDeprecations="true">
     <php>
     </php>
-    <filter>
-        <whitelist addUncoveredFilesFromWhitelist="true">
-            <file>../WebFiori/Cli/CLICommand.php</file>
+    <source>
+        <include>
+            <file>../WebFiori/Cli/Command.php</file>
             <file>../WebFiori/Cli/CommandArgument.php</file>
             <file>../WebFiori/Cli/Formatter.php</file>
             <file>../WebFiori/Cli/KeysMap.php</file>
@@ -15,11 +15,16 @@
             <file>../WebFiori/Cli/Streams/ArrayOutputStream.php</file>
             <file>../WebFiori/Cli/Streams/FileInputStream.php</file>
             <file>../WebFiori/Cli/Streams/FileOutputStream.php</file>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-clover" target="clover.xml"/>
-    </logging>
+            <file>../WebFiori/Cli/Discovery/CommandDiscovery.php</file>
+            <file>../WebFiori/Cli/Discovery/CommandMetadata.php</file>
+            <file>../WebFiori/Cli/Discovery/CommandCache.php</file>
+            <file>../WebFiori/Cli/Discovery/AutoDiscoverable.php</file>
+            <file>../WebFiori/Cli/Exceptions/CommandDiscoveryException.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBar.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarStyle.php</file>
+            <file>../WebFiori/Cli/Progress/ProgressBarFormat.php</file>
+        </include>
+    </source>
     <testsuites>
         <testsuite name="Tests">
             <directory>./WebFiori/Tests/Cli</directory>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         bootstrap="../../../../vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         stopOnFailure="false"
+         processIsolation="false"
+         backupGlobals="false"
+         backupStaticAttributes="false">
+    
+    <testsuites>
+        <testsuite name="WebFiori CLI Table Tests">
+            <file>TableBuilderTest.php</file>
+            <file>TableStyleTest.php</file>
+            <file>ColumnTest.php</file>
+            <file>TableDataTest.php</file>
+            <file>TableFormatterTest.php</file>
+            <file>TableThemeTest.php</file>
+            <file>ColumnCalculatorTest.php</file>
+            <file>TableRendererTest.php</file>
+        </testsuite>
+    </testsuites>
+    
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">../../../../WebFiori/Cli/Table</directory>
+        </include>
+        <exclude>
+            <file>../../../../WebFiori/CLI/Table/README.md</file>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage-html"/>
+            <text outputFile="coverage.txt"/>
+            <clover outputFile="coverage.xml"/>
+        </report>
+    </coverage>
+    
+    <logging>
+        <junit outputFile="test-results.xml"/>
+    </logging>
+    
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="1G"/>
+    </php>
+</phpunit>

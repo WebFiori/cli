@@ -1,12 +1,12 @@
 <?php
 
-namespace WebFiori\Tests\Cli;
+namespace WebFiori\Tests\CLI;
 
-use WebFiori\Cli\CLICommand;
+use WebFiori\Cli\Command;
 use WebFiori\Cli\Streams\ArrayOutputStream;
 use WebFiori\Cli\Streams\StdIn;
 
-class TestCommand extends CLICommand {
+class TestCommand extends Command {
     public function __construct($commandName, $args = array(), $description = '') {
         parent::__construct($commandName, $args, $description);
         $this->setInputStream(new StdIn());

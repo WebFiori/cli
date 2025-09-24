@@ -3,6 +3,7 @@ namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Exceptions\IOException;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Cli\Runner;
@@ -998,7 +999,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg02() {
         $command = new TestCommand('new-command');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $argDetails = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
@@ -1011,7 +1012,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg03() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $argDetails = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
@@ -1024,7 +1025,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg04() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $this->assertFalse($command->addArg('default-options'));
     }
@@ -1034,9 +1035,9 @@ class CLICommandTest extends TestCase {
     public function testAddArg05() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true,
-            'description' => ' ',
-            'default' => 'ok , good '
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => ' ',
+            ArgumentOption::DEFAULT => 'ok , good '
         ]));
         $arg = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $arg->getDescription());
@@ -1047,6 +1048,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1068,6 +1070,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1089,6 +1092,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear02() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1110,6 +1114,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear03() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1131,6 +1136,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear05() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1152,6 +1158,7 @@ class CLICommandTest extends TestCase {
      */
     public function testClear06() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1173,6 +1180,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1197,6 +1205,7 @@ class CLICommandTest extends TestCase {
      */
     public function testMove01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello', [
             'name' => [
@@ -1221,6 +1230,8 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList00() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command);
@@ -1242,6 +1253,8 @@ class CLICommandTest extends TestCase {
      */
     public function testPrintList01() {
         $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        $runner->setOutputStream(new ArrayOutputStream());
         $runner->setInputs([]);
         $command = new TestCommand('hello');
         $runner->runCommand($command, [
@@ -1284,4 +1297,443 @@ class CLICommandTest extends TestCase {
         $this->assertFalse($command->setArgValue('not-exist'));
     }
     
+    // ========== ENHANCED COMMAND TESTS ==========
+    
+    /**
+     * Test command aliases functionality
+     * @test
+     */
+    public function testCommandAliasesEnhanced() {
+        $command = new TestCommand('test-cmd', [], 'Test command', ['tc', 'test']);
+        
+        // Note: The actual implementation might not store aliases in the command itself
+        // but rather in the runner. Let's test what we can verify.
+        $this->assertEquals('test-cmd', $command->getName());
+        
+        // Test that aliases are passed to constructor (even if not stored in command)
+        $this->assertIsArray($command->getAliases());
+    }
+
+    /**
+     * Test command description edge cases
+     * @test
+     */
+    public function testCommandDescriptionEdgeCasesEnhanced() {
+        // Test with empty description
+        $command = new TestCommand('test-cmd', [], '');
+        $this->assertEquals('<NO DESCRIPTION>', $command->getDescription());
+        
+        // Test setting description after construction
+        $this->assertTrue($command->setDescription('New description'));
+        $this->assertEquals('New description', $command->getDescription());
+        
+        // Test setting empty description
+        $this->assertFalse($command->setDescription(''));
+        $this->assertEquals('New description', $command->getDescription()); // Should remain unchanged
+    }
+
+    /**
+     * Test command name validation
+     * @test
+     */
+    public function testCommandNameValidationEnhanced() {
+        // Test invalid names
+        $command = new TestCommand('');
+        $this->assertEquals('new-command', $command->getName()); // Should fallback to default
+        
+        $command2 = new TestCommand('invalid name with spaces');
+        $this->assertEquals('new-command', $command2->getName()); // Should fallback to default
+        
+        // Test valid name setting
+        $command3 = new TestCommand('valid-name');
+        $this->assertTrue($command3->setName('another-valid-name'));
+        $this->assertEquals('another-valid-name', $command3->getName());
+        
+        // Test invalid name setting
+        $this->assertFalse($command3->setName(''));
+        $this->assertEquals('another-valid-name', $command3->getName()); // Should remain unchanged
+    }
+
+    /**
+     * Test argument handling edge cases
+     * @test
+     */
+    public function testArgumentHandlingEdgeCasesEnhanced() {
+        $command = new TestCommand('test-cmd');
+        
+        // Test adding argument with all options
+        $this->assertTrue($command->addArg('--test-arg', [
+            ArgumentOption::OPTIONAL => false,
+            ArgumentOption::DESCRIPTION => 'Test argument',
+            ArgumentOption::DEFAULT => 'default-value',
+            ArgumentOption::VALUES => ['val1', 'val2', 'val3']
+        ]));
+        
+        // Test duplicate argument
+        $this->assertFalse($command->addArg('--test-arg', [])); // Should fail for duplicate
+        
+        // Test getting non-existent argument
+        $this->assertNull($command->getArg('--non-existent'));
+        
+        // Test checking if argument exists
+        $this->assertTrue($command->hasArg('--test-arg'));
+        $this->assertFalse($command->hasArg('--non-existent'));
+        
+        // Test getting argument names
+        $argNames = $command->getArgsNames();
+        $this->assertContains('--test-arg', $argNames);
+    }
+
+    /**
+     * Test cursor movement methods
+     * @test
+     */
+    public function testCursorMovementMethodsEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        // Test cursor movements
+        $command->moveCursorUp(5);
+        $command->moveCursorDown(3);
+        $command->moveCursorLeft(2);
+        $command->moveCursorRight(4);
+        $command->moveCursorTo(10, 20);
+        
+        $outputArray = $output->getOutputArray();
+        $this->assertNotEmpty($outputArray);
+        
+        // Test with invalid values (should be handled gracefully)
+        $command->moveCursorUp(-1); // Should be ignored or handled
+        $command->moveCursorDown(0);
+        $command->moveCursorLeft(-5);
+        $command->moveCursorRight(0);
+    }
+
+    /**
+     * Test screen clearing methods
+     * @test
+     */
+    public function testScreenClearingMethodsEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        // Test clear methods
+        $result1 = $command->clear(5, true);
+        $this->assertInstanceOf(TestCommand::class, $result1); // Should return self
+        
+        $result2 = $command->clear(3, false);
+        $this->assertInstanceOf(TestCommand::class, $result2);
+        
+        $result3 = $command->clearConsole();
+        $this->assertInstanceOf(TestCommand::class, $result3);
+        
+        $command->clearLine();
+        
+        $outputArray = $output->getOutputArray();
+        $this->assertNotEmpty($outputArray);
+    }
+
+    /**
+     * Test input reading methods
+     * @test
+     */
+    public function testInputReadingMethodsEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $input = new ArrayInputStream(['test input', '42', '3.14']);
+        $command->setInputStream($input);
+        
+        // Test basic input reading
+        $result = $command->readln();
+        $this->assertEquals('test input', $result);
+        
+        // Test reading integer
+        $intResult = $command->readInteger('Enter number: ');
+        $this->assertEquals(42, $intResult);
+        
+        // Test reading float
+        $floatResult = $command->readFloat('Enter float: ');
+        $this->assertEquals(3.14, $floatResult);
+    }
+
+    /**
+     * Test confirmation dialog
+     * @test
+     */
+    public function testConfirmationDialogEnhanced() {
+        $command = new TestCommand('test-cmd');
+        
+        // Test with 'y' input
+        $input1 = new ArrayInputStream(['y']);
+        $command->setInputStream($input1);
+        $result1 = $command->confirm('Continue?');
+        $this->assertTrue($result1);
+        
+        // Test with 'n' input
+        $input2 = new ArrayInputStream(['n']);
+        $command->setInputStream($input2);
+        $result2 = $command->confirm('Continue?');
+        $this->assertFalse($result2);
+        
+        // Test with default value
+        $input3 = new ArrayInputStream(['']); // Empty input
+        $command->setInputStream($input3);
+        $result3 = $command->confirm('Continue?', true);
+        $this->assertTrue($result3); // Should use default
+    }
+
+    /**
+     * Test selection method
+     * @test
+     */
+    public function testSelectionMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        $choices = ['Option 1', 'Option 2', 'Option 3'];
+        
+        // Test valid selection
+        $input = new ArrayInputStream(['2']);
+        $command->setInputStream($input);
+        $result = $command->select('Choose option:', $choices);
+        $this->assertEquals('Option 3', $result); // Index 2 = Option 3 (0-based indexing)
+        
+        // Test with default
+        $input2 = new ArrayInputStream(['']); // Empty input
+        $command->setInputStream($input2);
+        $result2 = $command->select('Choose option:', $choices, 0);
+        $this->assertEquals('Option 1', $result2); // Should use default index
+    }
+
+    /**
+     * Test list printing
+     * @test
+     */
+    public function testListPrintingMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        $items = ['Item 1', 'Item 2', 'Item 3'];
+        $command->printList($items);
+        
+        $outputArray = $output->getOutputArray();
+        $this->assertNotEmpty($outputArray);
+        
+        // Test with string values only
+        $output->reset();
+        $stringItems = ['value1', 'value2'];
+        $command->printList($stringItems);
+    }
+
+    /**
+     * Test message formatting methods
+     * @test
+     */
+    public function testMessageFormattingMethodsEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        // Test different message types
+        $command->error('Error message');
+        $command->warning('Warning message');
+        $command->info('Info message');
+        $command->success('Success message');
+        
+        $outputArray = $output->getOutputArray();
+        $this->assertCount(4, $outputArray);
+        
+        // Test with ANSI enabled
+        $ansiArg = new Argument('--ansi');
+        $ansiArg->setValue('');
+        $command->addArgument($ansiArg);
+        
+        $output2 = new ArrayOutputStream();
+        $command->setOutputStream($output2);
+        
+        $command->error('ANSI Error');
+        $command->warning('ANSI Warning');
+        $command->info('ANSI Info');
+        $command->success('ANSI Success');
+        
+        $ansiOutputArray = $output2->getOutputArray();
+        $this->assertCount(4, $ansiOutputArray);
+        
+        // ANSI output should contain escape sequences
+        $this->assertStringContainsString("\e[", $ansiOutputArray[0]);
+    }
+
+    /**
+     * Test argument removal
+     * @test
+     */
+    public function testArgumentRemovalMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        
+        // Add some arguments
+        $command->addArg('--arg1', []);
+        $command->addArg('--arg2', []);
+        $command->addArg('--arg3', []);
+        
+        $this->assertTrue($command->hasArg('--arg1'));
+        $this->assertTrue($command->hasArg('--arg2'));
+        $this->assertTrue($command->hasArg('--arg3'));
+        
+        // Remove an argument
+        $this->assertTrue($command->removeArgument('--arg2'));
+        $this->assertFalse($command->hasArg('--arg2'));
+        $this->assertTrue($command->hasArg('--arg1')); // Others should remain
+        $this->assertTrue($command->hasArg('--arg3'));
+        
+        // Try to remove non-existent argument
+        $this->assertFalse($command->removeArgument('--non-existent'));
+    }
+
+    /**
+     * Test input validation with InputValidator
+     * @test
+     */
+    public function testInputValidationMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        
+        // Test with a simple validation function
+        $validator = new InputValidator(
+            function(string &$input): bool {
+                return strlen($input) >= 3;
+            },
+            'Input must be at least 3 characters long'
+        );
+        
+        // Test valid input
+        $input1 = new ArrayInputStream(['valid']);
+        $command->setInputStream($input1);
+        $result1 = $command->getInput('Enter text: ', null, $validator);
+        $this->assertEquals('valid', $result1);
+        
+        // Test with default value
+        $input2 = new ArrayInputStream(['']);
+        $command->setInputStream($input2);
+        $result2 = $command->getInput('Enter text: ', 'default', $validator);
+        $this->assertEquals('default', $result2);
+    }
+
+    /**
+     * Test owner (Runner) relationship
+     * @test
+     */
+    public function testOwnerRelationshipMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        
+        // Initially no owner
+        $this->assertNull($command->getOwner());
+        
+        // Set owner
+        $command->setOwner($runner);
+        $this->assertSame($runner, $command->getOwner());
+        
+        // Clear owner
+        $command->setOwner(null);
+        $this->assertNull($command->getOwner());
+    }
+
+    /**
+     * Test sub-command execution
+     * @test
+     */
+    public function testSubCommandExecutionMethodEnhanced() {
+        $command = new TestCommand('main-cmd');
+        $runner = new Runner();
+        $runner->setOutputStream(new ArrayOutputStream());
+        $subCommand = new TestCommand('sub-cmd');
+        
+        $runner->register($command);
+        $runner->register($subCommand);
+        $command->setOwner($runner);
+        
+        // Test executing sub-command
+        $result = $command->execSubCommand('sub-cmd');
+        $this->assertEquals(0, $result); // Assuming TestCommand returns 0
+        
+        // Test executing non-existent sub-command
+        $result2 = $command->execSubCommand('non-existent');
+        $this->assertEquals(-1, $result2); // Should return error code
+    }
+
+    /**
+     * Test argument provided checking
+     * @test
+     */
+    public function testArgumentProvidedCheckingMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $command->addArg('--test-arg', [ArgumentOption::OPTIONAL => true]);
+        
+        // Initially not provided
+        $this->assertFalse($command->isArgProvided('--test-arg'));
+        
+        // Set value
+        $command->setArgValue('--test-arg', 'value');
+        $this->assertTrue($command->isArgProvided('--test-arg'));
+        
+        // Test non-existent argument
+        $this->assertFalse($command->isArgProvided('--non-existent'));
+    }
+
+    /**
+     * Test stream getters and setters
+     * @test
+     */
+    public function testStreamHandlingMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        
+        // Test default streams
+        $this->assertNotNull($command->getInputStream());
+        $this->assertNotNull($command->getOutputStream());
+        
+        // Test setting custom streams
+        $customInput = new ArrayInputStream(['test']);
+        $customOutput = new ArrayOutputStream();
+        
+        $command->setInputStream($customInput);
+        $command->setOutputStream($customOutput);
+        
+        $this->assertSame($customInput, $command->getInputStream());
+        $this->assertSame($customOutput, $command->getOutputStream());
+    }
+
+    /**
+     * Test reading with byte limit
+     * @test
+     */
+    public function testReadWithByteLimitMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $input = new ArrayInputStream(['hello world']);
+        $command->setInputStream($input);
+        
+        // Test reading specific number of bytes
+        $result = $command->read(5);
+        $this->assertEquals('hello', $result);
+    }
+
+    /**
+     * Test command execution wrapper
+     * @test
+     */
+    public function testCommandExecutionWrapperMethodEnhanced() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        // Test successful execution
+        $result = $command->excCommand();
+        $this->assertEquals(0, $result);
+        
+        // The excCommand method should call exec() and handle any exceptions
+        $outputArray = $output->getOutputArray();
+        $this->assertNotEmpty($outputArray); // TestCommand should produce some output
+    }
 }

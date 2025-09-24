@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 /**
@@ -34,7 +35,7 @@ class ArrayOutputStream implements OutputStream {
      * 
      * @param array $_ Any extra formatting options.
      */
-    public function println(string $str, ...$_) {
+    public function println(string $str, ...$_): void {
         $this->isPrintln = true;
         $toPass = [$str."\n"];
 
@@ -53,7 +54,7 @@ class ArrayOutputStream implements OutputStream {
      * 
      * @param array $_ Any extra parameters that the string needs.
      */
-    public function prints(string $str, ...$_) {
+    public function prints(string $str, ...$_): void {
         $arrayToPass = [$str];
 
         foreach ($_ as $val) {
@@ -81,7 +82,7 @@ class ArrayOutputStream implements OutputStream {
     /**
      * Removes all stored output.
      */
-    public function reset() {
+    public function reset(): void {
         $this->outputArr = [];
     }
 }

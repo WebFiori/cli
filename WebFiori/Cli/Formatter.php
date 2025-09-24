@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli;
 
 /**
@@ -10,7 +11,6 @@ namespace WebFiori\Cli;
 class Formatter {
     /**
      * An associative array that contains color codes and names.
-     * @since 1.0
      */
     const COLORS = [
         'black' => 30,
@@ -73,7 +73,6 @@ class Formatter {
      * </ul>
      * @return string The string after applying the formatting to it.
      * 
-     * @since 1.0
      */
     public static function format(string $string, array $formatOptions = []) : string {
         $validatedOptions = self::validateOutputOptions($formatOptions);
@@ -126,7 +125,7 @@ class Formatter {
 
         return $mannerStr;
     }
-    private static function getFormattedOutput($outputString, $formatOptions) {
+    private static function getFormattedOutput(string $outputString, array $formatOptions): string {
         $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
@@ -135,7 +134,7 @@ class Formatter {
 
         return $outputString;
     }
-    private static function validateOutputOptions($formatArr) {
+    private static function validateOutputOptions(array $formatArr): array {
         $noColor = 'NO_COLOR';
 
         if (!isset($formatArr['bold'])) {

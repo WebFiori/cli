@@ -15,9 +15,9 @@ class KeysMapTest extends TestCase {
      */
     public function test00() {
         $stream = new ArrayInputStream([
-            "\e"
+            chr(27) // ESC character
         ]);
-        $this->assertEquals("\e", KeysMap::read($stream));
+        $this->assertEquals("ESC", KeysMap::readAndTranslate($stream));
     }
     /**
      * @test
@@ -26,16 +26,17 @@ class KeysMapTest extends TestCase {
         $stream = new ArrayInputStream([
             "\r"
         ]);
-        $this->assertEquals("\r", KeysMap::read($stream));
+        $this->assertEquals("CR", KeysMap::readAndTranslate($stream));
     }
     /**
      * @test
      */
     public function test02() {
         $stream = new ArrayInputStream([
-            "\r\n"
+            "\r",
+            "\n"
         ]);
-        $this->assertEquals("\r", KeysMap::read($stream));
-        $this->assertEquals("\n", KeysMap::read($stream));
+        $this->assertEquals("CR", KeysMap::readAndTranslate($stream));
+        $this->assertEquals("LF", KeysMap::readAndTranslate($stream));
     }
 }

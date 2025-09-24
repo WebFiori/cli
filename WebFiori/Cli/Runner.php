@@ -1,14 +1,19 @@
 <?php
+declare(strict_types=1);
+
 namespace WebFiori\Cli;
 
 use Throwable;
+use WebFiori\Cli\Commands\HelpCommand;
+use WebFiori\Cli\Discovery\AutoDiscoverable;
+use WebFiori\Cli\Discovery\CommandCache;
+use WebFiori\Cli\Discovery\CommandDiscovery;
 use WebFiori\Cli\Streams\ArrayInputStream;
 use WebFiori\Cli\Streams\ArrayOutputStream;
 use WebFiori\Cli\Streams\InputStream;
 use WebFiori\Cli\Streams\OutputStream;
 use WebFiori\Cli\Streams\StdIn;
 use WebFiori\Cli\Streams\StdOut;
-
 
 /**
  * The core class which is used to manage command line related operations.
@@ -19,9 +24,10 @@ class Runner {
     /**
      * The command that will be executed now.
      * 
-     * @var CLICommand|null
+     * @var Command|null
      */
     private $activeCommand;
+
     /**
      * An array that holds sub-arrays for callbacks that will be executed
      * each time a command finish execution.
@@ -29,9 +35,31 @@ class Runner {
      * @var array
      */
     private $afterRunPool;
+
+    /**
+     * An associative array that maps aliases to command names.
+     * 
+     * @var array
+     */
+    private $aliases;
     private $argsV;
+
+    /**
+     * Whether auto-discovery is enabled.
+     * 
+     * @var bool
+     */
+    private $autoDiscoveryEnabled;
     private $beforeStartPool;
+
+    /**
+     * Command discovery instance for auto-registration.
+     * 
+     * @var CommandDiscovery|null
+     */
+    private $commandDiscovery;
     private $commandExitVal;
+
     /**
      * An associative array that contains supported commands. 
      * 
@@ -39,12 +67,21 @@ class Runner {
      * 
      */
     private $commands;
+
+    /**
+     * Whether commands have been discovered yet.
+     * 
+     * @var bool
+     */
+    private $commandsDiscovered;
+
     /**
      * 
-     * @var CLICommand|null
+     * @var Command|null
      */
     private $defaultCommand;
     private $globalArgs;
+
     /**
      * 
      * @var InputStream
@@ -52,6 +89,7 @@ class Runner {
      */
     private $inputStream;
     private $isAnsi;
+
     /**
      * An attribute which is set to true if CLI is running in interactive mode 
      * or not.
@@ -59,16 +97,19 @@ class Runner {
      * @var bool
      */
     private $isInteractive;
+
     /**
      * 
      * @var OutputStream
      */
     private $outputStream;
+
     /**
      * Creates new instance of the class.
      */
     public function __construct() {
         $this->commands = [];
+        $this->aliases = [];
         $this->globalArgs = [];
         $this->argsV = [];
         $this->isInteractive = false;
@@ -78,18 +119,25 @@ class Runner {
         $this->commandExitVal = 0;
         $this->afterRunPool = [];
 
+        // Initialize discovery properties
+        $this->commandDiscovery = null;
+        $this->autoDiscoveryEnabled = false;
+        $this->commandsDiscovered = false;
+
         $this->addArg('--ansi', [
-            Option::OPTIONAL => true,
-            Option::DESCRIPTION => 'Force the use of ANSI output.'
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
-        $this->setBeforeStart(function (Runner $r)
-        {
+        $this->setBeforeStart(function (Runner $r) {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
             $r->checkIsInteractive();
         });
+        $this->register(new HelpCommand(), ['-h']);
+        $this->setDefaultCommand('help');
     }
+
     /**
      * Adds a global command argument.
      * 
@@ -120,9 +168,8 @@ class Runner {
      * @return bool If the argument is added, the method will return true.
      * Other than that, the method will return false.
      * 
-     * @since 1.0
      */
-    public function addArg(string $name, array $options = []) : bool {
+    public function addArg(string $name, array $options = []): bool {
         $toAdd = Argument::create($name, $options);
 
         if ($toAdd === null) {
@@ -131,6 +178,7 @@ class Runner {
 
         return $this->addArgument($toAdd);
     }
+
     /**
      * Adds an argument to the set of global arguments.
      * 
@@ -142,7 +190,7 @@ class Runner {
      * @return bool If the argument is added, the method will return true.
      * Other than that, false is returned.
      */
-    public function addArgument(Argument $arg) : bool {
+    public function addArgument(Argument $arg): bool {
         if (!$this->hasArg($arg->getName())) {
             $this->globalArgs[] = $arg;
 
@@ -151,49 +199,247 @@ class Runner {
 
         return false;
     }
+
+    /**
+     * Add a directory path to search for commands.
+     * 
+     * @param string $path Directory path to search
+     * @return Runner
+     */
+    public function addDiscoveryPath(string $path): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPath($path);
+
+        return $this;
+    }
+
+    /**
+     * Add multiple discovery paths.
+     * 
+     * @param array $paths Array of directory paths
+     * @return Runner
+     */
+    public function addDiscoveryPaths(array $paths): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->addSearchPaths($paths);
+
+        return $this;
+    }
+
+    /**
+     * Auto-register commands from a directory (convenience method).
+     * 
+     * @param string $path Directory path to search
+     * @param array $excludePatterns Optional exclude patterns
+     * @return Runner
+     */
+    public function autoRegister(string $path, array $excludePatterns = []): Runner {
+        return $this->addDiscoveryPath($path)
+                        ->excludePatterns($excludePatterns)
+                        ->discoverCommands();
+    }
+
+    /**
+     * Clear discovery cache.
+     * 
+     * @return Runner
+     */
+    public function clearDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->clear();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Disable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function disableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Disable discovery caching.
+     * 
+     * @return Runner
+     */
+    public function disableDiscoveryCache(): Runner {
+        if ($this->commandDiscovery !== null) {
+            $this->commandDiscovery->getCache()->setEnabled(false);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Discover and register commands from configured paths.
+     * 
+     * @return Runner
+     */
+    public function discoverCommands(): Runner {
+        if (!$this->autoDiscoveryEnabled || $this->commandsDiscovered) {
+            return $this;
+        }
+
+        $discoveredCommands = $this->commandDiscovery->discover();
+
+        foreach ($discoveredCommands as $command) {
+            // Check if command implements AutoDiscoverable
+            if ($command instanceof AutoDiscoverable && !$command::shouldAutoRegister()) {
+                continue;
+            }
+
+            $this->register($command);
+        }
+
+        $this->commandsDiscovered = true;
+
+        return $this;
+    }
+
+    /**
+     * Enable auto-discovery of commands.
+     * 
+     * @return Runner
+     */
+    public function enableAutoDiscovery(): Runner {
+        $this->autoDiscoveryEnabled = true;
+
+        if ($this->commandDiscovery === null) {
+            $this->commandDiscovery = new CommandDiscovery();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enable discovery caching.
+     * 
+     * @param string $cacheFile Optional cache file path
+     * @return Runner
+     */
+    public function enableDiscoveryCache(string $cacheFile = 'cache/commands.json'): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->getCache()->setEnabled(true);
+        $this->commandDiscovery->getCache()->setCacheFile($cacheFile);
+
+        return $this;
+    }
+
+    /**
+     * Add a pattern to exclude files/directories from discovery.
+     * 
+     * @param string $pattern Glob pattern to exclude
+     * @return Runner
+     */
+    public function excludePattern(string $pattern): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePattern($pattern);
+
+        return $this;
+    }
+
+    /**
+     * Add multiple exclude patterns.
+     * 
+     * @param array $patterns Array of glob patterns
+     * @return Runner
+     */
+    public function excludePatterns(array $patterns): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->excludePatterns($patterns);
+
+        return $this;
+    }
+
     /**
      * Returns the command which is being executed.
      * 
-     * @return CLICommand|null If a command is requested and currently in execute 
+     * @return Command|null If a command is requested and currently in execute 
      * stage, the method will return it as an object. If 
      * no command is active, the method will return null.
      * 
      */
-    public function getActiveCommand() {
+    public function getActiveCommand(): ?Command {
         return $this->activeCommand;
     }
+
+    /**
+     * Resolve alias conflict interactively by prompting the user.
+     * 
+     * @param string $alias The conflicting alias.
+     * @param string $existingCommand The existing command that uses the alias.
+     * @param string $newCommand The new command trying to use the alias.
+     * 
+     * @return string The command name chosen by the user.
+     * /**
+     * Get all registered aliases.
+     * 
+     * @return array An associative array where keys are aliases and values are command names.
+     */
+    public function getAliases(): array {
+        return $this->aliases;
+    }
+
     /**
      * Returns an array that contains objects that represents global arguments.
      * 
      * @return array An array that contains objects that represents global arguments.
      */
-    public function getArgs() : array {
+    public function getArgs(): array {
         return $this->globalArgs;
     }
+
     /**
      * Returns an array that contains arguments vector values.
      * 
      * @return array Each index will have one part of arguments vector.
      */
-    public function getArgsVector() : array {
+    public function getArgsVector(): array {
         return $this->argsV;
     }
+
     /**
      * Returns a registered command given its name.
      * 
      * @param string $name The name of the command as specified when it was
      * initialized.
      * 
-     * @return CLICommand|null If the command is registered, it is returned
+     * @return Command|null If the command is registered, it is returned
      * as an object. Other than that, null is returned.
      */
-    public function getCommandByName(string $name) {
+    public function getCommandByName(string $name): ?Command {
+        // First check if it's a direct command name
         if (isset($this->getCommands()[$name])) {
             return $this->getCommands()[$name];
         }
 
+        // Then check if it's an alias
+        if (isset($this->aliases[$name])) {
+            $commandName = $this->aliases[$name];
+
+            if (isset($this->getCommands()[$commandName])) {
+                return $this->getCommands()[$commandName];
+            }
+        }
+
         return null;
     }
+
+    /**
+     * Get the command discovery instance.
+     * 
+     * @return CommandDiscovery|null
+     */
+    public function getCommandDiscovery(): ?CommandDiscovery {
+        return $this->commandDiscovery;
+    }
+
     /**
      * Returns an associative array of registered commands.
      * 
@@ -202,25 +448,36 @@ class Runner {
      * an object that holds command information.
      * 
      */
-    public function getCommands() : array {
+    public function getCommands(): array {
         return $this->commands;
     }
+
     /**
      * Return the command which will get executed in case no command name
      * was provided as argument.
      * 
-     * @return CLICommand|null If set, it will be returned as object.
+     * @return Command|null If set, it will be returned as object.
      * Other than that, null is returned.
      */
-    public function getDefaultCommand() {
+    public function getDefaultCommand(): ?Command {
         return $this->defaultCommand;
     }
+
+    /**
+     * Get discovery cache instance.
+     * 
+     * @return CommandCache|null
+     */
+    public function getDiscoveryCache(): ?CommandCache {
+        return $this->commandDiscovery?->getCache();
+    }
+
     /**
      * Returns the stream at which the engine is using to get inputs.
      * 
      * @return InputStream The default input stream is 'StdIn'.
      */
-    public function getInputStream() : InputStream {
+    public function getInputStream(): InputStream {
         return $this->inputStream;
     }
 
@@ -230,9 +487,10 @@ class Runner {
      * @return int For success run, the method should return 0. Other than that,
      * it means the command was executed with an error.
      */
-    public function getLastCommandExitStatus() : int {
+    public function getLastCommandExitStatus(): int {
         return $this->commandExitVal;
     }
+
     /**
      * Returns an array that contain all generated output by executing a command.
      * 
@@ -243,7 +501,7 @@ class Runner {
      * @return array An array that contains all output lines which are generated
      * by executing a specific command.
      */
-    public function getOutput() : array {
+    public function getOutput(): array {
         $outputStream = $this->getOutputStream();
 
         if ($outputStream instanceof ArrayOutputStream) {
@@ -252,14 +510,27 @@ class Runner {
 
         return [];
     }
+
     /**
      * Returns the stream at which the engine is using to send outputs.
      * 
      * @return OutputStream The default input stream is 'StdOut'.
      */
-    public function getOutputStream() : OutputStream {
+    public function getOutputStream(): OutputStream {
         return $this->outputStream;
     }
+
+    /**
+     * Check if an alias is registered.
+     * 
+     * @param string $alias The alias to check.
+     * 
+     * @return bool True if the alias exists, false otherwise.
+     */
+    public function hasAlias(string $alias): bool {
+        return isset($this->aliases[$alias]);
+    }
+
     /**
      * Checks if the runner has specific global argument or not given its name.
      * 
@@ -268,7 +539,7 @@ class Runner {
      * @return bool If the runner has such argument, true is returned. Other than
      * that, false is returned.
      */
-    public function hasArg(string $name) : bool {
+    public function hasArg(string $name): bool {
         foreach ($this->getArgs() as $argObj) {
             if ($argObj->getName() == $name) {
                 return true;
@@ -277,6 +548,16 @@ class Runner {
 
         return false;
     }
+
+    /**
+     * Check if auto-discovery is enabled.
+     * 
+     * @return bool
+     */
+    public function isAutoDiscoveryEnabled(): bool {
+        return $this->autoDiscoveryEnabled;
+    }
+
     /**
      * Checks if the class is running through command line interface (CLI) or 
      * through a web server.
@@ -285,12 +566,13 @@ class Runner {
      * the method will return true. False if not.
      * 
      */
-    public static function isCLI() : bool {
+    public static function isCLI(): bool {
         //best way to check if app is running through CLi
         // or in a web server.
         // Did a lot of research on that.
         return http_response_code() === false;
     }
+
     /**
      * Checks if CLI is running in interactive mode or not.
      * 
@@ -298,23 +580,50 @@ class Runner {
      * return true. False otherwise.
      * 
      */
-    public function isInteractive() : bool {
+    public function isInteractive(): bool {
         return $this->isInteractive;
     }
+
     /**
      * Register new command.
      * 
-     * @param CLICommand $cliCommand The command that will be registered.
+     * @param Command $cliCommand The command that will be registered.
      * 
      * @return Runner The method will return the instance at which the method
      * is called on
      * 
      */
-    public function register(CLICommand $cliCommand) : Runner {
+    public function register(Command $cliCommand, array $aliases = []): Runner {
+        if ($cliCommand->getName() != 'help') {
+            $helpCommand = $this->getCommandByName('help');
+            if ($helpCommand !== null) {
+                $cliCommand->addArg($helpCommand->getName(), [
+                    ArgumentOption::OPTIONAL => true,
+                    ArgumentOption::DESCRIPTION => 'Display command help.'
+                ]);
+                
+                foreach ($helpCommand->getAliases() as $alias) {
+                    $cliCommand->addArg($alias, [
+                        ArgumentOption::OPTIONAL => true
+                    ]);
+                }
+            }
+        }
         $this->commands[$cliCommand->getName()] = $cliCommand;
+
+        // Register runtime aliases
+        foreach ($aliases as $alias) {
+            $this->registerAlias($alias, $cliCommand->getName());
+        }
+
+        // Register built-in aliases from command itself
+        foreach ($cliCommand->getAliases() as $alias) {
+            $this->registerAlias($alias, $cliCommand->getName());
+        }
 
         return $this;
     }
+
     /**
      * Removes an argument from the global args set given its name.
      * 
@@ -323,7 +632,7 @@ class Runner {
      * @return bool If removed, true is returned. Other than that, false is
      * returned.
      */
-    public function removeArgument(string $name) : bool {
+    public function removeArgument(string $name): bool {
         $removed = false;
         $temp = [];
 
@@ -345,17 +654,33 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function reset() : Runner {
+    public function reset(): Runner {
         $this->inputStream = new StdIn();
         $this->outputStream = new StdOut();
         $this->commands = [];
+        $this->aliases = [];
+        
+        // Re-register help command after reset
+        $this->register(new HelpCommand());
 
         return $this;
     }
+
+    /**
+     * Get the command name for a given alias.
+     * 
+     * @param string $alias The alias to resolve.
+     * 
+     * @return string|null The command name if alias exists, null otherwise.
+     */
+    public function resolveAlias(string $alias): ?string {
+        return $this->aliases[$alias] ?? null;
+    }
+
     /**
      * Executes a command given as object.
      * 
-     * @param CLICommand $c The command that will be executed. If null is given,
+     * @param Command $c The command that will be executed. If null is given,
      * the method will take command name from the array '$args'.
      * 
      * @param array $args An optional array that can hold command arguments.
@@ -370,7 +695,7 @@ class Runner {
      * running the command. Usually, if the command exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public function runCommand(?CLICommand $c = null, array $args = [], bool $ansi = false) : int {
+    public function runCommand(?Command $c = null, array $args = [], bool $ansi = false): int {
         $commandName = null;
 
         if ($c === null) {
@@ -411,9 +736,9 @@ class Runner {
         } catch (Throwable $ex) {
             $this->printMsg('An exception was thrown.', 'Error:', 'red');
             $this->printMsg($ex->getMessage(), 'Exception Message:', 'yellow');
-            $this->printMsg($ex->getCode(), 'Code:', 'yellow');
+            $this->printMsg((string)$ex->getCode(), 'Code:', 'yellow');
             $this->printMsg($ex->getFile(), 'At:', 'yellow');
-            $this->printMsg($ex->getLine(), 'Line:', 'yellow');
+            $this->printMsg((string)$ex->getLine(), 'Line:', 'yellow');
             $this->printMsg("\n", 'Stack Trace:', 'yellow');
             $this->printMsg("\n".$ex->getTraceAsString());
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
@@ -424,6 +749,7 @@ class Runner {
 
         return $this->commandExitVal;
     }
+
     /**
      * Execute a registered command using a sub-runner.
      * 
@@ -441,7 +767,7 @@ class Runner {
      * @return int The method will return an integer that represent exit status
      * code of the command after execution.
      */
-    public function runCommandAsSub(string $commandName, array $additionalArgs = []) : int {
+    public function runCommandAsSub(string $commandName, array $additionalArgs = []): int {
         $c = $this->getCommandByName($commandName);
 
         if ($c === null) {
@@ -470,12 +796,12 @@ class Runner {
      * This method is used internally by execution engine to set the command which
      * is being executed.
      * 
-     * @param CLICommand $c The command which is in execution stage.
+     * @param Command $c The command which is in execution stage.
      * 
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setActiveCommand(?CLICommand $c = null) : Runner {
+    public function setActiveCommand(?Command $c = null): Runner {
         if ($this->getActiveCommand() !== null) {
             $this->getActiveCommand()->setOwner();
         }
@@ -489,6 +815,7 @@ class Runner {
 
         return $this;
     }
+
     /**
      * Add a function to execute after every command.
      * 
@@ -504,7 +831,7 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setAfterExecution(callable $func, array $params = []) : Runner {
+    public function setAfterExecution(callable $func, array $params = []): Runner {
         $this->afterRunPool[] = [
             'func' => $func,
             'params' => $params
@@ -512,6 +839,7 @@ class Runner {
 
         return $this;
     }
+
     /**
      * Sets arguments vector to have specific value.
      * 
@@ -528,11 +856,12 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setArgsVector(array $argsVector) : Runner {
+    public function setArgsVector(array $argsVector): Runner {
         $this->argsV = $argsVector;
 
         return $this;
     }
+
     /**
      * Sets a callable to call before start running CLI engine.
      * 
@@ -545,11 +874,25 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setBeforeStart(callable $func) : Runner {
+    public function setBeforeStart(callable $func): Runner {
         $this->beforeStartPool[] = $func;
 
         return $this;
     }
+
+    /**
+     * Set a custom command discovery instance.
+     * 
+     * @param CommandDiscovery $discovery
+     * @return Runner
+     */
+    public function setCommandDiscovery(CommandDiscovery $discovery): Runner {
+        $this->commandDiscovery = $discovery;
+        $this->autoDiscoveryEnabled = true;
+
+        return $this;
+    }
+
     /**
      * Sets the default command that will be executed in case no command
      * name was provided as argument.
@@ -560,7 +903,7 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setDefaultCommand(string $commandName) : Runner {
+    public function setDefaultCommand(string $commandName): Runner {
         $c = $this->getCommandByName($commandName);
 
         if ($c !== null) {
@@ -569,6 +912,20 @@ class Runner {
 
         return $this;
     }
+
+    /**
+     * Enable or disable strict mode for discovery.
+     * 
+     * @param bool $strict
+     * @return Runner
+     */
+    public function setDiscoveryStrictMode(bool $strict): Runner {
+        $this->enableAutoDiscovery();
+        $this->commandDiscovery->setStrictMode($strict);
+
+        return $this;
+    }
+
     /**
      * Sets an array as an input for running specific command.
      * 
@@ -586,7 +943,7 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setInputs(array $inputs = []) : Runner {
+    public function setInputs(array $inputs = []): Runner {
         $this->setInputStream(new ArrayInputStream($inputs));
         $this->setOutputStream(new ArrayOutputStream());
 
@@ -601,11 +958,12 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setInputStream(InputStream $stream) : Runner {
+    public function setInputStream(InputStream $stream): Runner {
         $this->inputStream = $stream;
 
         return $this;
     }
+
     /**
      * Sets the stream at which the runner will be using to send outputs to.
      * 
@@ -614,11 +972,12 @@ class Runner {
      * @return Runner The method will return the instance at which the method
      * is called on
      */
-    public function setOutputStream(OutputStream $stream) : Runner {
+    public function setOutputStream(OutputStream $stream): Runner {
         $this->outputStream = $stream;
 
         return $this;
     }
+
     /**
      * Start command line process.
      * 
@@ -626,7 +985,7 @@ class Runner {
      * the process. Usually, if the process exit with a number other than 0,
      * it means that there was an error in execution.
      */
-    public function start() : int {
+    public function start(): int {
         foreach ($this->beforeStartPool as $func) {
             call_user_func_array($func, [$this]);
         }
@@ -657,17 +1016,20 @@ class Runner {
             return $this->run();
         }
     }
-    private function checkIsInteractive() {
+
+    private function checkIsInteractive(): void {
         foreach ($this->getArgsVector() as $arg) {
             $this->isInteractive = $arg == '-i' || $this->isInteractive;
         }
     }
-    private function invokeAfterExc() {
+
+    private function invokeAfterExc(): void {
         foreach ($this->afterRunPool as $funcArr) {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
     }
-    private function printMsg(string $msg, ?string $prefix = null, ?string $color = null) {
+
+    private function printMsg(string $msg, ?string $prefix = null, ?string $color = null): void {
         if ($prefix !== null) {
             $prefix = Formatter::format($prefix, [
                 'color' => $color,
@@ -682,23 +1044,64 @@ class Runner {
         }
     }
 
-    private function readInteractive() {
+    private function readInteractive(): array {
         $input = trim($this->getInputStream()->readLine());
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
 
         if (in_array('--ansi', $argsArr)) {
-            return array_diff($argsArr, ['--ansi']);
+            $argsArr = array_diff($argsArr, ['--ansi']);
         }
+
+        // Preprocess help patterns
+        $argsArr = $this->preprocessHelpPattern($argsArr);
 
         return $argsArr;
     }
+
+    /**
+     * Register an alias for a command.
+     * 
+     * @param string $alias The alias to register.
+     * @param string $commandName The name of the command the alias points to.
+     * 
+     * @return Runner The method will return the instance at which the method
+     * is called on
+     */
+    private function registerAlias(string $alias, string $commandName): Runner {
+        // Check for conflicts
+        if (isset($this->aliases[$alias])) {
+            $existingCommand = $this->aliases[$alias];
+
+            if ($this->isInteractive()) {
+                // Interactive mode: prompt user to choose
+                $choice = $this->resolveAliasConflictInteractively($alias, $existingCommand, $commandName);
+
+                if ($choice === $commandName) {
+                    $this->aliases[$alias] = $commandName;
+                }
+                // If user chose existing command, do nothing
+            } else {
+                // Non-interactive mode: use first-come-first-served (do nothing)
+                // Suppress warning if both existing and new command are 'help' (expected duplicate registration)
+                if (!($existingCommand === 'help' && $commandName === 'help')) {
+                    $this->printMsg("Alias '$alias' already exists for command '$existingCommand'. Ignoring new alias for '$commandName'.", 'Warning:', 'yellow');
+                }
+            }
+        } else {
+            // No conflict, register the alias
+            $this->aliases[$alias] = $commandName;
+        }
+
+        return $this;
+    }
+
     /**
      * Run the command line as single run.
      *
      * @return int
      */
-    private function run() : int {
+    private function run(): int {
         $argsArr = array_slice($this->getArgsVector(), 1);
 
         if (in_array('--ansi', $argsArr)) {
@@ -717,6 +1120,9 @@ class Runner {
             $argsArr = $tempArgs;
         }
 
+
+        // Preprocess help patterns for non-interactive mode
+        $argsArr = $this->preprocessHelpPattern($argsArr);
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
 
@@ -725,7 +1131,8 @@ class Runner {
 
         return $this->runCommand(null, $argsArr, $this->isAnsi);
     }
-    private function setArgV(array $args) {
+
+    private function setArgV(array $args): void {
         $argV = [];
 
         foreach ($args as $argName => $argVal) {
@@ -736,5 +1143,31 @@ class Runner {
             }
         }
         $this->argsV = $argV;
+    }
+    /**
+     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
+     * 
+     * @param array $args The arguments array to preprocess
+     * @return array The preprocessed arguments array
+     */
+    private function preprocessHelpPattern(array $args): array {
+        if (count($args) >= 2) {
+            $lastArg = end($args);
+            
+            // Check if the last argument is 'help' or '-h'
+            if ($lastArg === 'help' || $lastArg === '-h') {
+                $commandName = $args[0];
+                
+                // Check if the first argument is a valid command name
+                if ($this->getCommandByName($commandName) !== null) {
+                    // Remove 'help' or '-h' from the end
+                    array_pop($args);
+                    // Add it as a proper argument flag
+                    $args[] = $lastArg;
+                }
+            }
+        }
+        
+        return $args;
     }
 }

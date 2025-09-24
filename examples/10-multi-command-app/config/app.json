@@ -1,0 +1,21 @@
+{
+    "app": {
+        "name": "Multi-Command CLI App",
+        "version": "1.0.0",
+        "environment": "development",
+        "debug": true,
+        "timezone": "UTC"
+    },
+    "logging": {
+        "level": "info",
+        "file_enabled": true,
+        "max_file_size": "10MB",
+        "retention_days": 30
+    },
+    "features": {
+        "auto_backup": true,
+        "backup_interval": "daily",
+        "max_backups": 7,
+        "compression": true
+    }
+}

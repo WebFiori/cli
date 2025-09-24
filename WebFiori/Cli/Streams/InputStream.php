@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 /**
@@ -7,9 +8,7 @@ namespace WebFiori\Cli\Streams;
  *
  * @author Ibrahim
  * 
- * @since 2.3.1
  * 
- * @version 1.0
  */
 interface InputStream {
     /**

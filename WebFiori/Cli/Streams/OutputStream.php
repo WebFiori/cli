@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace WebFiori\Cli\Streams;
 
 /**
@@ -19,7 +20,6 @@ interface OutputStream {
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method.
      * 
-     * @since 1.0
      */
     public function println(string $str, ...$_);
     /**
@@ -32,7 +32,6 @@ interface OutputStream {
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. 
      * 
-     * @since 1.0
      */
     public function prints(string $str, ...$_);
 }
