@@ -160,7 +160,7 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
@@ -175,7 +175,7 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $this->executeMultiCommand([], [], [
             new Command00()
@@ -201,7 +201,7 @@ class RunnerTest extends CommandTestCase {
             "\e[1;93mGlobal Arguments:\e[0m\n",
             "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
-            "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
@@ -214,7 +214,7 @@ class RunnerTest extends CommandTestCase {
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), [
             '--ansi',
-            '--command-name' => 'super-hero'
+            '--command' => 'super-hero'
         ]));
         $this->assertEquals([
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
@@ -238,7 +238,7 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
@@ -254,7 +254,7 @@ class RunnerTest extends CommandTestCase {
         $runner->setArgsVector([
             'entry.php',
             'help',
-            '--command-name' => 'super-hero'
+            '--command' => 'super-hero'
         ]);
         $runner->start();
         $this->assertEquals([
@@ -272,7 +272,7 @@ class RunnerTest extends CommandTestCase {
             $r->setArgsVector([
                 'entry.php',
                 'help',
-                '--command-name' => 'super hero',
+                '--command' => 'super hero',
                 '--ansi'
             ]);
             $r->register(new Command00());
@@ -335,7 +335,7 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n",
             ">> ",
         ], $runner->getOutput());
@@ -355,7 +355,7 @@ class RunnerTest extends CommandTestCase {
             '-i',
         ]);
         $runner->setInputs([
-            'help --ansi --command-name=super-hero',
+            'help --ansi --command=super-hero',
             'super-hero name=Ibrahim',
             'exit'
         ]);
@@ -387,7 +387,7 @@ class RunnerTest extends CommandTestCase {
             '-i',
         ]);
         $runner->setInputs([
-            'help --command-name=super-hero',
+            'help --command=super-hero',
             'with-exception',
             'exit'
         ]);
