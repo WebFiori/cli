@@ -97,6 +97,31 @@ class KeysMap {
      */
     public static function readAndTranslate(InputStream $stream) : string {
         $keypress = $stream->read();
+        
+        // Handle EOF
+        if ($keypress === '') {
+            return '';
+        }
+        
+        // Handle escape sequences (multi-byte)
+        if ($keypress === "\033") {
+            try {
+                // Read the next character to see if it's part of an escape sequence
+                $next = $stream->read();
+                if ($next === '[') {
+                    // Read the final character of the sequence
+                    $final = $stream->read();
+                    $sequence = $keypress . $next . $final;
+                    return self::map($sequence);
+                } else {
+                    // Not a complete escape sequence, return ESC
+                    return self::map($keypress);
+                }
+            } catch (\Exception $e) {
+                // If we can't read more bytes, just return ESC
+                return self::map($keypress);
+            }
+        }
 
         return self::map($keypress);
     }
@@ -134,18 +159,14 @@ class KeysMap {
         if ($ch == 'BACKSPACE' && strlen($input) > 0) {
             $input = substr($input, 0, strlen($input) - 1);
         } else if ($ch == 'ESC') {
-            $input .= "\e";
+            // Ignore ESC key
         } else if ($ch == "CR") {
             // Do nothing - don't add CR to input
         } else if ($ch == "LF") {
             // Do nothing - don't add LF to input (readLine should not include line ending)
-        } else if ($ch == 'DOWN') {
-            // read history;
-            //$input .= ' ';
-        } else if ($ch == 'UP') {
-            // read history;
-            //$input .= ' ';
-        } else if ($ch != 'CR' && $ch != 'LF') {
+        } else if ($ch == 'DOWN' || $ch == 'UP' || $ch == 'LEFT' || $ch == 'RIGHT') {
+            // Ignore arrow keys for now - they don't add to input
+        } else {
             if ($ch == 'SPACE') {
                 $input .= ' ';
             } else {
