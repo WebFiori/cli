@@ -220,8 +220,6 @@ class RunnerTest extends CommandTestCase {
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
             "\e[1;94m    Supported Arguments:\e[0m\n",
             "\e[1;33m                         name:\e[0m The name of the hero\n",
-            "\e[1;33m                         help:\e[0m[Optional] Display command help.\n",
-            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -263,8 +261,6 @@ class RunnerTest extends CommandTestCase {
             "    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            "                         help:[Optional] Display command help.\n",
-            "                           -h:[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -370,8 +366,6 @@ class RunnerTest extends CommandTestCase {
             ">>     super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            "                         help:[Optional] Display command help.\n",
-            "                           -h:[Optional] <NO DESCRIPTION>\n",
             ">> Hello hero Ibrahim\n",
             ">> "
         ], $runner->getOutput());
@@ -411,8 +405,6 @@ class RunnerTest extends CommandTestCase {
             "[1;34m>>[0m [1;33m    super-hero[0m:         A command to display hero's name.\n",
             "[1;94m    Supported Arguments:[0m\n",
             "[1;33m                         name:[0m The name of the hero\n",
-            "[1;33m                         help:[0m[Optional] Display command help.\n",
-            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
