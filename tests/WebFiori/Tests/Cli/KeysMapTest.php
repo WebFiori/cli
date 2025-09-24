@@ -4,39 +4,77 @@ namespace WebFiori\Tests\Cli;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Cli\KeysMap;
 use WebFiori\Cli\Streams\ArrayInputStream;
+
 /**
- * Description of KeysMapTest
- *
- * @author Ibrahim
+ * Test cases for KeysMap class arrow key handling.
  */
 class KeysMapTest extends TestCase {
+    
     /**
-     * @test
+     * Test that arrow key escape sequences are properly detected.
      */
-    public function test00() {
-        $stream = new ArrayInputStream([
-            chr(27) // ESC character
-        ]);
-        $this->assertEquals("ESC", KeysMap::readAndTranslate($stream));
+    public function testArrowKeyDetection() {
+        // Test UP arrow
+        $inputStream = new ArrayInputStream(["\033[A"]);
+        $result = KeysMap::readAndTranslate($inputStream);
+        $this->assertEquals('UP', $result);
+        
+        // Test DOWN arrow
+        $inputStream = new ArrayInputStream(["\033[B"]);
+        $result = KeysMap::readAndTranslate($inputStream);
+        $this->assertEquals('DOWN', $result);
+        
+        // Test RIGHT arrow
+        $inputStream = new ArrayInputStream(["\033[C"]);
+        $result = KeysMap::readAndTranslate($inputStream);
+        $this->assertEquals('RIGHT', $result);
+        
+        // Test LEFT arrow
+        $inputStream = new ArrayInputStream(["\033[D"]);
+        $result = KeysMap::readAndTranslate($inputStream);
+        $this->assertEquals('LEFT', $result);
     }
+    
     /**
-     * @test
+     * Test that arrow keys don't appear in readline input.
      */
-    public function test01() {
-        $stream = new ArrayInputStream([
-            "\r"
-        ]);
-        $this->assertEquals("CR", KeysMap::readAndTranslate($stream));
+    public function testArrowKeysIgnoredInReadLine() {
+        // Input with arrow keys mixed with regular text
+        $inputStream = new ArrayInputStream(["\033[A\033[Bhello\033[C\033[D\n"]);
+        $result = KeysMap::readLine($inputStream);
+        
+        // Should only contain "hello", arrow keys should be ignored
+        $this->assertEquals('hello', $result);
     }
+    
     /**
-     * @test
+     * Test that regular characters still work normally.
      */
-    public function test02() {
-        $stream = new ArrayInputStream([
-            "\r",
-            "\n"
-        ]);
-        $this->assertEquals("CR", KeysMap::readAndTranslate($stream));
-        $this->assertEquals("LF", KeysMap::readAndTranslate($stream));
+    public function testRegularCharacters() {
+        $inputStream = new ArrayInputStream(["hello world\n"]);
+        $result = KeysMap::readLine($inputStream);
+        
+        $this->assertEquals('hello world', $result);
+    }
+    
+    /**
+     * Test backspace functionality still works.
+     */
+    public function testBackspaceWithArrowKeys() {
+        // Type "hello", backspace once, arrow keys (ignored), type "p"
+        $inputStream = new ArrayInputStream(["hello\177\033[A\033[Bp\n"]);
+        $result = KeysMap::readLine($inputStream);
+        
+        // Should be "hellp" (hello -> hell -> hell -> hell -> hellp)
+        $this->assertEquals('hellp', $result);
+    }
+    
+    /**
+     * Test ESC key handling.
+     */
+    public function testEscapeKey() {
+        $inputStream = new ArrayInputStream(["\ehello\n"]);
+        $result = KeysMap::readAndTranslate($inputStream);
+        $this->assertEquals('ESC', $result);
     }
 }
