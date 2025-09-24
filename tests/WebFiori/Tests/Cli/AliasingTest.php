@@ -230,8 +230,10 @@ class AliasingTest extends CommandTestCase {
         
         // Reset and verify aliases are cleared
         $runner->reset();
-        $this->assertEmpty($runner->getAliases());
+        // Should only contain help command aliases, not the custom 'test' alias
         $this->assertFalse($runner->hasAlias('test'));
+        // Help command should have its -h alias
+        $this->assertTrue($runner->hasAlias('-h'));
     }
 
     /**

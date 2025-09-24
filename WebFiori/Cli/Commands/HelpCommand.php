@@ -26,7 +26,7 @@ class HelpCommand extends Command {
                 .'will be specific to the given command only.'
             ]
         ], 'Display CLI Help. To display help for specific command, use the argument '
-                .'"--command-name" with this command.');
+                .'"--command-name" with this command.', ['-h']);
     }
     /**
      * Execute the command.
