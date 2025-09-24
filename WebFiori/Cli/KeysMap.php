@@ -103,7 +103,7 @@ class KeysMap {
             return '';
         }
         
-        // Handle escape sequences (multi-byte)
+        // Handle escape sequences (multi-byte) - kept for future use
         if ($keypress === "\033") {
             try {
                 // Read the next character to see if it's part of an escape sequence
@@ -165,7 +165,7 @@ class KeysMap {
         } else if ($ch == "LF") {
             // Do nothing - don't add LF to input (readLine should not include line ending)
         } else if ($ch == 'DOWN' || $ch == 'UP' || $ch == 'LEFT' || $ch == 'RIGHT') {
-            // Ignore arrow keys for now - they don't add to input
+            // Ignore arrow keys - kept for future navigation features
         } else {
             if ($ch == 'SPACE') {
                 $input .= ' ';
