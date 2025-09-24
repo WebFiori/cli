@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * User profile command that demonstrates comprehensive argument validation.
@@ -17,39 +17,39 @@ class UserProfileCommand extends Command {
     public function __construct() {
         parent::__construct('profile', [
             '--name' => [
-                Option::DESCRIPTION => 'User full name (required)',
-                Option::OPTIONAL => false
+                ArgumentOption::DESCRIPTION => 'User full name (required)',
+                ArgumentOption::OPTIONAL => false
             ],
             '--email' => [
-                Option::DESCRIPTION => 'User email address (required)',
-                Option::OPTIONAL => false
+                ArgumentOption::DESCRIPTION => 'User email address (required)',
+                ArgumentOption::OPTIONAL => false
             ],
             '--age' => [
-                Option::DESCRIPTION => 'User age (13-120, required)',
-                Option::OPTIONAL => false
+                ArgumentOption::DESCRIPTION => 'User age (13-120, required)',
+                ArgumentOption::OPTIONAL => false
             ],
             '--role' => [
-                Option::DESCRIPTION => 'User role in the system',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'user',
-                Option::VALUES => ['user', 'admin', 'moderator', 'guest']
+                ArgumentOption::DESCRIPTION => 'User role in the system',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'user',
+                ArgumentOption::VALUES => ['user', 'admin', 'moderator', 'guest']
             ],
             '--department' => [
-                Option::DESCRIPTION => 'User department',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'General'
+                ArgumentOption::DESCRIPTION => 'User department',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'General'
             ],
             '--active' => [
-                Option::DESCRIPTION => 'Mark user as active (flag)',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Mark user as active (flag)',
+                ArgumentOption::OPTIONAL => true
             ],
             '--skills' => [
-                Option::DESCRIPTION => 'Comma-separated list of skills',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Comma-separated list of skills',
+                ArgumentOption::OPTIONAL => true
             ],
             '--bio' => [
-                Option::DESCRIPTION => 'Short biography (max 200 characters)',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Short biography (max 200 characters)',
+                ArgumentOption::OPTIONAL => true
             ]
         ], 'Creates a user profile with validation and formatting');
     }
@@ -135,7 +135,7 @@ class UserProfileCommand extends Command {
         }
         $profile['age'] = $age;
 
-        // Get role (already validated by Option::VALUES)
+        // Get role (already validated by ArgumentOption::VALUES)
         $profile['role'] = $this->getArgValue('--role') ?? 'user';
 
         // Get department

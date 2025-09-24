@@ -2,6 +2,7 @@
 namespace WebFiori\Tests\Cli\TestCommands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Command;
 
 
@@ -14,7 +15,7 @@ class Command01 extends Command {
             ],
             new Argument('arg-2'),
             'arg-3' => [
-                'default' => 'Hello'
+                ArgumentOption::DEFAULT => 'Hello'
             ]
         ], 'No desc');
     }

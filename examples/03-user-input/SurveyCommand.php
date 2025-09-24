@@ -2,7 +2,7 @@
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Interactive survey command demonstrating various input methods.
@@ -20,12 +20,12 @@ class SurveyCommand extends Command {
     public function __construct() {
         parent::__construct('survey', [
             '--name' => [
-                Option::DESCRIPTION => 'Pre-fill your name (optional)',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Pre-fill your name (optional)',
+                ArgumentOption::OPTIONAL => true
             ],
             '--quick' => [
-                Option::DESCRIPTION => 'Use quick mode with minimal questions',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Use quick mode with minimal questions',
+                ArgumentOption::OPTIONAL => true
             ]
         ], 'Interactive survey demonstrating various input methods');
     }

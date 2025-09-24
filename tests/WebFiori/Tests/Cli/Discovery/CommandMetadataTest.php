@@ -2,6 +2,7 @@
 namespace WebFiori\Tests\Cli\Discovery;
 
 use PHPUnit\Framework\TestCase;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 use WebFiori\Cli\Discovery\CommandMetadata;
 use WebFiori\Tests\Cli\Discovery\TestCommands\TestCommand;
@@ -22,7 +23,7 @@ class CommandMetadataTest extends TestCase {
         
         $this->assertEquals(TestCommand::class, $metadata['className']);
         $this->assertEquals('test-cmd', $metadata['name']);
-        $this->assertEquals('A test command', $metadata['description']);
+        $this->assertEquals('A test command', $metadata[ArgumentOption::DESCRIPTION]);
         $this->assertEquals('test', $metadata['group']);
         $this->assertFalse($metadata['hidden']);
         $this->assertIsString($metadata['file']);
@@ -96,7 +97,7 @@ class CommandMetadataTest extends TestCase {
         $metadata = CommandMetadata::extract(TestCommand::class);
         
         // Should extract description from @Command annotation
-        $this->assertEquals('A test command', $metadata['description']);
+        $this->assertEquals('A test command', $metadata[ArgumentOption::DESCRIPTION]);
     }
     
     /**

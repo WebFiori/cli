@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * A simple hello world command that demonstrates basic CLI functionality.
@@ -16,9 +16,9 @@ class HelloCommand extends Command {
     public function __construct() {
         parent::__construct('hello', [
             '--name' => [
-                Option::DESCRIPTION => 'The name to greet (default: World)',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'World'
+                ArgumentOption::DESCRIPTION => 'The name to greet (default: World)',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'World'
             ]
         ], 'A simple greeting command that says hello to someone');
     }

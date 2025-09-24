@@ -2,7 +2,7 @@
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Interactive quiz command demonstrating input validation and scoring.
@@ -24,15 +24,15 @@ class QuizCommand extends Command {
     public function __construct() {
         parent::__construct('quiz', [
             '--difficulty' => [
-                Option::DESCRIPTION => 'Quiz difficulty level',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'medium',
-                Option::VALUES => ['easy', 'medium', 'hard']
+                ArgumentOption::DESCRIPTION => 'Quiz difficulty level',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'medium',
+                ArgumentOption::VALUES => ['easy', 'medium', 'hard']
             ],
             '--questions' => [
-                Option::DESCRIPTION => 'Number of questions (5-20)',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => '10'
+                ArgumentOption::DESCRIPTION => 'Number of questions (5-20)',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => '10'
             ]
         ], 'Interactive knowledge quiz with scoring and feedback');
     }

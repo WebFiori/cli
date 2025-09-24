@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Comprehensive formatting demonstration command.
@@ -17,13 +17,13 @@ class FormattingDemoCommand extends Command {
     public function __construct() {
         parent::__construct('format-demo', [
             '--section' => [
-                Option::DESCRIPTION => 'Show specific section only',
-                Option::OPTIONAL => true,
-                Option::VALUES => ['colors', 'styles', 'tables', 'progress', 'layouts', 'animations']
+                ArgumentOption::DESCRIPTION => 'Show specific section only',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['colors', 'styles', 'tables', 'progress', 'layouts', 'animations']
             ],
             '--no-colors' => [
-                Option::DESCRIPTION => 'Disable color output',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Disable color output',
+                ArgumentOption::OPTIONAL => true
             ]
         ], 'Demonstrates various output formatting techniques and ANSI styling');
     }

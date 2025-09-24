@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * User management command with full CRUD operations.
@@ -19,49 +19,49 @@ class UserCommand extends Command {
     public function __construct() {
         parent::__construct('user', [
             '--action' => [
-                Option::DESCRIPTION => 'Action to perform',
-                Option::OPTIONAL => false,
-                Option::VALUES => ['list', 'create', 'update', 'delete', 'search', 'export']
+                ArgumentOption::DESCRIPTION => 'Action to perform',
+                ArgumentOption::OPTIONAL => false,
+                ArgumentOption::VALUES => ['list', 'create', 'update', 'delete', 'search', 'export']
             ],
             '--id' => [
-                Option::DESCRIPTION => 'User ID for update/delete operations',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'User ID for update/delete operations',
+                ArgumentOption::OPTIONAL => true
             ],
             '--name' => [
-                Option::DESCRIPTION => 'User full name',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'User full name',
+                ArgumentOption::OPTIONAL => true
             ],
             '--email' => [
-                Option::DESCRIPTION => 'User email address',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'User email address',
+                ArgumentOption::OPTIONAL => true
             ],
             '--status' => [
-                Option::DESCRIPTION => 'User status',
-                Option::OPTIONAL => true,
-                Option::VALUES => ['active', 'inactive']
+                ArgumentOption::DESCRIPTION => 'User status',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['active', 'inactive']
             ],
             '--format' => [
-                Option::DESCRIPTION => 'Output format',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'table',
-                Option::VALUES => ['table', 'json', 'csv', 'xml']
+                ArgumentOption::DESCRIPTION => 'Output format',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'table',
+                ArgumentOption::VALUES => ['table', 'json', 'csv', 'xml']
             ],
             '--search' => [
-                Option::DESCRIPTION => 'Search term for filtering users',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Search term for filtering users',
+                ArgumentOption::OPTIONAL => true
             ],
             '--limit' => [
-                Option::DESCRIPTION => 'Maximum number of results',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => '50'
+                ArgumentOption::DESCRIPTION => 'Maximum number of results',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => '50'
             ],
             '--batch' => [
-                Option::DESCRIPTION => 'Enable batch mode for bulk operations',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Enable batch mode for bulk operations',
+                ArgumentOption::OPTIONAL => true
             ],
             '--file' => [
-                Option::DESCRIPTION => 'File path for batch operations or export',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'File path for batch operations or export',
+                ArgumentOption::OPTIONAL => true
             ]
         ], 'User management operations (list, create, update, delete, search, export)');
 

@@ -2,6 +2,7 @@
 namespace WebFiori\Tests\CLI;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\CommandTestCase;
 use WebFiori\Cli\Runner;
@@ -59,7 +60,7 @@ class RunnerTest extends CommandTestCase {
         $this->assertFalse($runner->addArgument($argObj));
         
         $this->assertTrue($runner->addArg('global-arg', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $this->assertEquals(2, count($runner->getArgs()));
         $runner->removeArgument('--ansi');
@@ -675,8 +676,8 @@ class RunnerTest extends CommandTestCase {
         
         // Add global arguments
         $this->assertTrue($runner->addArg('--global-arg', [
-            'optional' => true,
-            'description' => 'Global argument'
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Global argument'
         ]));
         
         // Test duplicate global argument

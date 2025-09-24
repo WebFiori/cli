@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace WebFiori\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Command;
 
 /**
@@ -16,18 +17,22 @@ class HelpCommand extends Command {
      * 
      * The command will have name 'help'. This command 
      * is used to display help information for the registered commands.
-     * The command have one extra argument which is '--command-name'. If 
+     * The command have one extra argument which is '--command'. If 
      * provided, the shown help will be specific to the selected command.
      */
     public function __construct() {
         parent::__construct('help', [
-            '--command-name' => [
-                'optional' => true,
-                'description' => 'An optional command name. If provided, help '
+            '--command' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'An optional command name. If provided, help '
                 .'will be specific to the given command only.'
+            ],
+            '--table' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Display command arguments in table format for better readability.'
             ]
         ], 'Display CLI Help. To display help for specific command, use the argument '
-                .'"--command-name" with this command.', ['-h']);
+                .'"--command" with this command.', ['-h']);
     }
     /**
      * Execute the command.
@@ -35,7 +40,7 @@ class HelpCommand extends Command {
      */
     public function exec() : int {
         $regCommands = $this->getOwner()->getCommands();
-        $commandName = $this->getArgValue('--command-name');
+        $commandName = $this->getArgValue('--command');
         $len = $this->getMaxCommandNameLen();
 
         if ($commandName !== null) {
@@ -91,6 +96,20 @@ class HelpCommand extends Command {
         $this->println(" %s", $argObj->getDescription());
     }
 
+    private function printArgsTable(array $args) {
+        $rows = [];
+        foreach ($args as $argObj) {
+            $name = $argObj->getName();
+            $required = $argObj->isOptional() ? 'No' : 'Yes';
+            $default = $argObj->getDefault() ?: '-';
+            $description = $argObj->getDescription() ?: '<NO DESCRIPTION>';
+            
+            $rows[] = [$name, $required, $default, $description];
+        }
+        
+        $this->table($rows, ['Argument', 'Required', 'Default', 'Description']);
+    }
+
     /**
      * Prints meta information of a specific command.
      *
@@ -110,7 +129,9 @@ class HelpCommand extends Command {
         $this->println(str_repeat(' ', $spacesCount)."%s", $cliCommand->getDescription());
 
         if ($withArgs) {
-            $args = $cliCommand->getArgs();
+            $args = array_filter($cliCommand->getArgs(), function($arg) {
+                return !in_array($arg->getName(), ['help', '-h']);
+            });
 
             if (count($args) != 0) {
                 $this->println("    Supported Arguments:", [
@@ -118,8 +139,12 @@ class HelpCommand extends Command {
                     'color' => 'light-blue'
                 ]);
 
-                foreach ($args as $argObj) {
-                    $this->printArg($argObj);
+                if ($this->getArgValue('--table') !== null) {
+                    $this->printArgsTable($args);
+                } else {
+                    foreach ($args as $argObj) {
+                        $this->printArg($argObj);
+                    }
                 }
             }
         }

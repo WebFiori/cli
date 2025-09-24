@@ -2,6 +2,7 @@
 namespace WebFiori\Tests\Cli\TestCommands;
 
 use WebFiori\Cli\Command;
+use WebFiori\Cli\ArgumentOption;
 
 
 /**
@@ -14,10 +15,10 @@ class Command00 extends Command {
     public function __construct() {
         parent::__construct('super-hero', [
             'name' => [
-                'values' => [
+                ArgumentOption::VALUES => [
                     'Ibrahim', 'Ali'
                 ],
-                'description' => 'The name of the hero'
+                ArgumentOption::DESCRIPTION => 'The name of the hero'
             ]
         ], 'A command to display hero\'s name.');
     }

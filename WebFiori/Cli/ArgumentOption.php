@@ -7,7 +7,7 @@ namespace WebFiori\Cli;
  *
  * @author Ibrahim
  */
-class Option {
+class ArgumentOption {
     /**
      * An option which is used to set a default value for the argument if not
      * provided and it was optional.

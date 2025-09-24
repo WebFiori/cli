@@ -355,7 +355,7 @@ abstract class Command {
             // Check for help first, before validating required arguments
             if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
                 $help = $runner->getCommandByName('help');
-                $help->setArgValue('--command-name', $this->getName());
+                $help->setArgValue('--command', $this->getName());
                 $help->setOwner($runner);
                 $help->setOutputStream($runner->getOutputStream());
                 $this->removeArgument('help');

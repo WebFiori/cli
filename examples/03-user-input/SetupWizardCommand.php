@@ -2,7 +2,7 @@
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Setup wizard command demonstrating multi-step interactive workflows.
@@ -26,14 +26,14 @@ class SetupWizardCommand extends Command {
     public function __construct() {
         parent::__construct('setup', [
             '--step' => [
-                Option::DESCRIPTION => 'Start from specific step (basic, database, security, features)',
-                Option::OPTIONAL => true,
-                Option::VALUES => ['basic', 'database', 'security', 'features']
+                ArgumentOption::DESCRIPTION => 'Start from specific step (basic, database, security, features)',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['basic', 'database', 'security', 'features']
             ],
             '--config-file' => [
-                Option::DESCRIPTION => 'Output configuration file path',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'app-config.json'
+                ArgumentOption::DESCRIPTION => 'Output configuration file path',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'app-config.json'
             ]
         ], 'Interactive setup wizard for application configuration');
     }

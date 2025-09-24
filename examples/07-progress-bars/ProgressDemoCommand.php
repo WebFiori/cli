@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Progress\ProgressBarFormat;
 use WebFiori\Cli\Progress\ProgressBarStyle;
 
@@ -19,25 +19,25 @@ class ProgressDemoCommand extends Command {
     public function __construct() {
         parent::__construct('progress-demo', [
             '--style' => [
-                Option::DESCRIPTION => 'Progress bar style (default, ascii, dots, arrow)',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => 'all',
-                Option::VALUES => ['all', 'default', 'ascii', 'dots', 'arrow', 'custom']
+                ArgumentOption::DESCRIPTION => 'Progress bar style (default, ascii, dots, arrow)',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'all',
+                ArgumentOption::VALUES => ['all', 'default', 'ascii', 'dots', 'arrow', 'custom']
             ],
             '--items' => [
-                Option::DESCRIPTION => 'Number of items to process (10-1000)',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => '50'
+                ArgumentOption::DESCRIPTION => 'Number of items to process (10-1000)',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => '50'
             ],
             '--delay' => [
-                Option::DESCRIPTION => 'Delay between items in milliseconds',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => '100'
+                ArgumentOption::DESCRIPTION => 'Delay between items in milliseconds',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => '100'
             ],
             '--format' => [
-                Option::DESCRIPTION => 'Progress bar format template',
-                Option::OPTIONAL => true,
-                Option::VALUES => ['basic', 'eta', 'rate', 'verbose', 'custom']
+                ArgumentOption::DESCRIPTION => 'Progress bar format template',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['basic', 'eta', 'rate', 'verbose', 'custom']
             ]
         ], 'Demonstrates progress bar functionality with different styles and formats');
     }

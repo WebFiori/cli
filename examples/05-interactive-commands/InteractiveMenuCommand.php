@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Interactive menu system demonstrating complex CLI navigation.
@@ -22,9 +22,9 @@ class InteractiveMenuCommand extends Command {
     public function __construct() {
         parent::__construct('menu', [
             '--section' => [
-                Option::DESCRIPTION => 'Start in specific menu section',
-                Option::OPTIONAL => true,
-                Option::VALUES => ['users', 'settings', 'reports', 'tools']
+                ArgumentOption::DESCRIPTION => 'Start in specific menu section',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['users', 'settings', 'reports', 'tools']
             ]
         ], 'Interactive multi-level menu system with navigation');
     }

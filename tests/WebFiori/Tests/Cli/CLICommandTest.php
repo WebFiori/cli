@@ -3,6 +3,7 @@ namespace WebFiori\Tests\Cli;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Exceptions\IOException;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Cli\Runner;
@@ -998,7 +999,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg02() {
         $command = new TestCommand('new-command');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $argDetails = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
@@ -1011,7 +1012,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg03() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $argDetails = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
@@ -1024,7 +1025,7 @@ class CLICommandTest extends TestCase {
     public function testAddArg04() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true
+            ArgumentOption::OPTIONAL => true
         ]));
         $this->assertFalse($command->addArg('default-options'));
     }
@@ -1034,9 +1035,9 @@ class CLICommandTest extends TestCase {
     public function testAddArg05() {
         $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
-            'optional' => true,
-            'description' => ' ',
-            'default' => 'ok , good '
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => ' ',
+            ArgumentOption::DEFAULT => 'ok , good '
         ]));
         $arg = $command->getArg('default-options');
         $this->assertEquals('<NO DESCRIPTION>', $arg->getDescription());
@@ -1362,10 +1363,10 @@ class CLICommandTest extends TestCase {
         
         // Test adding argument with all options
         $this->assertTrue($command->addArg('--test-arg', [
-            'optional' => false,
-            'description' => 'Test argument',
-            'default' => 'default-value',
-            'values' => ['val1', 'val2', 'val3']
+            ArgumentOption::OPTIONAL => false,
+            ArgumentOption::DESCRIPTION => 'Test argument',
+            ArgumentOption::DEFAULT => 'default-value',
+            ArgumentOption::VALUES => ['val1', 'val2', 'val3']
         ]));
         
         // Test duplicate argument
@@ -1669,7 +1670,7 @@ class CLICommandTest extends TestCase {
      */
     public function testArgumentProvidedCheckingMethodEnhanced() {
         $command = new TestCommand('test-cmd');
-        $command->addArg('--test-arg', ['optional' => true]);
+        $command->addArg('--test-arg', [ArgumentOption::OPTIONAL => true]);
         
         // Initially not provided
         $this->assertFalse($command->isArgProvided('--test-arg'));

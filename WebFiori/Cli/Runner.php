@@ -125,8 +125,8 @@ class Runner {
         $this->commandsDiscovered = false;
 
         $this->addArg('--ansi', [
-            Option::OPTIONAL => true,
-            Option::DESCRIPTION => 'Force the use of ANSI output.'
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
         $this->setBeforeStart(function (Runner $r) {
             if (count($r->getArgsVector()) == 0) {
@@ -598,13 +598,13 @@ class Runner {
             $helpCommand = $this->getCommandByName('help');
             if ($helpCommand !== null) {
                 $cliCommand->addArg($helpCommand->getName(), [
-                    Option::OPTIONAL => true,
-                    Option::DESCRIPTION => 'Display command help.'
+                    ArgumentOption::OPTIONAL => true,
+                    ArgumentOption::DESCRIPTION => 'Display command help.'
                 ]);
                 
                 foreach ($helpCommand->getAliases() as $alias) {
                     $cliCommand->addArg($alias, [
-                        Option::OPTIONAL => true
+                        ArgumentOption::OPTIONAL => true
                     ]);
                 }
             }

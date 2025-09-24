@@ -1,7 +1,7 @@
 <?php
 
 use WebFiori\Cli\Command;
-use WebFiori\Cli\Option;
+use WebFiori\Cli\ArgumentOption;
 
 /**
  * Calculator command that demonstrates various argument types and validation.
@@ -17,22 +17,22 @@ class CalculatorCommand extends Command {
     public function __construct() {
         parent::__construct('calc', [
             '--operation' => [
-                Option::DESCRIPTION => 'Mathematical operation to perform',
-                Option::OPTIONAL => false,
-                Option::VALUES => ['add', 'subtract', 'multiply', 'divide', 'average']
+                ArgumentOption::DESCRIPTION => 'Mathematical operation to perform',
+                ArgumentOption::OPTIONAL => false,
+                ArgumentOption::VALUES => ['add', 'subtract', 'multiply', 'divide', 'average']
             ],
             '--numbers' => [
-                Option::DESCRIPTION => 'Comma-separated list of numbers (e.g., "1,2,3,4")',
-                Option::OPTIONAL => false
+                ArgumentOption::DESCRIPTION => 'Comma-separated list of numbers (e.g., "1,2,3,4")',
+                ArgumentOption::OPTIONAL => false
             ],
             '--precision' => [
-                Option::DESCRIPTION => 'Number of decimal places for the result',
-                Option::OPTIONAL => true,
-                Option::DEFAULT => '2'
+                ArgumentOption::DESCRIPTION => 'Number of decimal places for the result',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => '2'
             ],
             '--verbose' => [
-                Option::DESCRIPTION => 'Show detailed calculation steps',
-                Option::OPTIONAL => true
+                ArgumentOption::DESCRIPTION => 'Show detailed calculation steps',
+                ArgumentOption::OPTIONAL => true
             ]
         ], 'Performs mathematical calculations on a list of numbers');
     }

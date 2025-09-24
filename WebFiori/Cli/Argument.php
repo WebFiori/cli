@@ -86,24 +86,24 @@ class Argument {
             return null;
         }
 
-        if (isset($options[Option::OPTIONAL])) {
-            $arg->setIsOptional($options[Option::OPTIONAL]);
+        if (isset($options[ArgumentOption::OPTIONAL])) {
+            $arg->setIsOptional($options[ArgumentOption::OPTIONAL]);
         }
-        $desc = isset($options[Option::DESCRIPTION]) ? trim($options[Option::DESCRIPTION]) : '<NO DESCRIPTION>';
+        $desc = isset($options[ArgumentOption::DESCRIPTION]) ? trim($options[ArgumentOption::DESCRIPTION]) : '<NO DESCRIPTION>';
 
         if (strlen($desc) != 0) {
             $arg->setDescription($desc);
         } else {
             $arg->setDescription('<NO DESCRIPTION>');
         }
-        $allowedValues = $options[Option::VALUES] ?? [];
+        $allowedValues = $options[ArgumentOption::VALUES] ?? [];
 
         foreach ($allowedValues as $val) {
             $arg->addAllowedValue($val);
         }
 
-        if (isset($options[Option::DEFAULT]) && gettype($options[Option::DEFAULT]) == 'string') {
-            $arg->setDefault($options[Option::DEFAULT]);
+        if (isset($options[ArgumentOption::DEFAULT]) && gettype($options[ArgumentOption::DEFAULT]) == 'string') {
+            $arg->setDefault($options[ArgumentOption::DEFAULT]);
         }
 
         return $arg;
