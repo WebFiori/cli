@@ -392,11 +392,12 @@ class RunnerTest extends CommandTestCase {
         $runner->start();
         $output = $runner->getOutput();
         // Null out the stack trace content as it can vary
-        for ($i = 14; $i < count($output) - 2; $i++) {
+        for ($i = 12; $i < count($output) - 2; $i++) {
             if ($output[$i] !== null && strpos($output[$i], 'Command Exit Status: -1') === false && strpos($output[$i], '>> ') === false) {
                 $output[$i] = null;
             }
         }
+
         $this->assertEquals([
             "[1;34m>>[0m Running in interactive mode.\n",
             "[1;34m>>[0m Type command name or 'exit' to close.\n",
