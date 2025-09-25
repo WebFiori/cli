@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit stderr="true" colors="true" bootstrap="bootstrap.php" displayDetailsOnTestsThatTriggerDeprecations="true">
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+    bootstrap="bootstrap.php"
+    colors="true"
+    stderr="true">
+
     <php>
+        <!-- put env/constants here if needed -->
+        <!-- <env name="APP_ENV" value="test"/> -->
     </php>
-    <source>
+
+    <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">../WebFiori/Cli</directory>
         </include>
-    </source>
+        <!-- <exclude> ... </exclude> -->
+    </coverage>
+
     <testsuites>
         <testsuite name="Tests">
             <directory>./WebFiori/Tests/Cli</directory>
