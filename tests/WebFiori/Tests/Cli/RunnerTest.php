@@ -15,8 +15,6 @@ use WebFiori\Tests\Cli\TestCommands\Command01;
 use WebFiori\Tests\Cli\TestCommands\WithExceptionCommand;
 use WebFiori\Tests\Cli\TestCommands\Command03;
 use WebFiori\Tests\Cli\TestCommand;
-use const DS;
-use const ROOT_DIR;
 
 
 /**
@@ -160,7 +158,7 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
@@ -175,7 +173,7 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $this->executeMultiCommand([], [], [
             new Command00()
@@ -201,7 +199,7 @@ class RunnerTest extends CommandTestCase {
             "\e[1;93mGlobal Arguments:\e[0m\n",
             "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
-            "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n"
         ], $runner->getOutput());
     }
@@ -214,14 +212,12 @@ class RunnerTest extends CommandTestCase {
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(new HelpCommand(), [
             '--ansi',
-            '--command-name' => 'super-hero'
+            '--command' => 'super-hero'
         ]));
         $this->assertEquals([
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n",
             "\e[1;94m    Supported Arguments:\e[0m\n",
             "\e[1;33m                         name:\e[0m The name of the hero\n",
-            "\e[1;33m                         help:\e[0m[Optional] Display command help.\n",
-            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -240,7 +236,7 @@ class RunnerTest extends CommandTestCase {
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $runner->getLastCommandExitStatus());
@@ -256,15 +252,13 @@ class RunnerTest extends CommandTestCase {
         $runner->setArgsVector([
             'entry.php',
             'help',
-            '--command-name' => 'super-hero'
+            '--command' => 'super-hero'
         ]);
         $runner->start();
         $this->assertEquals([
             "    super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            "                         help:[Optional] Display command help.\n",
-            "                           -h:[Optional] <NO DESCRIPTION>\n"
         ], $runner->getOutput());
     }
     /**
@@ -276,7 +270,7 @@ class RunnerTest extends CommandTestCase {
             $r->setArgsVector([
                 'entry.php',
                 'help',
-                '--command-name' => 'super hero',
+                '--command' => 'super hero',
                 '--ansi'
             ]);
             $r->register(new Command00());
@@ -339,7 +333,7 @@ class RunnerTest extends CommandTestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n",
             ">> ",
         ], $runner->getOutput());
@@ -359,7 +353,7 @@ class RunnerTest extends CommandTestCase {
             '-i',
         ]);
         $runner->setInputs([
-            'help --ansi --command-name=super-hero',
+            'help --ansi --command=super-hero',
             'super-hero name=Ibrahim',
             'exit'
         ]);
@@ -370,8 +364,6 @@ class RunnerTest extends CommandTestCase {
             ">>     super-hero:     A command to display hero's name.\n",
             "    Supported Arguments:\n",
             "                         name: The name of the hero\n",
-            "                         help:[Optional] Display command help.\n",
-            "                           -h:[Optional] <NO DESCRIPTION>\n",
             ">> Hello hero Ibrahim\n",
             ">> "
         ], $runner->getOutput());
@@ -393,31 +385,30 @@ class RunnerTest extends CommandTestCase {
             '-i',
         ]);
         $runner->setInputs([
-            'help --command-name=super-hero',
+            'help --command=super-hero',
             'with-exception',
             'exit'
         ]);
         $runner->start();
         $output = $runner->getOutput();
         // Null out the stack trace content as it can vary
-        for ($i = 14; $i < count($output) - 2; $i++) {
+        for ($i = 12; $i < count($output) - 2; $i++) {
             if ($output[$i] !== null && strpos($output[$i], 'Command Exit Status: -1') === false && strpos($output[$i], '>> ') === false) {
                 $output[$i] = null;
             }
         }
+
         $this->assertEquals([
             "[1;34m>>[0m Running in interactive mode.\n",
             "[1;34m>>[0m Type command name or 'exit' to close.\n",
             "[1;34m>>[0m [1;33m    super-hero[0m:         A command to display hero's name.\n",
             "[1;94m    Supported Arguments:[0m\n",
             "[1;33m                         name:[0m The name of the hero\n",
-            "[1;33m                         help:[0m[Optional] Display command help.\n",
-            "[1;33m                           -h:[0m[Optional] <NO DESCRIPTION>\n",
             "Command Exit Status: 0\n",
             "[1;34m>>[0m [1;31mError:[0m An exception was thrown.\n",
             "[1;33mException Message:[0m Call to undefined method WebFiori\Tests\Cli\TestCommands\WithExceptionCommand::notExist()\n",
             "[1;33mCode:[0m 0\n",
-            "[1;33mAt:[0m ".\ROOT_DIR."tests".\DS."WebFiori".\DS."Tests".\DS."Cli".\DS."TestCommands".\DS."WithExceptionCommand.php\n",
+            "[1;33mAt:[0m ".ROOT_DIR."tests".DS."WebFiori".DS."Tests".DS."Cli".DS."TestCommands".DS."WithExceptionCommand.php\n",
             "[1;33mLine:[0m 13\n",
             "[1;33mStack Trace:[0m \n\n",
             null,

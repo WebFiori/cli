@@ -28,7 +28,7 @@ class AliasingIntegrationTest extends CommandTestCase {
         $runner->register($aliasCommand);
         
         // Test help for command via direct name (not alias, as help might not resolve aliases)
-        $runner->setArgsVector(['script.php', 'help', '--command-name=alias-test']);
+        $runner->setArgsVector(['script.php', 'help', '--command=alias-test']);
         $exitCode = $runner->start();
         
         $output = $runner->getOutputStream()->getOutputArray();

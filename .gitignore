@@ -17,3 +17,5 @@ test/*
 tests/clover.xml
 cache/commands.json
 *.Identifier
+/test2
+/home/ibrahim/cli/test2
