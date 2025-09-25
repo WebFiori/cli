@@ -31,7 +31,11 @@ class InitAppCommand extends Command {
         }
 
         if (defined('ROOT_DIR')) {
-            $appPath = ROOT_DIR.DIRECTORY_SEPARATOR.$dirName;
+            $path = ROOT_DIR;
+            if ($path[strlen($path) - 1] != DIRECTORY_SEPARATOR) {
+                $path .= DIRECTORY_SEPARATOR;
+            }
+            $appPath = $path.$dirName;
         } else {
             $appPath = getcwd().DIRECTORY_SEPARATOR.$dirName;
         }
@@ -44,7 +48,7 @@ class InitAppCommand extends Command {
             $this->success('App created successfully.');
 
             return 0;
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $this->error('Unable to initialize due to an exception:');
             $this->println($ex->getCode().' - '.$ex->getMessage());
 
