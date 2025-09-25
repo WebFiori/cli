@@ -42,10 +42,15 @@ class InitAppCommandTest extends TestCase {
             '--dir' => "test\0a"
         ]);
         $this->assertEquals(-1, $r->start());
+        $this->assertEquals([
+            "Creating new app at \"/home/ibrahim/cli/test\000a\" ...\n",
+            "Creating \"test\000a/main.php\"...\n",
+            "Error: Unable to initialize due to an exception:\n",
+            "0 - mkdir(): Argument #1 (\$directory) must not contain any null bytes\n"
+        ], $r->getOutput());
     }
     /**
      * @test
-     * @depends test01
      */
     public function test02() {
         $r = new Runner();
@@ -58,12 +63,12 @@ class InitAppCommandTest extends TestCase {
             '--dir' => 'test'
         ]);
         // Cleanup existing files
-        $appPath = ROOT_DIR.DS.'test';
+        $appPath = ROOT_DIR.'test';
         if (file_exists($appPath)) {
-            if (file_exists($appPath.DS.'main.php')) unlink($appPath.DS.'main.php');
-            if (file_exists($appPath.DS.'test')) unlink($appPath.DS.'test');
-            if (file_exists($appPath.DS.'HelloCommand.php')) unlink($appPath.DS.'HelloCommand.php');
-            if (is_dir($appPath)) rmdir($appPath);
+            unlink(ROOT_DIR.DS.'test'.DS.'main.php');
+            unlink(ROOT_DIR.DS.'test'.DS.'HelloCommand.php');
+            unlink(ROOT_DIR.DS.'test'.DS.'main');
+            rmdir(ROOT_DIR.DS.'test');
         }
         $this->assertEquals(0, $r->start());
         $this->assertEquals([
@@ -90,7 +95,7 @@ class InitAppCommandTest extends TestCase {
         ]);
         // Don't cleanup - this test expects files to exist
         $this->assertEquals(0, $r->start());
-        $appPath = ROOT_DIR.DS.'test';
+        $appPath = ROOT_DIR.'test';
         $this->assertEquals([
             "Creating new app at \"$appPath\" ...\n",
             "Creating \"test/main.php\"...\n",
@@ -121,14 +126,14 @@ class InitAppCommandTest extends TestCase {
             '--entry' => 'bang'
         ]);
         // Cleanup existing files
-        $appPath = ROOT_DIR.DS.'test2';
+        $appPath = ROOT_DIR.'test2';
         if (file_exists($appPath)) {
-            if (file_exists($appPath.DS.'bang')) unlink($appPath.DS.'bang');
-            if (file_exists($appPath.DS.'HelloCommand.php')) unlink($appPath.DS.'HelloCommand.php');
-            if (is_dir($appPath)) rmdir($appPath);
+            unlink($appPath.DS.'main.php');
+            unlink($appPath.DS.'bang');
+            unlink($appPath.DS.'HelloCommand.php');
+            rmdir($appPath);
         }
         $this->assertEquals(0, $r->start());
-        $appPath = ROOT_DIR.DS.'test2';
         $this->assertEquals([
             "Creating new app at \"$appPath\" ...\n",
             "Creating \"test2/main.php\"...\n",
@@ -138,6 +143,7 @@ class InitAppCommandTest extends TestCase {
         ], $r->getOutput());
         unlink($appPath.DS.'main.php');
         unlink($appPath.DS.'bang');
+        unlink($appPath.DS.'HelloCommand.php');
         rmdir($appPath);
     }
 }
