@@ -588,6 +588,24 @@ abstract class Command {
     public function getInputStream() : InputStream {
         return $this->inputStream;
     }
+    
+    /**
+     * Check if the current input stream supports interactive input.
+     * 
+     * @return bool True if the input stream supports interactive input (real-time user interaction),
+     *              false otherwise (files, pipes, arrays, etc.)
+     */
+    public function supportsInteractiveInput(): bool {
+        $stream = $this->getInputStream();
+        
+        // Only StdIn with tty supports true interaction
+        if ($stream instanceof Streams\StdIn) {
+            return function_exists('posix_isatty') && posix_isatty(STDIN);
+        }
+        
+        // All other stream types are non-interactive
+        return false;
+    }
     /**
      * Returns the name of the command.
      * 

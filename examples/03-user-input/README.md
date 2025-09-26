@@ -1,222 +1,375 @@
 # User Input Example
 
-This example demonstrates interactive user input handling, validation, and different input methods in WebFiori CLI.
+This example demonstrates comprehensive user input handling and validation techniques using WebFiori CLI library.
 
-## 🎯 What You'll Learn
+## Features Demonstrated
 
-- Interactive input collection with prompts
-- Input validation and custom validators
-- Different input types (text, numbers, selections, confirmations)
-- Password input handling
-- Multi-step interactive workflows
-- Error handling and retry mechanisms
+- Interactive input collection with defaults
+- Input validation and error handling
+- Email format validation
+- Age range validation (13-120)
+- Country selection from numbered lists
+- Programming language selection with y/N prompts
+- Experience level selection
+- Survey summary and statistics
+- Pre-filled values and quick mode options
 
-## 📁 Files
+## Files
 
-- `SurveyCommand.php` - Interactive survey with various input types
-- `SetupWizardCommand.php` - Multi-step configuration wizard
-- `QuizCommand.php` - Interactive quiz with scoring
-- `main.php` - Application entry point
-- `README.md` - This documentation
+- `main.php` - Application entry point and runner setup
+- `SurveyCommand.php` - Interactive survey with comprehensive input handling
+- `SimpleCommand.php` - Non-interactive demo survey
 
-## 🚀 Running the Examples
+## Usage Examples
 
-### Survey Command
+### General Help
 ```bash
-# Start interactive survey
+php main.php
+# or
+php main.php help
+```
+**Output:**
+```
+Usage:
+    command [arg1 arg2="val" arg3...]
+
+Global Arguments:
+    --ansi:[Optional] Force the use of ANSI output.
+Available Commands:
+    help:              Display CLI Help. To display help for specific command, use the argument "--command" with this command.
+    survey:            Interactive survey demonstrating various input methods
+    simple-survey:     A simple survey without interactive input
+```
+
+## Simple Survey Command
+
+### Show Simple Survey Help
+```bash
+php main.php help --command=simple-survey
+```
+**Output:**
+```
+    simple-survey:     A simple survey without interactive input
+```
+
+### Run Simple Survey Demo
+```bash
+php main.php simple-survey
+```
+**Output:**
+```
+📋 Simple Survey Demo
+====================
+
+✅ Survey completed! Here's your data:
+
+Name: John Doe
+Email: john@example.com
+Age: 30
+Country: Canada
+Languages: PHP, Python
+Experience: Advanced
+```
+
+## Interactive Survey Command
+
+### Show Survey Help
+```bash
+php main.php help --command=survey
+```
+**Output:**
+```
+    survey:            Interactive survey demonstrating various input methods
+    Supported Arguments:
+                       --name:[Optional] Pre-fill your name (optional)
+                      --quick:[Optional] Use quick mode with minimal questions
+```
+
+### Basic Interactive Survey
+```bash
 php main.php survey
-
-# Survey with pre-filled name
-php main.php survey --name="John Doe"
 ```
-
-### Setup Wizard
-```bash
-# Run configuration wizard
-php main.php setup
-
-# Skip to specific step
-php main.php setup --step=database
-```
-
-### Quiz Command
-```bash
-# Start the quiz
-php main.php quiz
-
-# Quiz with specific difficulty
-php main.php quiz --difficulty=hard
-```
-
-## 📖 Code Explanation
-
-### Input Methods Demonstrated
-
-#### Basic Text Input
-```php
-$name = $this->getInput('Enter your name: ', 'Anonymous');
-```
-
-#### Validated Input
-```php
-$email = $this->getInput('Enter email: ', null, new InputValidator(function($input) {
-    return filter_var($input, FILTER_VALIDATE_EMAIL) !== false;
-}, 'Please enter a valid email address'));
-```
-
-#### Numeric Input
-```php
-$age = $this->readInteger('Enter your age: ', 25);
-$score = $this->readFloat('Enter score: ', 0.0);
-```
-
-#### Selection Input
-```php
-$choice = $this->select('Choose your favorite color:', [
-    'Red', 'Green', 'Blue', 'Yellow'
-], 0); // Default to first option
-```
-
-#### Confirmation Input
-```php
-$confirmed = $this->confirm('Do you want to continue?', true);
-```
-
-#### Password Input (Simulated)
-```php
-$password = $this->getInput('Enter password: ');
-// Note: Real password input would hide characters
-```
-
-### Custom Validation Examples
-
-#### Email Validation
-```php
-new InputValidator(function($input) {
-    return filter_var($input, FILTER_VALIDATE_EMAIL) !== false;
-}, 'Invalid email format')
-```
-
-#### Range Validation
-```php
-new InputValidator(function($input) {
-    $num = (int)$input;
-    return $num >= 1 && $num <= 10;
-}, 'Please enter a number between 1 and 10')
-```
-
-#### Pattern Validation
-```php
-new InputValidator(function($input) {
-    return preg_match('/^[A-Za-z\s]+$/', $input);
-}, 'Only letters and spaces allowed')
-```
-
-## 🔍 Key Features
-
-### 1. Input Types
-- **Text input**: Names, descriptions, free text
-- **Numeric input**: Integers, floats with validation
-- **Selection input**: Choose from predefined options
-- **Boolean input**: Yes/no confirmations
-- **Validated input**: Custom validation rules
-
-### 2. Validation Strategies
-- **Built-in validators**: Email, numeric, etc.
-- **Custom validators**: Business logic validation
-- **Range validation**: Min/max values
-- **Pattern matching**: Regex validation
-- **Retry mechanisms**: Allow user to correct input
-
-### 3. User Experience
-- **Default values**: Sensible defaults for quick input
-- **Clear prompts**: Descriptive input requests
-- **Error messages**: Helpful validation feedback
-- **Progress indication**: Multi-step workflow progress
-- **Confirmation steps**: Verify important actions
-
-## 🎨 Expected Output
-
-### Survey Example
+**Sample Output:**
 ```
 📋 Welcome to the Interactive Survey!
+=====================================
 
-👤 What's your name? [Anonymous]: John Doe
-📧 Enter your email: john@example.com
-🎂 How old are you? [25]: 30
+📝 Basic Information
+-------------------
+👤 What's your name? Enter = 'Anonymous'
+📧 Enter your email:
+🎂 How old are you? Enter = '25'
+
+🎯 Preferences
+-------------
 🌍 Select your country:
 0: United States
 1: Canada
 2: United Kingdom
 3: Australia
-Your choice [0]: 1
+4: Germany
+5: France
+6: Japan
+7: Other
+Enter number (0-7) Enter = '0'
+
+💻 Programming experience:
+Do you know PHP? (y/N) Enter = 'n'
+Do you know JavaScript? (y/N) Enter = 'n'
+Do you know Python? (y/N) Enter = 'n'
+Do you know Java? (y/N) Enter = 'n'
+Do you know C++? (y/N) Enter = 'n'
+Do you know Go? (y/N) Enter = 'n'
+Do you know Rust? (y/N) Enter = 'n'
+
+📈 Your programming experience level:
+0: Beginner
+1: Intermediate
+2: Advanced
+3: Expert
+Enter number (0-3) Enter = '1'
+
+📋 Additional Details
+--------------------
+🎨 What's your favorite color? Enter = 'Blue'
+⭐ Rate your satisfaction with CLI tools (1-10): Enter = '7'
+💬 Any additional feedback? (optional): Enter = ''
+📧 Subscribe to our newsletter?(y/N)
+
+📊 Survey Summary
+================
+👤 Name: Anonymous
+📧 Email: user@example.com
+🎂 Age: 25
+🌍 Country: United States
+📈 Experience: Intermediate
+💻 Languages: None specified
+🎨 Favorite Color: Blue
+⭐ Satisfaction: 7/10 ⭐⭐⭐⭐⭐⭐⭐☆☆☆
+📧 Newsletter: No
+
+Submit this survey?(Y/n)
+📤 Submitting survey...
+...
+✅ Thank you for completing the survey!
+📋 Survey ID: SRV-20250926-1234
+
+📈 Quick Stats:
+   • Questions answered: 9
+   • Languages known: 0
+   • Completion time: ~5 minutes
+```
+
+### Survey with Pre-filled Name
+```bash
+php main.php survey --name="Ahmed Hassan"
+```
+**Sample Output:**
+```
+📋 Welcome to the Interactive Survey!
+=====================================
+
+📝 Basic Information
+-------------------
+👤 What's your name? Enter = 'Ahmed Hassan'
+📧 Enter your email:
+🎂 How old are you? Enter = '25'
+
+[... continues with survey flow ...]
+
+📊 Survey Summary
+================
+👤 Name: Ahmed Hassan
+📧 Email: ahmed@example.com
+🎂 Age: 25
+🌍 Country: Canada
+📈 Experience: Advanced
+💻 Languages: PHP, JavaScript, Python
+🎨 Favorite Color: Blue
+⭐ Satisfaction: 9/10 ⭐⭐⭐⭐⭐⭐⭐⭐⭐☆
+📧 Newsletter: No
 
 ✅ Thank you for completing the survey!
+📋 Survey ID: SRV-20250926-3555
 
-📊 Survey Results:
-   • Name: John Doe
-   • Email: john@example.com
-   • Age: 30
-   • Country: Canada
+📈 Quick Stats:
+   • Questions answered: 9
+   • Languages known: 3
+   • Completion time: ~3 minutes
+🎉 Great to hear you're satisfied with CLI tools!
 ```
 
-### Setup Wizard Example
+### Quick Mode Survey
+```bash
+php main.php survey --quick
 ```
-🔧 Application Setup Wizard
+**Sample Output:**
+```
+📋 Welcome to the Interactive Survey!
+=====================================
 
-Step 1/4: Basic Configuration
-📝 Application name [MyApp]: AwesomeApp
-🌐 Environment (dev/staging/prod) [dev]: prod
+⚡ Running in quick mode - fewer questions!
 
-Step 2/4: Database Configuration
-🗄️  Database host [localhost]: db.example.com
-👤 Database username: admin
-🔑 Database password: ********
+📝 Basic Information
+-------------------
+👤 What's your name? Enter = 'Anonymous'
+📧 Enter your email:
+🎂 How old are you? Enter = '25'
 
-✅ Setup completed successfully!
+🎯 Preferences
+-------------
+🌍 Select your country:
+[... country selection ...]
+
+💻 Programming experience:
+[... language selection ...]
+
+📈 Your programming experience level:
+[... experience selection ...]
+
+📊 Survey Summary
+================
+👤 Name: Anonymous
+📧 Email: user@example.com
+🎂 Age: 25
+🌍 Country: United States
+📈 Experience: Intermediate
+💻 Languages: None specified
+
+✅ Thank you for completing the survey!
+📋 Survey ID: SRV-20250926-1364
+
+📈 Quick Stats:
+   • Questions answered: 6
+   • Languages known: 0
+   • Completion time: ~5 minutes
 ```
 
-### Quiz Example
+### Combined Options
+```bash
+php main.php survey --name="Fatima Al-Zahra" --quick
 ```
-🧠 Welcome to the Knowledge Quiz!
+**Sample Output:**
+```
+📋 Welcome to the Interactive Survey!
+=====================================
 
-Question 1/5: What is the capital of France?
-0: London
-1: Berlin
-2: Paris
-3: Madrid
-Your answer: 2
-✅ Correct!
+⚡ Running in quick mode - fewer questions!
 
-Question 2/5: What is 15 + 27?
-Enter your answer: 42
-✅ Correct!
+📝 Basic Information
+-------------------
+👤 What's your name? Enter = 'Fatima Al-Zahra'
+[... continues with quick survey flow ...]
 
-🎉 Quiz completed!
-📊 Final Score: 5/5 (100%)
-🏆 Excellent work!
+📊 Survey Summary
+================
+👤 Name: Fatima Al-Zahra
+📧 Email: fatima@example.com
+🎂 Age: 25
+🌍 Country: United States
+📈 Experience: Intermediate
+💻 Languages: None specified
+
+✅ Thank you for completing the survey!
+📋 Survey ID: SRV-20250926-1871
+
+📈 Quick Stats:
+   • Questions answered: 6
+   • Languages known: 0
+   • Completion time: ~3 minutes
 ```
 
-## 🔗 Next Steps
+## Error Handling Examples
 
-After mastering this example, move on to:
-- **[04-output-formatting](../04-output-formatting/)** - Advanced output styling
-- **[05-interactive-commands](../05-interactive-commands/)** - Complex interactive workflows
-- **[07-progress-bars](../07-progress-bars/)** - Visual progress indicators
+### Invalid Command
+```bash
+php main.php invalid
+```
+**Output:**
+```
+Error: The command 'invalid' is not supported.
+```
 
-## 💡 Try This
+### Input Validation
+The survey includes several validation mechanisms:
 
-Experiment with the code:
+- **Email validation**: Prompts for valid email format
+- **Age validation**: Ensures age is between 13-120
+- **Country selection**: Validates numeric input within range
+- **Experience level**: Validates numeric input for experience level
 
-1. **Add new input types**: Date input, URL validation
-2. **Create complex workflows**: Multi-branch decision trees
-3. **Add input history**: Remember previous inputs
-4. **Implement autocomplete**: Suggest completions for input
+## Key Learning Points
 
+1. **Interactive Input**: Use `getInput()` for collecting user data with defaults
+2. **Input Validation**: Implement custom validation logic for business rules
+3. **User Experience**: Provide clear prompts, defaults, and error messages
+4. **Data Collection**: Structure complex surveys with multiple sections
+5. **Conditional Logic**: Use flags like `--quick` to modify behavior
+6. **Pre-filled Data**: Use command arguments to pre-populate fields
+7. **Summary Display**: Format collected data in readable summaries
+8. **Progress Feedback**: Show completion statistics and survey IDs
+
+## Code Structure Examples
+
+### Survey Command Structure
 ```php
-// Example: Date input validation
-new InputValidator(function($input) {
-    $date = DateTime::createFromFormat('Y-m-d', $input);
-    return $date && $date->format('Y-m-d') === $input;
-}, 'Please enter date in YYYY-MM-DD format')
+class SurveyCommand extends Command {
+    public function __construct() {
+        parent::__construct('survey', [
+            '--name' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Pre-fill your name (optional)'
+            ],
+            '--quick' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Use quick mode with minimal questions'
+            ]
+        ], 'Interactive survey demonstrating various input methods');
+    }
+
+    public function exec(): int {
+        $this->println('📋 Welcome to the Interactive Survey!');
+        
+        // Collect basic information
+        $this->collectBasicInfo();
+        
+        // Collect preferences
+        $this->collectPreferences();
+        
+        // Show summary and submit
+        $this->showSummaryAndSubmit();
+        
+        return 0;
+    }
+}
 ```
+
+### Input Collection with Validation
+```php
+private function collectBasicInfo() {
+    // Name with pre-fill option
+    $preFillName = $this->getArgValue('--name');
+    $name = $this->getInput('👤 What\'s your name?', $preFillName ?? 'Anonymous');
+    
+    // Email with validation
+    do {
+        $email = $this->getInput('📧 Enter your email:');
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->error('Please enter a valid email address');
+        }
+    } while (!filter_var($email, FILTER_VALIDATE_EMAIL));
+    
+    // Age with validation
+    $age = $this->getInput('🎂 How old are you?', '25');
+    $age = is_numeric($age) ? (int)$age : 25;
+}
+```
+
+## Technical Notes
+
+- **Interactive Limitations**: The survey works best in interactive mode; piped input may cause issues with the underlying input handling system
+- **Alternative Approach**: The `simple-survey` command provides a non-interactive demonstration
+- **Input Validation**: Multiple validation layers ensure data quality
+- **User Experience**: Rich formatting with emojis and clear section divisions
+
+This example demonstrates advanced user input handling suitable for complex CLI applications requiring data collection and validation.

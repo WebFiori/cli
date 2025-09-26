@@ -53,7 +53,17 @@ class KeysMap {
      * 
      * </ul>
      */
-    public static function map(string $ch) : string {
+    public static function map($ch) : string {
+        // Handle end-of-stream case for any input type
+        if ($ch === false || $ch === null) {
+            return "\n"; // Treat as Enter key
+        }
+        
+        // Ensure we have a string
+        if (!is_string($ch)) {
+            $ch = (string)$ch;
+        }
+        
         $keyMap = self::KEY_MAP;
 
         if (isset($keyMap[$ch])) {
