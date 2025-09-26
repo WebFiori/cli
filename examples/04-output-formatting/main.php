@@ -11,7 +11,6 @@
  * - Terminal cursor manipulation
  */
 
-use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\Runner;
 
 // Load dependencies
@@ -22,11 +21,9 @@ require_once 'FormattingDemoCommand.php';
 $runner = new Runner();
 
 // Register commands
-$runner->register(new HelpCommand());
 $runner->register(new FormattingDemoCommand());
 
 // Set default command
-$runner->setDefaultCommand('help');
 
 // Start the application
 exit($runner->start());

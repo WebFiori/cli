@@ -685,7 +685,8 @@ class FormattingDemoCommand extends Command {
 
             $bar = str_repeat('▓', $filled).str_repeat('░', $empty);
 
-            $this->prints("\rProgress: [$bar] $percent%");
+            echo "\rProgress: [$bar] $percent%";
+            flush();
             usleep(150000); // 0.15 seconds
         }
 

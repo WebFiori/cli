@@ -1,241 +1,564 @@
 # Output Formatting Example
 
-This example demonstrates advanced output formatting, ANSI colors, styling, and visual elements in WebFiori CLI.
+This example demonstrates comprehensive output formatting and ANSI styling techniques using WebFiori CLI library.
 
-## 🎯 What You'll Learn
+## Features Demonstrated
 
-- ANSI color codes and text styling
-- Creating tables and formatted layouts
-- Progress bars and visual indicators
-- Custom formatting functions
-- Terminal cursor manipulation
-- Creating beautiful CLI interfaces
+- ANSI color support (basic, light, background colors)
+- Text styling (bold, underlined, combinations)
+- Message types with icons (success, error, warning, info)
+- Table formatting (simple, styled, aligned)
+- Progress indicators (bars, percentages, multi-step)
+- Layout techniques (boxes, columns, lists)
+- Animations (spinners, bouncing, loading dots)
+- Color control and section filtering
 
-## 📁 Files
+## Files
 
-- `FormattingDemoCommand.php` - Comprehensive formatting demonstrations
-- `TableCommand.php` - Table creation and formatting
-- `DashboardCommand.php` - Real-time dashboard simulation
-- `main.php` - Application entry point
-- `README.md` - This documentation
+- `main.php` - Application entry point and runner setup
+- `FormattingDemoCommand.php` - Comprehensive formatting demonstration
 
-## 🚀 Running the Examples
+## Usage Examples
 
-### Formatting Demo
+### General Help
 ```bash
-# Show all formatting options
-php main.php format-demo
+php main.php
+# or
+php main.php help
+```
+**Output:**
+```
+Usage:
+    command [arg1 arg2="val" arg3...]
 
-# Show specific sections
+Global Arguments:
+    --ansi:[Optional] Force the use of ANSI output.
+Available Commands:
+    help:            Display CLI Help. To display help for specific command, use the argument "--command" with this command.
+    format-demo:     Demonstrates various output formatting techniques and ANSI styling
+```
+
+### Show Format Demo Help
+```bash
+php main.php help --command=format-demo
+```
+**Output:**
+```
+    format-demo:     Demonstrates various output formatting techniques and ANSI styling
+    Supported Arguments:
+                    --section:[Optional] Show specific section only
+                  --no-colors:[Optional] Disable color output
+```
+
+## Full Formatting Demonstration
+
+### Complete Demo
+```bash
+php main.php format-demo
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
+
+🌈 Color Demonstration
+
+Basic Foreground Colors:
+  black text
+  red text
+  green text
+  yellow text
+  blue text
+  magenta text
+  cyan text
+  white text
+
+Light Foreground Colors:
+  light-red text
+  light-green text
+  light-yellow text
+  light-blue text
+  light-magenta text
+  light-cyan text
+
+Background Colors:
+  Text with red background
+  Text with green background
+  Text with yellow background
+  Text with blue background
+  Text with magenta background
+  Text with cyan background
+
+Color Combinations:
+  Error style
+  Success style
+  Warning style
+  Info style
+
+────────────────────────────────────────────────────────────
+
+✨ Text Styling Demonstration
+
+  Bold text
+  Underlined text
+  Bold red text
+  Underlined blue text
+  Bold text with background
+
+Message Types:
+✅ Success message
+❌ Error message
+⚠️  Warning message
+ℹ️  Info message
+
+────────────────────────────────────────────────────────────
+
+📊 Table Demonstration
+
+Simple Table:
+| Name         | Age          | City         | 
+|--------------|--------------|--------------|
+| Ahmed Hassan | 30           | Cairo        | 
+| Fatima Ali   | 25           | Dubai        | 
+| Mohammed Omar| 35           | Riyadh       | 
+
+Styled Table:
+┌─────────────┬─────────┬────────────┐
+│ Name        │ Age     │ Department │
+├─────────────┼─────────┼────────────┤
+│ Sara Ahmed  │ 28      │ Engineering │
+│ Omar Khalil │ 32      │ Marketing  │
+│ Layla Hassan│ 29      │ Design     │
+└─────────────┴─────────┴────────────┘
+
+Data Table with Alignment:
+┌─────────────────┬──────────────┬──────────┬──────────────┐
+│ Product         │ Price        │ Stock    │ Status       │
+├─────────────────┼──────────────┼──────────┼──────────────┤
+│ Laptop          │ $1,299.99    │ 15       │ In Stock     │
+│ Mouse           │ $29.99       │ 150      │ In Stock     │
+│ Keyboard        │ $89.99       │ 0        │ Out of Stock │
+│ Monitor         │ $399.99      │ 8        │ Low Stock    │
+└─────────────────┴──────────────┴──────────┴──────────────┘
+
+────────────────────────────────────────────────────────────
+
+📈 Progress Indicators
+
+Simple Progress Bar:
+[████████████████████] Complete!
+
+Percentage Progress:
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100% Done!
+
+Multi-step Progress:
+Step 1/5: Initializing............. ✅
+Step 2/5: Loading data............. ✅
+Step 3/5: Processing............. ✅
+Step 4/5: Validating............. ✅
+Step 5/5: Finalizing............. ✅
+✅ All steps completed!
+
+────────────────────────────────────────────────────────────
+
+📐 Layout Demonstration
+
+Bordered Box:
+┌────────────────────────────────────────┐
+│ This is content inside a bordered box! │
+│ It can contain multiple lines          │
+│ and various formatting.                │
+└────────────────────────────────────────┘
+
+Two-Column Layout:
+Left Column               │ Right Column
+• Item 1                │ → Feature A
+• Item 2                │ → Feature B
+• Item 3                │ → Feature C
+• Item 4                │ → Feature D
+
+Formatted Lists:
+Bulleted List:
+  • First item
+  • Second item
+  • Third item with longer text
+  • Fourth item
+
+Numbered List:
+  1. First item
+  2. Second item
+  3. Third item with longer text
+  4. Fourth item
+
+Checklist:
+  ✅ Setup environment
+  ✅ Write code
+  ⬜ Test application
+  ⬜ Deploy to production
+
+────────────────────────────────────────────────────────────
+
+🎬 Animation Demonstration
+
+Spinner Animation:
+⠋ Processing... → ✅ Processing complete!
+
+Bouncing Animation:
+● (bounces left to right and back)
+
+Loading Dots:
+Loading... → Loading complete! ✨
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
+```
+
+## Section-Specific Demonstrations
+
+### Colors Section
+```bash
 php main.php format-demo --section=colors
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
+
+🌈 Color Demonstration
+
+Basic Foreground Colors:
+  black text
+  red text
+  green text
+  yellow text
+  blue text
+  magenta text
+  cyan text
+  white text
+
+Light Foreground Colors:
+  light-red text
+  light-green text
+  light-yellow text
+  light-blue text
+  light-magenta text
+  light-cyan text
+
+Background Colors:
+  Text with red background
+  Text with green background
+  Text with yellow background
+  Text with blue background
+  Text with magenta background
+  Text with cyan background
+
+Color Combinations:
+  Error style
+  Success style
+  Warning style
+  Info style
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
+```
+
+### Styles Section
+```bash
+php main.php format-demo --section=styles
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
+
+✨ Text Styling Demonstration
+
+  Bold text
+  Underlined text
+  Bold red text
+  Underlined blue text
+  Bold text with background
+
+Message Types:
+✅ Success message
+❌ Error message
+⚠️  Warning message
+ℹ️  Info message
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
+```
+
+### Tables Section
+```bash
 php main.php format-demo --section=tables
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
+
+📊 Table Demonstration
+
+Simple Table:
+| Name         | Age          | City         | 
+|--------------|--------------|--------------|
+| Ahmed Hassan | 30           | Cairo        | 
+| Fatima Ali   | 25           | Dubai        | 
+| Mohammed Omar| 35           | Riyadh       | 
+
+Styled Table:
+┌─────────────┬─────────┬────────────┐
+│ Name        │ Age     │ Department │
+├─────────────┼─────────┼────────────┤
+│ Sara Ahmed  │ 28      │ Engineering │
+│ Omar Khalil │ 32      │ Marketing  │
+│ Layla Hassan│ 29      │ Design     │
+└─────────────┴─────────┴────────────┘
+
+Data Table with Alignment:
+┌─────────────────┬──────────────┬──────────┬──────────────┐
+│ Product         │ Price        │ Stock    │ Status       │
+├─────────────────┼──────────────┼──────────┼──────────────┤
+│ Laptop          │ $1,299.99    │ 15       │ In Stock     │
+│ Mouse           │ $29.99       │ 150      │ In Stock     │
+│ Keyboard        │ $89.99       │ 0        │ Out of Stock │
+│ Monitor         │ $399.99      │ 8        │ Low Stock    │
+└─────────────────┴──────────────┴──────────┴──────────────┘
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
+```
+
+### Progress Section
+```bash
 php main.php format-demo --section=progress
 ```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
 
-### Table Command
+📈 Progress Indicators
+
+Simple Progress Bar:
+[████████████████████] Complete!
+
+Percentage Progress:
+Progress: [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100% Done!
+
+Multi-step Progress:
+Step 1/5: Initializing............. ✅
+Step 2/5: Loading data............. ✅
+Step 3/5: Processing............. ✅
+Step 4/5: Validating............. ✅
+Step 5/5: Finalizing............. ✅
+✅ All steps completed!
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
+```
+
+### Layouts Section
 ```bash
-# Display sample data table
-php main.php table
+php main.php format-demo --section=layouts
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
 
-# Custom table with data
-php main.php table --data=users
-php main.php table --data=sales --format=compact
+📐 Layout Demonstration
+
+Bordered Box:
+┌────────────────────────────────────────┐
+│ This is content inside a bordered box! │
+│ It can contain multiple lines          │
+│ and various formatting.                │
+└────────────────────────────────────────┘
+
+Two-Column Layout:
+Left Column               │ Right Column
+• Item 1                │ → Feature A
+• Item 2                │ → Feature B
+• Item 3                │ → Feature C
+• Item 4                │ → Feature D
+
+Formatted Lists:
+Bulleted List:
+  • First item
+  • Second item
+  • Third item with longer text
+  • Fourth item
+
+Numbered List:
+  1. First item
+  2. Second item
+  3. Third item with longer text
+  4. Fourth item
+
+Checklist:
+  ✅ Setup environment
+  ✅ Write code
+  ⬜ Test application
+  ⬜ Deploy to production
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
 ```
 
-### Dashboard Command
+### Animations Section
 ```bash
-# Show real-time dashboard
-php main.php dashboard
+php main.php format-demo --section=animations
+```
+**Output:**
+```
+🎨 WebFiori CLI Formatting Demonstration
+========================================
 
-# Dashboard with specific refresh rate
-php main.php dashboard --refresh=2
+🎬 Animation Demonstration
+
+Spinner Animation:
+⠋ Processing... → ✅ Processing complete!
+
+Bouncing Animation:
+● (bounces left to right and back)
+
+Loading Dots:
+Loading... → Loading complete! ✨
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
 ```
 
-## 📖 Code Explanation
+## Advanced Options
 
-### ANSI Color Codes
+### Disable Colors
+```bash
+php main.php format-demo --section=colors --no-colors
+```
+**Output:**
+```
+⚠️  Color output disabled
 
-#### Basic Colors
-```php
-// Foreground colors
-$this->prints("Red text", ['color' => 'red']);
-$this->prints("Green text", ['color' => 'green']);
-$this->prints("Blue text", ['color' => 'blue']);
+🎨 WebFiori CLI Formatting Demonstration
+========================================
 
-// Background colors
-$this->prints("Text with background", ['bg-color' => 'yellow']);
+🌈 Color Demonstration
+
+Colors disabled - showing plain text versions
+
+Basic Foreground Colors:
+  black text
+  red text
+  green text
+  yellow text
+  blue text
+  magenta text
+  cyan text
+  white text
+
+[... continues with plain text versions ...]
+
+✨ Formatting demonstration completed!
+💡 Tip: Use --section=<name> to view specific sections
 ```
 
-#### Text Styles
-```php
-// Bold text
-$this->prints("Bold text", ['bold' => true]);
+## Error Handling Examples
 
-// Underlined text
-$this->prints("Underlined text", ['underline' => true]);
-
-// Blinking text (if supported)
-$this->prints("Blinking text", ['blink' => true]);
+### Invalid Section
+```bash
+php main.php format-demo --section=invalid
+```
+**Output:**
+```
+Error: The following argument(s) have invalid values: '--section'
+Info: Allowed values for the argument '--section':
+colors
+styles
+tables
+progress
+layouts
+animations
 ```
 
-### Table Formatting
+### Invalid Command
+```bash
+php main.php invalid
+```
+**Output:**
+```
+Error: The command 'invalid' is not supported.
+```
 
-#### Simple Table
+## Key Learning Points
+
+1. **ANSI Colors**: 8 basic + 6 light foreground colors, 6 background colors
+2. **Text Styling**: Bold, underlined, and combination formatting
+3. **Message Types**: Consistent styling for success, error, warning, info
+4. **Table Formatting**: Simple markdown, Unicode box-drawing, data alignment
+5. **Progress Indicators**: Visual feedback for long-running operations
+6. **Layout Techniques**: Boxes, columns, lists for structured output
+7. **Animations**: Dynamic visual elements for better user experience
+8. **Color Control**: Ability to disable colors for plain text environments
+9. **Section Filtering**: View specific formatting categories
+10. **Unicode Support**: Emojis, box-drawing characters, special symbols
+
+## Code Structure Examples
+
+### Format Demo Command Structure
 ```php
-private function createTable(array $headers, array $rows): void {
-    $this->printTableHeader($headers);
-    foreach ($rows as $row) {
-        $this->printTableRow($row);
+class FormattingDemoCommand extends Command {
+    public function __construct() {
+        parent::__construct('format-demo', [
+            '--section' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['colors', 'styles', 'tables', 'progress', 'layouts', 'animations'],
+                ArgumentOption::DESCRIPTION => 'Show specific section only'
+            ],
+            '--no-colors' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Disable color output'
+            ]
+        ], 'Demonstrates various output formatting techniques and ANSI styling');
     }
-}
-```
 
-#### Styled Table
-```php
-private function printStyledTable(array $data): void {
-    // Header with background
-    $this->prints("┌", ['color' => 'blue']);
-    // ... table drawing logic
-}
-```
-
-### Progress Indicators
-
-#### Simple Progress Bar
-```php
-private function showProgress(int $total): void {
-    for ($i = 0; $i <= $total; $i++) {
-        $percent = ($i / $total) * 100;
-        $bar = str_repeat('█', (int)($percent / 5));
-        $empty = str_repeat('░', 20 - (int)($percent / 5));
+    public function exec(): int {
+        $section = $this->getArgValue('--section');
+        $noColors = $this->isArgProvided('--no-colors');
         
-        $this->prints("\r[$bar$empty] " . number_format($percent, 1) . "%");
-        usleep(100000);
-    }
-}
-```
-
-#### Spinner Animation
-```php
-private function showSpinner(int $duration): void {
-    $chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-    $start = time();
-    
-    while (time() - $start < $duration) {
-        foreach ($chars as $char) {
-            $this->prints("\r$char Processing...");
-            usleep(100000);
+        if ($noColors) {
+            $this->warning('⚠️  Color output disabled');
+            $this->println();
         }
+        
+        $this->showHeader();
+        
+        if ($section) {
+            $this->showSection($section, $noColors);
+        } else {
+            $this->showAllSections($noColors);
+        }
+        
+        $this->showFooter();
+        return 0;
     }
 }
 ```
 
-## 🔍 Key Features
-
-### 1. Color System
-- **16 basic colors**: Standard ANSI colors
-- **256 colors**: Extended color palette
-- **RGB colors**: True color support (where available)
-- **Background colors**: Text highlighting
-- **Color combinations**: Foreground + background
-
-### 2. Text Styling
-- **Bold**: Emphasized text
-- **Italic**: Slanted text (limited support)
-- **Underline**: Underlined text
-- **Strikethrough**: Crossed-out text
-- **Reverse**: Inverted colors
-- **Dim**: Faded text
-
-### 3. Layout Elements
-- **Tables**: Structured data display
-- **Boxes**: Bordered content areas
-- **Lists**: Bulleted and numbered lists
-- **Columns**: Multi-column layouts
-- **Separators**: Visual dividers
-
-### 4. Interactive Elements
-- **Progress bars**: Task completion indicators
-- **Spinners**: Loading animations
-- **Counters**: Real-time value updates
-- **Meters**: Gauge-style indicators
-- **Status indicators**: Success/error/warning states
-
-## 🎨 Expected Output
-
-### Color Demo
-```
-🎨 Color Demonstration:
-   Red text in red
-   Green text in green
-   Blue text in blue
-   Yellow background text
-   Bold red text
-   Underlined blue text
-```
-
-### Table Example
-```
-┌─────────────┬─────────┬────────────┬─────────┐
-│ Name        │ Age     │ Department │ Salary  │
-├─────────────┼─────────┼────────────┼─────────┤
-│ John Doe    │ 30      │ IT         │ $75,000 │
-│ Jane Smith  │ 28      │ Marketing  │ $65,000 │
-│ Bob Johnson │ 35      │ Sales      │ $80,000 │
-└─────────────┴─────────┴────────────┴─────────┘
-```
-
-### Progress Bar Example
-```
-Processing files...
-[████████████████████] 100.0% (50/50) Complete!
-
-⠋ Loading data...
-⠙ Loading data...
-⠹ Loading data...
-✅ Data loaded successfully!
-```
-
-### Dashboard Example
-```
-╔══════════════════════════════════════════════════════════╗
-║                    System Dashboard                      ║
-╠══════════════════════════════════════════════════════════╣
-║ CPU Usage:    [████████░░] 80%                          ║
-║ Memory:       [██████░░░░] 60%                          ║
-║ Disk Space:   [███░░░░░░░] 30%                          ║
-║ Network:      [██████████] 100%                         ║
-║                                                          ║
-║ Active Users: 1,234                                     ║
-║ Requests/sec: 45                                        ║
-║ Uptime:       2d 14h 32m                                ║
-╚══════════════════════════════════════════════════════════╝
-```
-
-## 🔗 Next Steps
-
-After mastering this example, move on to:
-- **[05-interactive-commands](../05-interactive-commands/)** - Complex interactive workflows
-- **[07-progress-bars](../07-progress-bars/)** - Advanced progress indicators
-- **[10-multi-command-app](../10-multi-command-app/)** - Building complete CLI applications
-
-## 💡 Try This
-
-Experiment with the code:
-
-1. **Create custom themes**: Define color schemes for different contexts
-2. **Add animations**: Create smooth transitions and effects
-3. **Build charts**: ASCII bar charts and graphs
-4. **Design layouts**: Complex multi-panel interfaces
-
+### Animation Implementation
 ```php
-// Example: Custom color theme
-private function applyTheme(string $theme): array {
-    return match($theme) {
-        'dark' => ['bg-color' => 'black', 'color' => 'white'],
-        'ocean' => ['bg-color' => 'blue', 'color' => 'cyan'],
-        'forest' => ['bg-color' => 'green', 'color' => 'light-green'],
-        default => []
-    };
+private function showSpinnerAnimation(): void {
+    $frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    
+    for ($i = 0; $i < 30; $i++) {
+        $frame = $frames[$i % count($frames)];
+        $this->prints("\r$frame Processing...");
+        usleep(100000); // 0.1 seconds
+    }
+    
+    $this->println("\r✅ Processing complete!");
 }
 ```
+
+This example demonstrates professional CLI output formatting suitable for creating visually appealing and user-friendly command-line applications.
