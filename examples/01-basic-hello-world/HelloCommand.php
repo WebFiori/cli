@@ -48,7 +48,7 @@ class HelloCommand extends Command {
         // Special greeting for WebFiori
         if (strtolower($name) === 'webfiori') {
             $this->success("🎉 Hello, $name! Welcome to the CLI world!");
-            $this->info('You\'re using the WebFiori CLI library - great choice!');
+            $this->info('You\'re using the WebFiori CLI library.');
         } else {
             // Standard greeting
             $this->println("Hello, $name! 👋");
