@@ -27,9 +27,9 @@ echo "----------------------\n";
 
 $basicTable = TableBuilder::create()
     ->setHeaders(['Name', 'Age', 'City'])
-    ->addRow(['John Doe', 30, 'New York'])
-    ->addRow(['Jane Smith', 25, 'Los Angeles'])
-    ->addRow(['Bob Johnson', 35, 'Chicago']);
+    ->addRow(['Ahmed Hassan', 30, 'Cairo'])
+    ->addRow(['Sarah Johnson', 25, 'Los Angeles'])
+    ->addRow(['Omar Al-Rashid', 35, 'Dubai']);
 
 echo $basicTable->render()."\n\n";
 

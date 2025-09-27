@@ -14,7 +14,7 @@ class SimpleCommand extends Command {
         
         // Simulate collecting data
         $data = [
-            'name' => 'John Doe',
+            'name' => 'Ahmed Hassan',
             'email' => 'john@example.com',
             'age' => 30,
             'country' => 'Canada',

@@ -3,7 +3,7 @@ Class library that can help in writing command line based applications with mini
 
 <p align="center">
   <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yaml">
-    <img src="https://github.com/WebFiori/cli/actions/workflows/php83.yaml/badge.svg?branch=main">
+    <img src="https://github.com/WebFiori/cli/actions/workflows/php84.yaml/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -104,13 +104,13 @@ exit(\$runner->start());
 A complete sample application with multiple examples can be found here: **[📁 View Sample Application](https://github.com/WebFiori/cli/tree/main/examples)**
 
 The sample application includes:
-- **[Basic Commands](https://github.com/WebFiori/cli/tree/main/examples/01-basic-command)** - Simple command creation
-- **[Arguments Handling](https://github.com/WebFiori/cli/tree/main/examples/02-command-with-args)** - Working with command arguments
-- **[Interactive Mode](https://github.com/WebFiori/cli/tree/main/examples/03-interactive-mode)** - Building interactive applications
+- **[Basic Commands](https://github.com/WebFiori/cli/tree/main/examples/01-basic-hello-world)** - Simple command creation
+- **[Arguments Handling](https://github.com/WebFiori/cli/tree/main/examples/02-arguments-and-options)** - Working with command arguments
+- **[User Input](https://github.com/WebFiori/cli/tree/main/examples/03-user-input)** - Building interactive applications
 - **[Multi-Command Apps](https://github.com/WebFiori/cli/tree/main/examples/10-multi-command-app)** - Complex applications with multiple commands
-- **[Progress Bars](https://github.com/WebFiori/cli/tree/main/examples/05-progress-bars)** - Visual progress indicators
+- **[Progress Bars](https://github.com/WebFiori/cli/tree/main/examples/07-progress-bars)** - Visual progress indicators
 - **[Table Display](https://github.com/WebFiori/cli/tree/main/examples/06-table-display)** - Formatting data in tables
-- **[Testing Examples](https://github.com/WebFiori/cli/tree/main/examples/tests)** - Unit testing your commands
+- **[Database Operations](https://github.com/WebFiori/cli/tree/main/examples/09-database-ops)** - Database CLI commands
 
 ## Installation
 
@@ -165,7 +165,7 @@ php app.php greet
 # Output: Hello from WebFiori CLI!
 ```
 
-**[📖 View Complete Example](https://github.com/WebFiori/cli/tree/main/examples/01-basic-command)**
+**[📖 View Complete Example](https://github.com/WebFiori/cli/tree/main/examples/01-basic-hello-world)**
 
 ### Command with Arguments
 
@@ -210,7 +210,7 @@ php app.php greet-person --name=Sarah
 # Output: Hello Friend Sarah!
 ```
 
-**[📖 View Complete Example](https://github.com/WebFiori/cli/tree/main/examples/02-command-with-args)**
+**[📖 View Complete Example](https://github.com/WebFiori/cli/tree/main/examples/02-arguments-and-options)**
 
 ### Multi-Command Application
 
@@ -394,7 +394,7 @@ This will show following output in terminal:
 >>
 ```
 
-**[📖 View Interactive Mode Example](https://github.com/WebFiori/cli/tree/main/examples/03-interactive-mode)**
+**[📖 View Interactive Mode Example](https://github.com/WebFiori/cli/tree/main/examples/05-interactive-commands)**
 
 ### Input and Output Streams
 
@@ -411,7 +411,7 @@ $command->setInputStream(new FileInputStream('input.txt'));
 $command->setOutputStream(new FileOutputStream('output.txt'));
 ```
 
-**[📖 View Streams Example](https://github.com/WebFiori/cli/tree/main/examples/04-custom-streams)**
+**[📖 View Streams Example](https://github.com/WebFiori/cli/tree/main/examples/08-file-processing)**
 
 ### ANSI Colors and Formatting
 
@@ -427,7 +427,7 @@ public function exec(): int {
 }
 ```
 
-**[📖 View Formatting Example](https://github.com/WebFiori/cli/tree/main/examples/07-ansi-formatting)**
+**[📖 View Formatting Example](https://github.com/WebFiori/cli/tree/main/examples/04-output-formatting)**
 
 ### Progress Bars
 
@@ -449,7 +449,7 @@ public function exec(): int {
 }
 ```
 
-**[📖 View Progress Bar Example](https://github.com/WebFiori/cli/tree/main/examples/05-progress-bars)**
+**[📖 View Progress Bar Example](https://github.com/WebFiori/cli/tree/main/examples/07-progress-bars)**
 
 ### Table Display
 
@@ -458,8 +458,8 @@ Display data in formatted tables:
 ```php
 public function exec(): int {
     $data = [
-        ['John Doe', 30, 'New York'],
-        ['Jane Smith', 25, 'Los Angeles']
+        ['Ahmed Hassan', 30, 'Cairo'],
+        ['Sarah Johnson', 25, 'Los Angeles']
     ];
     $headers = ['Name', 'Age', 'City'];
     
@@ -593,34 +593,33 @@ class HelloCommandTest extends CommandTestCase {
 
 ```
 
-**[📖 View Testing Examples](https://github.com/WebFiori/cli/tree/main/examples/tests)**
+**[📖 View Testing Examples](https://github.com/WebFiori/cli/tree/main/examples/10-multi-command-app)**
 
 ## Examples
 
 Explore comprehensive examples to learn different aspects of WebFiori CLI:
 
 ### Basic Examples
-- **[📁 Basic Command](https://github.com/WebFiori/cli/tree/main/examples/01-basic-command)** - Create your first CLI command
-- **[📁 Command with Arguments](https://github.com/WebFiori/cli/tree/main/examples/02-command-with-args)** - Handle command-line arguments
-- **[📁 Interactive Mode](https://github.com/WebFiori/cli/tree/main/examples/03-interactive-mode)** - Build interactive CLI applications
+- **[📁 Basic Command](https://github.com/WebFiori/cli/tree/main/examples/01-basic-hello-world)** - Create your first CLI command
+- **[📁 Command with Arguments](https://github.com/WebFiori/cli/tree/main/examples/02-arguments-and-options)** - Handle command-line arguments
+- **[📁 User Input](https://github.com/WebFiori/cli/tree/main/examples/03-user-input)** - Read and validate user input
+- **[📁 Output Formatting](https://github.com/WebFiori/cli/tree/main/examples/04-output-formatting)** - Colors and text formatting
 
 ### Advanced Examples
-- **[📁 Custom Streams](https://github.com/WebFiori/cli/tree/main/examples/04-custom-streams)** - Custom input/output handling
-- **[📁 Progress Bars](https://github.com/WebFiori/cli/tree/main/examples/05-progress-bars)** - Visual progress indicators
+- **[📁 Interactive Commands](https://github.com/WebFiori/cli/tree/main/examples/05-interactive-commands)** - Build interactive CLI applications
 - **[📁 Table Display](https://github.com/WebFiori/cli/tree/main/examples/06-table-display)** - Format data in tables
-- **[📁 ANSI Formatting](https://github.com/WebFiori/cli/tree/main/examples/07-ansi-formatting)** - Colors and text formatting
+- **[📁 Progress Bars](https://github.com/WebFiori/cli/tree/main/examples/07-progress-bars)** - Visual progress indicators
 - **[📁 File Processing](https://github.com/WebFiori/cli/tree/main/examples/08-file-processing)** - File manipulation commands
 - **[📁 Database Operations](https://github.com/WebFiori/cli/tree/main/examples/09-database-ops)** - Database CLI commands
 
 ### Complete Applications
 - **[📁 Multi-Command Application](https://github.com/WebFiori/cli/tree/main/examples/10-multi-command-app)** - Full-featured CLI application
-- **[📁 Testing Suite](https://github.com/WebFiori/cli/tree/main/examples/tests)** - Unit testing examples
 
 ### Quick Links
 - **[📖 All Examples](https://github.com/WebFiori/cli/tree/main/examples)** - Browse all available examples
-- **[🧪 Test Examples](https://github.com/WebFiori/cli/tree/main/examples/tests/HelloCommandTest.php)** - See how to test your commands
-- **[🚀 Sample App](https://github.com/WebFiori/cli/tree/main/examples/10-multi-command-app/app.php)** - Ready-to-run sample application
+- **[🚀 Sample App](https://github.com/WebFiori/cli/tree/main/examples/10-multi-command-app/main.php)** - Ready-to-run sample application
+
 
 ---
 
-**Ready to build amazing CLI applications? Start with the [📁 Basic Command Example](https://github.com/WebFiori/cli/tree/main/examples/01-basic-command) and work your way up!**
+**Ready to build amazing CLI applications? Start with the [📁 Basic Command Example](https://github.com/WebFiori/cli/tree/main/examples/01-basic-hello-world) and work your way up!**

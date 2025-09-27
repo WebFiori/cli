@@ -135,9 +135,9 @@ class DatabaseCommand extends Command {
 
         // Insert sample users
         $users = [
-            ['John Doe', 'john@example.com'],
-            ['Jane Smith', 'jane@example.com'],
-            ['Bob Johnson', 'bob@example.com']
+            ['Ahmed Hassan', 'ahmed.hassan@example.com'],
+            ['Sarah Johnson', 'sarah.johnson@example.com'],
+            ['Omar Al-Rashid', 'omar.alrashid@example.com']
         ];
 
         foreach ($users as $user) {
@@ -150,9 +150,9 @@ class DatabaseCommand extends Command {
         // Insert sample posts
         $posts = [
             [1, 'First Post', 'This is the content of the first post.'],
-            [1, 'Second Post', 'This is another post by John.'],
-            [2, 'Jane\'s Post', 'Hello from Jane!'],
-            [3, 'Bob\'s Thoughts', 'Some thoughts from Bob.']
+            [1, 'Second Post', 'This is another post by Ahmed.'],
+            [2, 'Sarah\'s Post', 'Hello from Sarah!'],
+            [3, 'Omar\'s Thoughts', 'Some thoughts from Omar.']
         ];
 
         foreach ($posts as $post) {

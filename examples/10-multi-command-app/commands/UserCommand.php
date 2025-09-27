@@ -497,10 +497,10 @@ class UserCommand extends Command {
         $this->println();
         $this->println('Examples:');
         $this->println('  php main.php user --action=list');
-        $this->println('  php main.php user --action=create --name="John Doe" --email="john@example.com"');
-        $this->println('  php main.php user --action=update --id=1 --name="Jane Doe"');
+        $this->println('  php main.php user --action=create --name="Ahmed Hassan" --email="ahmed.hassan@example.com"');
+        $this->println('  php main.php user --action=update --id=1 --name="Sarah Johnson"');
         $this->println('  php main.php user --action=delete --id=1');
-        $this->println('  php main.php user --action=search --search="john"');
+        $this->println('  php main.php user --action=search --search="ahmed"');
         $this->println('  php main.php user --action=export --format=json');
 
         return 0;

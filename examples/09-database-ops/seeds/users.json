@@ -1,31 +1,31 @@
 [
     {
-        "name": "John Doe",
-        "email": "john.doe@example.com",
+        "name": "Ahmed Hassan",
+        "email": "ahmed.hassan@example.com",
         "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
         "status": "active"
     },
     {
-        "name": "Jane Smith",
-        "email": "jane.smith@example.com",
+        "name": "Sarah Johnson",
+        "email": "sarah.johnson@example.com",
         "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
         "status": "active"
     },
     {
-        "name": "Bob Johnson",
-        "email": "bob.johnson@example.com",
+        "name": "Omar Al-Rashid",
+        "email": "omar.alrashid@example.com",
         "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
         "status": "inactive"
     },
     {
-        "name": "Alice Brown",
-        "email": "alice.brown@example.com",
+        "name": "Fatima Al-Zahra",
+        "email": "fatima.alzahra@example.com",
         "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
         "status": "active"
     },
     {
-        "name": "Charlie Wilson",
-        "email": "charlie.wilson@example.com",
+        "name": "Michael Davis",
+        "email": "michael.davis@example.com",
         "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
         "status": "active"
     }

@@ -177,9 +177,9 @@ class TableDemoCommand extends Command {
         $this->println('---------------------------');
 
         $exportData = [
-            ['1', 'John Doe', 'john@example.com', 'Active'],
-            ['2', 'Jane Smith', 'jane@example.com', 'Inactive'],
-            ['3', 'Bob Johnson', 'bob@example.com', 'Active']
+            ['1', 'Ahmed Hassan', 'ahmed.hassan@example.com', 'Active'],
+            ['2', 'Sarah Johnson', 'sarah.johnson@example.com', 'Inactive'],
+            ['3', 'Omar Al-Rashid', 'omar.alrashid@example.com', 'Active']
         ];
 
         $table = TableBuilder::create()
@@ -372,11 +372,11 @@ class TableDemoCommand extends Command {
         $this->println('-------------------------');
 
         $users = [
-            ['1', 'John Doe', 'john.doe@example.com', 'Active', '2024-01-15', 'Admin', '$1,250.75'],
-            ['2', 'Jane Smith', 'jane.smith@example.com', 'Inactive', '2024-01-16', 'User', '$890.50'],
-            ['3', 'Bob Johnson', 'bob.johnson@example.com', 'Active', '2024-01-17', 'Manager', '$2,100.00'],
-            ['4', 'Alice Brown', 'alice.brown@example.com', 'Pending', '2024-01-18', 'User', '$750.25'],
-            ['5', 'Charlie Davis', 'charlie.davis@example.com', 'Active', '2024-01-19', 'Admin', '$1,800.80']
+            ['1', 'Ahmed Hassan', 'ahmed.hassan@example.com', 'Active', '2024-01-15', 'Admin', '$1,250.75'],
+            ['2', 'Sarah Johnson', 'sarah.johnson@example.com', 'Inactive', '2024-01-16', 'User', '$890.50'],
+            ['3', 'Omar Al-Rashid', 'omar.alrashid@example.com', 'Active', '2024-01-17', 'Manager', '$2,100.00'],
+            ['4', 'Fatima Al-Zahra', 'fatima.alzahra@example.com', 'Pending', '2024-01-18', 'User', '$750.25'],
+            ['5', 'Michael Davis', 'michael.davis@example.com', 'Active', '2024-01-19', 'Admin', '$1,800.80']
         ];
 
         $table = TableBuilder::create()
