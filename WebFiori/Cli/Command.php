@@ -1035,12 +1035,18 @@ abstract class Command {
      * @param int $defaultIndex The index of the default value in case no value 
      * is selected and the user hit enter.
      * 
+     * * @param int $maxTrials The maximum number of trials the user can do to select
+     * a value. If -1 is passed, the user can select a value forever.
+     * 
      * @return string|null The method will return the value which is selected by
-     * the user. If choices array is empty, null is returned.
+     * the user. If choices array is empty, null is returned. Also, null is returned
+     * if max trials is reached and it is not -1.
+     * 
      * 
      */
-    public function select(string $prompt, array $choices, int $defaultIndex = -1): ?string {
+    public function select(string $prompt, array $choices, int $defaultIndex = -1, int $maxTrials = -1): ?string {
         if (count($choices) != 0) {
+            $currentTry = 0;
             do {
                 $this->println($prompt, [
                     'color' => 'gray',
@@ -1054,6 +1060,11 @@ abstract class Command {
 
                 if ($check !== null) {
                     return $check;
+                }
+                $currentTry++;
+
+                if ($currentTry == $maxTrials && $maxTrials > 0) {
+                    return null;
                 }
             } while (true);
         }
