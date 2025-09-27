@@ -331,53 +331,6 @@ class UserCommand extends Command {
     }
 
     /**
-     * Display users in table format.
-     */
-    private function displayUsersTable(array $users): void {
-        // Table header
-        $this->prints('┌────┬─────────────────────┬─────────────────────────┬─────────────┬─────────────┐', ['color' => 'blue']);
-        $this->println();
-
-        $this->prints('│', ['color' => 'blue']);
-        $this->prints(' ID ', ['bold' => true]);
-        $this->prints('│', ['color' => 'blue']);
-        $this->prints(' Name                ', ['bold' => true]);
-        $this->prints('│', ['color' => 'blue']);
-        $this->prints(' Email                   ', ['bold' => true]);
-        $this->prints('│', ['color' => 'blue']);
-        $this->prints(' Status      ', ['bold' => true]);
-        $this->prints('│', ['color' => 'blue']);
-        $this->prints(' Created     ', ['bold' => true]);
-        $this->prints('│', ['color' => 'blue']);
-        $this->println();
-
-        $this->prints('├────┼─────────────────────┼─────────────────────────┼─────────────┼─────────────┤', ['color' => 'blue']);
-        $this->println();
-
-        // Table rows
-        foreach ($users as $user) {
-            $this->prints('│', ['color' => 'blue']);
-            $this->prints(' '.str_pad($user['id'], 2).' ');
-            $this->prints('│', ['color' => 'blue']);
-            $this->prints(' '.str_pad(substr($user['name'], 0, 19), 19).' ');
-            $this->prints('│', ['color' => 'blue']);
-            $this->prints(' '.str_pad(substr($user['email'], 0, 23), 23).' ');
-            $this->prints('│', ['color' => 'blue']);
-
-            $statusColor = $user['status'] === 'active' ? 'green' : 'red';
-            $this->prints(' '.str_pad(ucfirst($user['status']), 11).' ', ['color' => $statusColor]);
-
-            $this->prints('│', ['color' => 'blue']);
-            $this->prints(' '.str_pad(substr($user['created_at'], 0, 10), 11).' ');
-            $this->prints('│', ['color' => 'blue']);
-            $this->println();
-        }
-
-        $this->prints('└────┴─────────────────────┴─────────────────────────┴─────────────┴─────────────┘', ['color' => 'blue']);
-        $this->println();
-    }
-
-    /**
      * Export users to file.
      */
     private function exportUsers(): int {
@@ -486,7 +439,7 @@ class UserCommand extends Command {
         $this->println();
 
         if ($format === 'table') {
-            $this->displayUsersTable($users);
+            $this->table($users);
         } else {
             $output = $this->app->formatData($users, $format);
             $this->println($output);
@@ -525,7 +478,7 @@ class UserCommand extends Command {
         }
 
         if ($format === 'table') {
-            $this->displayUsersTable($filteredUsers);
+            $this->table($filteredUsers);
         } else {
             $output = $this->app->formatData(array_values($filteredUsers), $format);
             $this->println($output);
