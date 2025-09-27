@@ -13,7 +13,6 @@
  * - Basic application structure
  */
 
-use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\Runner;
 
 // Load the WebFiori CLI library
@@ -26,13 +25,11 @@ require_once 'HelloCommand.php';
 $runner = new Runner();
 
 // Register the help command (provides automatic help generation)
-$runner->register(new HelpCommand());
 
 // Register our custom hello command
 $runner->register(new HelloCommand());
 
 // Set the default command to show help when no command is specified
-$runner->setDefaultCommand('help');
 
 // Start the CLI application and exit with the appropriate code
 exit($runner->start());

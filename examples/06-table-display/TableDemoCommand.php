@@ -12,6 +12,7 @@ require_once '../../WebFiori/Cli/Table/TableTheme.php';
 require_once '../../WebFiori/Cli/Table/TableRenderer.php';
 require_once '../../WebFiori/Cli/Table/TableBuilder.php';
 
+use WebFiori\Cli\ArgumentOption;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\Table\Column;
 use WebFiori\Cli\Table\TableBuilder;
@@ -32,26 +33,26 @@ class TableDemoCommand extends Command {
     public function __construct() {
         parent::__construct('table-demo', [
             '--demo' => [
-                'optional' => true,
-                'description' => 'Specific demo to run (users, products, services, styles, themes, export)',
-                'values' => ['users', 'products', 'services', 'styles', 'themes', 'export', 'all']
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Specific demo to run (users, products, services, styles, themes, export)',
+                ArgumentOption::VALUES => ['users', 'products', 'services', 'styles', 'themes', 'export', 'all']
             ],
             '--style' => [
-                'optional' => true,
-                'description' => 'Table style to use',
-                'values' => ['bordered', 'simple', 'minimal', 'compact', 'markdown'],
-                'default' => 'bordered'
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Table style to use',
+                ArgumentOption::VALUES => ['bordered', 'simple', 'minimal', 'compact', 'markdown'],
+                ArgumentOption::DEFAULT => 'bordered'
             ],
             '--theme' => [
-                'optional' => true,
-                'description' => 'Color theme to use',
-                'values' => ['default', 'dark', 'light', 'colorful', 'professional', 'minimal'],
-                'default' => 'default'
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Color theme to use',
+                ArgumentOption::VALUES => ['default', 'dark', 'light', 'colorful', 'professional', 'minimal'],
+                ArgumentOption::DEFAULT => 'default'
             ],
             '--width' => [
-                'optional' => true,
-                'description' => 'Maximum table width (default: auto-detect)',
-                'default' => '0'
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DESCRIPTION => 'Maximum table width (default: auto-detect)',
+                ArgumentOption::DEFAULT => '0'
             ]
         ], 'Demonstrates WebFiori CLI Table display capabilities with various examples');
     }
@@ -176,9 +177,9 @@ class TableDemoCommand extends Command {
         $this->println('---------------------------');
 
         $exportData = [
-            ['1', 'John Doe', 'john@example.com', 'Active'],
-            ['2', 'Jane Smith', 'jane@example.com', 'Inactive'],
-            ['3', 'Bob Johnson', 'bob@example.com', 'Active']
+            ['1', 'Ahmed Hassan', 'ahmed.hassan@example.com', 'Active'],
+            ['2', 'Sarah Johnson', 'sarah.johnson@example.com', 'Inactive'],
+            ['3', 'Omar Al-Rashid', 'omar.alrashid@example.com', 'Active']
         ];
 
         $table = TableBuilder::create()
@@ -371,11 +372,11 @@ class TableDemoCommand extends Command {
         $this->println('-------------------------');
 
         $users = [
-            ['1', 'John Doe', 'john.doe@example.com', 'Active', '2024-01-15', 'Admin', '$1,250.75'],
-            ['2', 'Jane Smith', 'jane.smith@example.com', 'Inactive', '2024-01-16', 'User', '$890.50'],
-            ['3', 'Bob Johnson', 'bob.johnson@example.com', 'Active', '2024-01-17', 'Manager', '$2,100.00'],
-            ['4', 'Alice Brown', 'alice.brown@example.com', 'Pending', '2024-01-18', 'User', '$750.25'],
-            ['5', 'Charlie Davis', 'charlie.davis@example.com', 'Active', '2024-01-19', 'Admin', '$1,800.80']
+            ['1', 'Ahmed Hassan', 'ahmed.hassan@example.com', 'Active', '2024-01-15', 'Admin', '$1,250.75'],
+            ['2', 'Sarah Johnson', 'sarah.johnson@example.com', 'Inactive', '2024-01-16', 'User', '$890.50'],
+            ['3', 'Omar Al-Rashid', 'omar.alrashid@example.com', 'Active', '2024-01-17', 'Manager', '$2,100.00'],
+            ['4', 'Fatima Al-Zahra', 'fatima.alzahra@example.com', 'Pending', '2024-01-18', 'User', '$750.25'],
+            ['5', 'Michael Davis', 'michael.davis@example.com', 'Active', '2024-01-19', 'Admin', '$1,800.80']
         ];
 
         $table = TableBuilder::create()

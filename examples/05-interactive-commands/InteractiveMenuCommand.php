@@ -18,6 +18,8 @@ class InteractiveMenuCommand extends Command {
 
     private array $menuStack = [];
     private bool $running = true;
+    private int $failedTries = 0;
+    private const MAX_FAILED_TRIES = 5;
 
     public function __construct() {
         parent::__construct('menu', [
@@ -327,6 +329,8 @@ class InteractiveMenuCommand extends Command {
      * Handle main menu choices.
      */
     private function handleMainMenuChoice(int $choice): void {
+        $this->failedTries = 0; // Reset on valid choice
+        
         switch ($choice) {
             case 0:
                 $this->running = false;
@@ -378,12 +382,23 @@ class InteractiveMenuCommand extends Command {
 
         // Handle numeric choices
         if (!is_numeric($choice)) {
-            $this->error("Invalid choice. Please enter a number or command.");
+            $this->failedTries++;
+            $this->error("Invalid choice. Please enter a number or command. ({$this->failedTries}/" . self::MAX_FAILED_TRIES . ")");
+            
+            if ($this->failedTries >= self::MAX_FAILED_TRIES) {
+                $this->error("Too many invalid attempts. Exiting...");
+                $this->running = false;
+                return;
+            }
+            
             $this->println("Press Enter to continue...");
             $this->readln();
 
             return;
         }
+
+        // Reset counter on valid input
+        $this->failedTries = 0;
 
         $choice = (int)$choice;
         $currentMenu = end($this->menuStack);
@@ -411,6 +426,8 @@ class InteractiveMenuCommand extends Command {
      * Handle reports menu choices.
      */
     private function handleReportsMenuChoice(int $choice): void {
+        $this->failedTries = 0; // Reset on valid choice
+        
         switch ($choice) {
             case 1:
                 $this->showUsageStats();
@@ -442,6 +459,8 @@ class InteractiveMenuCommand extends Command {
      * Handle settings menu choices.
      */
     private function handleSettingsMenuChoice(int $choice): void {
+        $this->failedTries = 0; // Reset on valid choice
+        
         switch ($choice) {
             case 1:
                 $this->navigateTo('system-config', 'System Configuration');
@@ -485,6 +504,8 @@ class InteractiveMenuCommand extends Command {
      * Handle tools menu choices.
      */
     private function handleToolsMenuChoice(int $choice): void {
+        $this->failedTries = 0; // Reset on valid choice
+        
         switch ($choice) {
             case 1:
                 $this->runSystemCleanup();
@@ -516,6 +537,8 @@ class InteractiveMenuCommand extends Command {
      * Handle users menu choices.
      */
     private function handleUsersMenuChoice(int $choice): void {
+        $this->failedTries = 0; // Reset on valid choice
+        
         switch ($choice) {
             case 1:
                 $this->showUsersList();
@@ -547,7 +570,15 @@ class InteractiveMenuCommand extends Command {
      * Show invalid choice message.
      */
     private function invalidChoice(): void {
-        $this->error("Invalid choice. Please try again.");
+        $this->failedTries++;
+        $this->error("Invalid choice. Please try again. ({$this->failedTries}/" . self::MAX_FAILED_TRIES . ")");
+        
+        if ($this->failedTries >= self::MAX_FAILED_TRIES) {
+            $this->error("Too many invalid attempts. Exiting...");
+            $this->running = false;
+            return;
+        }
+        
         $this->println("Press Enter to continue...");
         $this->readln();
     }

@@ -11,7 +11,6 @@
  * - Error handling and user feedback
  */
 
-use WebFiori\Cli\Commands\HelpCommand;
 use WebFiori\Cli\Runner;
 
 // Load dependencies
@@ -23,12 +22,10 @@ require_once 'UserProfileCommand.php';
 $runner = new Runner();
 
 // Register commands
-$runner->register(new HelpCommand());
 $runner->register(new CalculatorCommand());
 $runner->register(new UserProfileCommand());
 
 // Set default command
-$runner->setDefaultCommand('help');
 
 // Start the application
 exit($runner->start());

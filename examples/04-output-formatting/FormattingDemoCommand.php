@@ -216,9 +216,9 @@ class FormattingDemoCommand extends Command {
     private function createSimpleTable(): void {
         $headers = ['Name', 'Age', 'City'];
         $rows = [
-            ['John Doe', '30', 'New York'],
-            ['Jane Smith', '25', 'Los Angeles'],
-            ['Bob Johnson', '35', 'Chicago']
+            ['Ahmed Hassan', '30', 'Cairo'],
+            ['Sarah Johnson', '25', 'Los Angeles'],
+            ['Omar Al-Rashid', '35', 'Dubai']
         ];
 
         // Header
@@ -263,7 +263,7 @@ class FormattingDemoCommand extends Command {
         $this->println();
 
         $data = [
-            ['Alice Brown', '28', 'Engineering'],
+            ['Fatima Al-Zahra', '28', 'Engineering'],
             ['Charlie Davis', '32', 'Marketing'],
             ['Diana Wilson', '29', 'Design']
         ];
@@ -685,7 +685,8 @@ class FormattingDemoCommand extends Command {
 
             $bar = str_repeat('▓', $filled).str_repeat('░', $empty);
 
-            $this->prints("\rProgress: [$bar] $percent%");
+            echo "\rProgress: [$bar] $percent%";
+            flush();
             usleep(150000); // 0.15 seconds
         }
 

@@ -1,130 +1,130 @@
 # Basic Hello World Example
 
-This example demonstrates the most fundamental concepts of creating a CLI command with the WebFiori CLI library.
+This example demonstrates the most basic CLI command creation using WebFiori CLI library.
 
-## 🎯 What You'll Learn
+## Features Demonstrated
 
-- How to create a basic command class
-- How to set up a CLI runner
-- How to handle simple command execution
-- Basic output methods
+- Creating a simple command class
+- Adding optional arguments with default values
+- Basic output formatting with emojis
+- Help system integration
+- Error handling
 
-## 📁 Files
+## Files
 
-- `HelloCommand.php` - A simple greeting command
-- `main.php` - Application entry point
-- `README.md` - This documentation
+- `main.php` - Application entry point and runner setup
+- `HelloCommand.php` - The hello command implementation
 
-## 🚀 Running the Example
+## Usage Examples
 
+### 1. Show General Help
 ```bash
-# Basic greeting
-php main.php hello
-
-# Greeting with a name
-php main.php hello --name="Alice"
-
-# Get help
+php main.php
+# or
 php main.php help
-php main.php help --command-name=hello
 ```
-
-## 📖 Code Explanation
-
-### HelloCommand.php
-
-The `HelloCommand` class extends the base `Command` class and demonstrates:
-
-- **Command naming**: Using `hello` as the command name
-- **Arguments**: Optional `--name` parameter with default value
-- **Output**: Using `println()` for formatted output
-- **Return codes**: Returning 0 for success
-
-### main.php
-
-The main application file shows:
-
-- **Runner setup**: Creating and configuring the CLI runner
-- **Command registration**: Adding commands to the runner
-- **Help command**: Including built-in help functionality
-- **Execution**: Starting the CLI application
-
-## 🔍 Key Concepts
-
-### Command Structure
-```php
-class HelloCommand extends Command {
-    public function __construct() {
-        parent::__construct(
-            'hello',                    // Command name
-            ['--name' => [...]],       // Arguments
-            'A simple greeting command' // Description
-        );
-    }
-    
-    public function exec(): int {
-        // Command logic
-        return 0; // Success
-    }
-}
+**Output:**
 ```
-
-### Argument Definition
-```php
-'--name' => [
-    Option::DESCRIPTION => 'Name to greet',
-    Option::OPTIONAL => true,
-    Option::DEFAULT => 'World'
-]
-```
-
-### Output Methods
-- `println()` - Print with newline
-- `prints()` - Print without newline
-- `success()` - Success message with green color
-- `error()` - Error message with red color
-- `info()` - Info message with blue color
-- `warning()` - Warning message with yellow color
-
-## 🎨 Expected Output
-
-```
-$ php main.php hello
-Hello, World!
-
-$ php main.php hello --name="Alice"
-Hello, Alice!
-
-$ php main.php help
 Usage:
     command [arg1 arg2="val" arg3...]
 
+Global Arguments:
+    --ansi:[Optional] Force the use of ANSI output.
 Available Commands:
-    help:          Display CLI Help
-    hello:         A simple greeting command
+    help:      Display CLI Help. To display help for specific command, use the argument "--command" with this command.
+    hello:     A simple greeting command that says hello to someone
 ```
 
-## 🔗 Next Steps
+### 2. Show Command-Specific Help
+```bash
+php main.php help --command=hello
+```
+**Output:**
+```
+    hello:     A simple greeting command that says hello to someone
+    Supported Arguments:
+                       --name:[Optional][Default = 'World'] The name to greet (default: World)
+```
 
-After mastering this example, move on to:
-- **[02-arguments-and-options](../02-arguments-and-options/)** - Learn about complex argument handling
-- **[03-user-input](../03-user-input/)** - Discover interactive input methods
-- **[04-output-formatting](../04-output-formatting/)** - Explore advanced output formatting
+### 3. Basic Hello (Default Name)
+```bash
+php main.php hello
+```
+**Output:**
+```
+Hello, World! 👋
+Have a wonderful day!
+```
 
-## 💡 Try This
+### 4. Hello with Custom Name
+```bash
+php main.php hello --name=Ahmed
+```
+**Output:**
+```
+Hello, Ahmed! 👋
+Have a wonderful day!
+```
 
-Experiment with the code:
+### 5. Hello with Multi-word Name
+```bash
+php main.php hello --name="Fatima Al-Zahra"
+```
+**Output:**
+```
+Hello, Fatima Al-Zahra! 👋
+Have a wonderful day!
+```
 
-1. **Add more arguments**: Try adding `--greeting` option
-2. **Change colors**: Use different output methods
-3. **Add validation**: Ensure name is not empty
-4. **Multiple greetings**: Support different languages
+### 6. Using Global ANSI Flag
+```bash
+php main.php hello --name=Mohammed --ansi
+```
+**Output:**
+```
+Hello, Mohammed! 👋
+Have a wonderful day!
+```
+
+### 7. Error Handling - Invalid Command
+```bash
+php main.php invalid
+```
+**Output:**
+```
+Error: The command 'invalid' is not supported.
+```
+
+## Key Learning Points
+
+1. **Command Structure**: Commands extend `WebFiori\Cli\Command` and implement `exec()` method
+2. **Arguments**: Optional arguments defined in constructor with default values
+3. **Output**: Use `println()` for formatted output with emoji support
+4. **Help Integration**: Commands automatically integrate with help system
+5. **Error Handling**: Invalid commands show appropriate error messages
+6. **Global Arguments**: `--ansi` flag works with all commands
+
+## Code Structure
 
 ```php
-// Example enhancement
-if ($name === 'WebFiori') {
-    $this->success("Hello, $name! Welcome to the CLI world!");
-} else {
-    $this->println("Hello, $name!");
+class HelloCommand extends Command {
+    public function __construct() {
+        parent::__construct('hello', [
+            '--name' => [
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::DEFAULT => 'World',
+                ArgumentOption::DESCRIPTION => 'The name to greet (default: World)'
+            ]
+        ], 'A simple greeting command that says hello to someone');
+    }
+
+    public function exec(): int {
+        $name = $this->getArgValue('--name');
+        $this->println("Hello, %s! 👋", $name);
+        $this->println("Have a wonderful day!");
+        return 0;
+    }
 }
 ```
+
+This example serves as the foundation for understanding WebFiori CLI basics before moving to more advanced features.
