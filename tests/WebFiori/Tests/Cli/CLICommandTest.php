@@ -1736,4 +1736,23 @@ class CLICommandTest extends TestCase {
         $outputArray = $output->getOutputArray();
         $this->assertNotEmpty($outputArray); // TestCommand should produce some output
     }
+
+    /**
+     * Test select with multiple invalid inputs then empty input (framework scenario)
+     * @test
+     */
+    public function testSelectFrameworkScenario() {
+        $command = new TestCommand('test-cmd');
+        $output = new ArrayOutputStream();
+        $command->setOutputStream($output);
+        
+        // Mimic framework test: empty input, invalid input 'XC', then valid input '0'
+        $input = new ArrayInputStream(['', 'XC', '0']);
+        $command->setInputStream($input);
+        
+        $choices = ['AR', 'EN'];
+        $result = $command->select('In which language you would like to update?', $choices);
+        
+        $this->assertEquals('AR', $result);
+    }
 }
