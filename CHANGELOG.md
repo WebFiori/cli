@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/WebFiori/cli/compare/v2.0.0...v2.0.1) (2025-10-06)
+
+
+### Bug Fixes
+
+* Default Value for `select` ([6acd1fa](https://github.com/WebFiori/cli/commit/6acd1fac5f3b9e89b41b4d39a654c23321de5720))
+
 ## [2.0.0](https://github.com/WebFiori/cli/compare/v1.3.1...v2.0.0) (2025-09-27)
 
 
