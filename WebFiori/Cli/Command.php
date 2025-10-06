@@ -1445,8 +1445,9 @@ abstract class Command {
             }
             $index++;
         }
+        
+        return null;
     }
-
     /**
      * Validate user input and show error message if user input is invalid.
      * @param string $input
