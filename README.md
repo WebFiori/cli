@@ -2,8 +2,8 @@
 Class library that can help in writing command line based applications with minimum dependencies using PHP.
 
 <p align="center">
-  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yaml">
-    <img src="https://github.com/WebFiori/cli/actions/workflows/php84.yaml/badge.svg?branch=main">
+  <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php85.yaml">
+    <img src="https://github.com/WebFiori/cli/actions/workflows/php85.yaml/badge.svg?branch=main">
   </a>
   <a href="https://codecov.io/gh/WebFiori/cli">
     <img src="https://codecov.io/gh/WebFiori/cli/branch/main/graph/badge.svg" />
@@ -56,6 +56,7 @@ Class library that can help in writing command line based applications with mini
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php82.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php82.yaml/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php83.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yaml/badge.svg?branch=main"></a> |
 | <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php84.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php84.yaml/badge.svg?branch=main"></a> |
+| <a target="_blank" href="https://github.com/WebFiori/cli/actions/workflows/php85.yaml"><img src="https://github.com/WebFiori/cli/actions/workflows/php85.yaml/badge.svg?branch=main"></a> |
 
 ## Features
 * **Easy Command Creation**: Simple class-based approach to building CLI commands
