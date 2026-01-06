@@ -32,8 +32,6 @@ jobs:
     name: Code Quality
     needs: test
     uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@main
-    with:
-      coverage-file: 'php-8.3-coverage.xml'
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           

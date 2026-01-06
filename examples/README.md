@@ -17,7 +17,7 @@ Building more sophisticated CLI applications.
 
 - **[05-interactive-commands](05-interactive-commands/)** - Creating interactive command experiences
 - **[07-progress-bars](07-progress-bars/)** - Visual progress indicators for long operations
-
+- **[11-masked-input](11-masked-input/)** - Secure input with character masking
 ### 🔴 **Advanced Examples**
 Complex scenarios and advanced features.
 
@@ -89,7 +89,7 @@ Explore examples 10-13 for real-world applications:
 |---------|----------|-------------|
 | **Command Creation** | 01, 02, 10 | Basic to advanced command structures |
 | **Arguments & Options** | 02, 13 | Parameter handling and validation |
-| **User Input** | 03, 05 | Interactive input and validation |
+| **User Input** | 03, 05, 11 | Interactive input, validation, and secure entry |
 | **Output Formatting** | 04, 07 | Colors, styles, and progress bars |
 | **Interactive Workflows** | 05, 10 | Menu systems and wizards |
 | **Progress Indicators** | 07, 10, 13 | Visual feedback for operations |
