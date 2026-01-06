@@ -279,3 +279,24 @@ php main.php make:command --name=data:export --args="format,output,filter"
 ---
 
 **Ready to boost your development speed?** Use the scaffolding tools to generate well-structured commands in seconds!
+## Related Examples
+
+### Generated Command Examples
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic template structure
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Commands with arguments (CRUD template)
+- **[03-user-input](../03-user-input/)** - Interactive commands (Interactive template)
+- **[08-file-processing](../08-file-processing/)** - File operations (File Processor template)
+
+### Enhanced Features for Generated Commands
+- **[04-output-formatting](../04-output-formatting/)** - Add formatting to generated commands
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive workflows
+- **[06-table-display](../06-table-display/)** - Data display in generated commands
+- **[07-progress-bars](../07-progress-bars/)** - Progress indicators
+- **[11-masked-input](../11-masked-input/)** - Secure input in generated commands
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Applications built with scaffolded commands
+- **[09-database-ops](../09-database-ops/)** - Database commands (perfect for CRUD template)
+
+### Development Workflow
+Use this scaffolding tool to quickly generate commands for any of the above examples!

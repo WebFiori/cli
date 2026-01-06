@@ -350,3 +350,22 @@ class UserProfileCommand extends Command {
 ```
 
 This example demonstrates advanced CLI application development with proper validation, error handling, and user experience design.
+
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Start here for basic command concepts
+
+### Next Steps
+- **[03-user-input](../03-user-input/)** - Interactive input and validation
+- **[11-masked-input](../11-masked-input/)** - Secure input for sensitive data
+- **[04-output-formatting](../04-output-formatting/)** - Enhanced output styling
+
+### Advanced Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Complete CLI applications
+- **[09-database-ops](../09-database-ops/)** - Database operations with validation
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands with arguments
+
+### Similar Concepts
+- **[05-interactive-commands](../05-interactive-commands/)** - Menu-driven interfaces
+- **[08-file-processing](../08-file-processing/)** - File operations with validation
