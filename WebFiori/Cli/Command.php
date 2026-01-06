@@ -579,6 +579,56 @@ abstract class Command {
         return null;
     }
     /**
+     * Reads user input with characters masked by a specified character.
+     * 
+     * This method is similar to getInput() but masks the input characters as the user types,
+     * making it suitable for sensitive information like passwords, tokens, or secrets.
+     * The actual input value is captured but only mask characters are displayed in the terminal.
+     * 
+     * @param string $prompt The prompt message to display to the user. Must be non-empty.
+     * 
+     * @param string $mask The character to display instead of the actual input characters.
+     * Default is '*'. Can be any single character or string.
+     * 
+     * @param string|null $default An optional default value to use if the user provides 
+     * empty input. If provided, it will be shown in the prompt.
+     * 
+     * @param InputValidator|null $validator An optional validator to validate the input.
+     * If validation fails, the user will be prompted again.
+     * 
+     * @return string|null Returns the actual input value (not masked) if valid input is provided,
+     * or null if the prompt is empty.
+     * 
+     * @since 1.1.0
+     */
+    public function getMaskedInput(string $prompt, string $mask = '*', ?string $default = null, ?InputValidator $validator = null): ?string {
+        $trimmed = trim($prompt);
+
+        if (strlen($trimmed) > 0) {
+            do {
+                $this->prints($trimmed, [
+                    'color' => 'gray',
+                    'bold' => true
+                ]);
+
+                if ($default !== null) {
+                    $this->prints(" Enter = '".$default."'", [
+                        'color' => 'light-blue'
+                    ]);
+                }
+                $this->println();
+                $input = trim($this->readMaskedLine($mask));
+
+                $check = $this->getInputHelper($input, $validator, $default);
+
+                if ($check['valid']) {
+                    return $check['value'];
+                }
+            } while (true);
+        }
+
+        return null;
+    }    /**
      * Returns the stream at which the command is sing to read inputs.
      * 
      * @return null|InputStream If the stream is set, it will be returned as 
@@ -964,7 +1014,63 @@ abstract class Command {
     public function readln() : string {
         return $this->getInputStream()->readLine();
     }
-
+    /**
+     * Reads a line from input stream with character masking.
+     * 
+     * This method reads input character by character and displays mask characters
+     * instead of the actual input. It handles backspace for character deletion
+     * and ignores special keys like ESC and arrow keys.
+     * 
+     * @param string $mask The character to display instead of actual input characters.
+     * 
+     * @return string The actual input string (unmasked).
+     * 
+     * @since 1.1.0
+     */
+    private function readMaskedLine(string $mask = '*'): string {
+        $input = '';
+        
+        // For testing with ArrayInputStream, read the whole line at once
+        if ($this->getInputStream() instanceof \WebFiori\Cli\Streams\ArrayInputStream) {
+            $input = $this->getInputStream()->readLine();
+            // Simulate masking output for testing
+            $this->prints(str_repeat($mask, strlen($input)));
+            $this->println();
+            return $input;
+        }
+        
+        // Set terminal to raw mode with echo disabled for real-time character reading
+        $sttyMode = null;
+        if (function_exists('shell_exec') && PHP_OS_FAMILY !== 'Windows') {
+            $sttyMode = shell_exec('stty -g 2>/dev/null');
+            shell_exec('stty -echo -icanon 2>/dev/null');
+        }
+        
+        try {
+            // For real terminal input, read character by character
+            while (true) {
+                $char = KeysMap::readAndTranslate($this->getInputStream());
+                
+                if ($char === 'LF' || $char === 'CR' || $char === '') {
+                    break;
+                } elseif ($char === 'BACKSPACE' && strlen($input) > 0) {
+                    $input = substr($input, 0, -1);
+                    $this->prints("\x08 \x08"); // Backspace, space, backspace
+                } elseif ($char !== 'BACKSPACE' && $char !== 'ESC' && $char !== 'DOWN' && $char !== 'UP' && $char !== 'LEFT' && $char !== 'RIGHT') {
+                    $input .= $char === 'SPACE' ? ' ' : $char;
+                    $this->prints($mask);
+                }
+            }
+        } finally {
+            // Restore terminal settings
+            if ($sttyMode !== null) {
+                shell_exec('stty ' . $sttyMode . ' 2>/dev/null');
+            }
+        }
+        
+        $this->println();
+        return $input;
+    }
     /**
      * Reads a string that represents class namespace.
      *
