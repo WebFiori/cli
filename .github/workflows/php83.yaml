@@ -12,7 +12,7 @@ jobs:
 
   test:
     name: Run Tests
-    uses: WebFiori/workflows/.github/workflows/test-php.yaml@v1.2
+    uses: WebFiori/workflows/.github/workflows/test-php.yaml@v1.2.1
     with:
       php-version: '8.3'
       phpunit-config: 'tests/phpunit10.xml'
@@ -21,7 +21,7 @@ jobs:
   code-coverage:
     name: Coverage
     needs: test
-    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
     with:
       php-version: '8.3'
       coverage-file: 'php-8.3-coverage.xml'
