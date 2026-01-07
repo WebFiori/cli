@@ -1,0 +1,73 @@
+<?php
+{{namespace}}{{use_statements}}
+
+/**
+ * {{class_name}} - CRUD operations command.
+ * 
+ * {{command_description}}
+ */
+class {{class_name}} extends Command {
+    
+    public function __construct() {
+        parent::__construct('{{command_name}}', array_merge({{arguments}}, [
+            '--action' => [
+                ArgumentOption::DESCRIPTION => 'CRUD action to perform',
+                ArgumentOption::OPTIONAL => true,
+                ArgumentOption::VALUES => ['create', 'read', 'show', 'update', 'delete', 'list'],
+                ArgumentOption::DEFAULT => 'list'
+            ]
+        ]), '{{command_description}}');
+    }
+
+    public function exec(): int {
+        $action = $this->getArgValue('--action') ?? 'list';
+        
+        switch ($action) {
+            case 'create':
+                return $this->createRecord();
+            case 'read':
+            case 'show':
+                return $this->showRecord();
+            case 'update':
+                return $this->updateRecord();
+            case 'delete':
+                return $this->deleteRecord();
+            case 'list':
+            default:
+                return $this->listRecords();
+        }
+    }
+    
+    private function createRecord(): int {
+        $this->info('Creating new record...');
+        // TODO: Implement create logic
+        $this->success('✅ Record created successfully!');
+        return 0;
+    }
+    
+    private function showRecord(): int {
+        $this->info('Showing record...');
+        // TODO: Implement show logic
+        return 0;
+    }
+    
+    private function updateRecord(): int {
+        $this->info('Updating record...');
+        // TODO: Implement update logic
+        $this->success('✅ Record updated successfully!');
+        return 0;
+    }
+    
+    private function deleteRecord(): int {
+        $this->info('Deleting record...');
+        // TODO: Implement delete logic
+        $this->success('✅ Record deleted successfully!');
+        return 0;
+    }
+    
+    private function listRecords(): int {
+        $this->info('Listing records...');
+        // TODO: Implement list logic
+        return 0;
+    }
+}

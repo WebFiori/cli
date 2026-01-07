@@ -95,7 +95,7 @@ class TableData {
                 continue;
             }
 
-            $row = str_getcsv($line, $delimiter);
+            $row = str_getcsv($line, $delimiter, '"', '\\');
 
             if ($hasHeaders && $headers === null) {
                 $headers = $row;

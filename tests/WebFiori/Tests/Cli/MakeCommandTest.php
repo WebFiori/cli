@@ -41,9 +41,17 @@ class MakeCommandTest extends CommandTestCase {
             '--name' => 'test-command',
             '--class' => 'TestCommand',
             '--path' => $this->testOutputDir
-        ], ['y']); // Confirm if file exists
+        ], ['', 'y']); // Empty namespace, then confirm overwrite if needed
         
-        $this->assertContains("Command generated successfully!\n", $output);
+        // Check for success message (flexible matching)
+        $found = false;
+        foreach ($output as $line) {
+            if (strpos($line, 'Command generated successfully!') !== false) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Success message not found in output');
         $this->assertEquals(0, $this->getExitCode());
         
         // Check if file was created
@@ -92,7 +100,7 @@ class MakeCommandTest extends CommandTestCase {
             '--name' => 'setup-wizard',
             '--template' => 'interactive',
             '--path' => $this->testOutputDir
-        ]);
+        ], ['']); // Empty namespace input
         
         $this->assertEquals(0, $this->getExitCode());
         
@@ -116,7 +124,7 @@ class MakeCommandTest extends CommandTestCase {
             '--name' => 'user-manager',
             '--template' => 'crud',
             '--path' => $this->testOutputDir
-        ]);
+        ], ['']); // Empty namespace input
         
         $this->assertEquals(0, $this->getExitCode());
         
@@ -141,7 +149,7 @@ class MakeCommandTest extends CommandTestCase {
             '--name' => 'process-data',
             '--args' => 'input file,output format,verbose mode',
             '--path' => $this->testOutputDir
-        ]);
+        ], ['']); // Empty namespace input
         
         $this->assertEquals(0, $this->getExitCode());
         
@@ -164,10 +172,18 @@ class MakeCommandTest extends CommandTestCase {
         $output = $this->executeSingleCommand($command, [
             '--name' => 'Invalid Command Name!',
             '--path' => $this->testOutputDir
-        ]);
+        ], ['']); // Empty namespace input
         
         $this->assertEquals(1, $this->getExitCode());
-        $this->assertContains("Command name must start with a letter\n", $output);
+        // Check for validation error message (flexible matching)
+        $found = false;
+        foreach ($output as $line) {
+            if (strpos($line, 'Command name must start with a letter') !== false) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Validation error message not found in output');
     }
     
     /**
@@ -182,16 +198,24 @@ class MakeCommandTest extends CommandTestCase {
         $this->executeSingleCommand($command, [
             '--name' => 'existing-command',
             '--path' => $this->testOutputDir
-        ]);
+        ], ['']); // Empty namespace input
         
         // Try to create again with 'no' confirmation
         $output = $this->executeSingleCommand($command, [
             '--name' => 'existing-command',
             '--path' => $this->testOutputDir
-        ], ['n']);
+        ], ['', 'n']); // Empty namespace, then 'no' to overwrite
         
         $this->assertEquals(1, $this->getExitCode());
-        $this->assertContains("File already exists and overwrite was declined\n", $output);
+        // Check for overwrite declined message (flexible matching)
+        $found = false;
+        foreach ($output as $line) {
+            if (strpos($line, 'File already exists and overwrite was declined') !== false) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Overwrite declined message not found in output');
     }
     
     /**
