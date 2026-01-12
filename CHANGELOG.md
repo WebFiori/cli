@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0](https://github.com/WebFiori/cli/compare/v2.0.1...v2.1.0) (2026-01-12)
+
+
+### Features
+
+* Command Scaffolding ([38a7541](https://github.com/WebFiori/cli/commit/38a7541fda02dfdcdcb79434ca1d4efc9fddc8a6))
+* Masked Input ([e4b9b4e](https://github.com/WebFiori/cli/commit/e4b9b4ea2d74b1a053f90de6de9ff11bf2995b16))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#37](https://github.com/WebFiori/cli/issues/37) from WebFiori/feat-input-mask ([e4ee130](https://github.com/WebFiori/cli/commit/e4ee1300b29acfbbbaa960ff6f4d6e645c3eab41))
+* Merge pull request [#38](https://github.com/WebFiori/cli/issues/38) from WebFiori/feat-scaffolding ([69e05c0](https://github.com/WebFiori/cli/commit/69e05c0be35ae4347228bae466f65254856b6229))
+* Merge pull request [#39](https://github.com/WebFiori/cli/issues/39) from WebFiori/dev ([b278081](https://github.com/WebFiori/cli/commit/b278081b39dbd94625129713c0df344cf86c78cf))
+
 ## [2.0.1](https://github.com/WebFiori/cli/compare/v2.0.0...v2.0.1) (2025-10-06)
 
 
