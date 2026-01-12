@@ -298,3 +298,25 @@ php main.php table-demo --help
 - **[05-interactive-commands](../05-interactive-commands/)** - Interactive menu systems
 - **[08-file-processing](../08-file-processing/)** - File data processing
 - **[10-multi-command-app](../10-multi-command-app/)** - Complete CLI applications
+
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[04-output-formatting](../04-output-formatting/)** - Colors and formatting basics
+
+### Enhanced Display Features
+- **[07-progress-bars](../07-progress-bars/)** - Visual progress indicators
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive menus with tables
+
+### Data Sources
+- **[08-file-processing](../08-file-processing/)** - Process files and display results in tables
+- **[09-database-ops](../09-database-ops/)** - Database queries with table output
+- **[03-user-input](../03-user-input/)** - Collect data and display in tables
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full applications with data display
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Commands with formatted output
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands with table display

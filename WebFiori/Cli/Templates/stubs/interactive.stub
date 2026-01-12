@@ -1,0 +1,43 @@
+<?php
+{{namespace}}{{use_statements}}
+
+/**
+ * {{class_name}} - Interactive CLI command.
+ * 
+ * {{command_description}}
+ */
+class {{class_name}} extends Command {
+    
+    public function __construct() {
+        parent::__construct('{{command_name}}', {{arguments}}, '{{command_description}}');
+    }
+
+    public function exec(): int {
+        $this->println('🔧 Interactive Command Setup');
+        $this->println('==========================');
+        
+        // Get user input
+        $name = $this->getInput('Enter name: ');
+        $email = $this->getInput('Enter email: ', null, new InputValidator(function($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        }, 'Please enter a valid email address!'));
+        
+        // Confirm action
+        if ($this->confirm('Proceed with the operation?')) {
+            $this->processData($name, $email);
+            $this->success('✅ Operation completed successfully!');
+        } else {
+            $this->info('Operation cancelled.');
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Process the collected data.
+     */
+    private function processData(string $name, string $email): void {
+        // TODO: Implement data processing logic
+        $this->info("Processing data for: $name ($email)");
+    }
+}

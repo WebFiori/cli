@@ -274,3 +274,25 @@ class FileProcessCommand extends Command {
 - **[04-output-formatting](../04-output-formatting/)** - Text formatting and colors
 - **[07-progress-bars](../07-progress-bars/)** - Progress tracking for file operations
 - **[10-multi-command-app](../10-multi-command-app/)** - Complete CLI applications
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[02-arguments-and-options](../02-arguments-and-options/)** - File path arguments and validation
+
+### Enhanced Processing
+- **[07-progress-bars](../07-progress-bars/)** - Visual progress for file operations
+- **[06-table-display](../06-table-display/)** - Display file data in formatted tables
+- **[04-output-formatting](../04-output-formatting/)** - Formatted status messages
+
+### User Interaction
+- **[03-user-input](../03-user-input/)** - Interactive file selection
+- **[05-interactive-commands](../05-interactive-commands/)** - File operation menus
+- **[11-masked-input](../11-masked-input/)** - Secure file path input
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full applications with file management
+- **[09-database-ops](../09-database-ops/)** - Database import/export from files
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate file processing commands

@@ -562,3 +562,25 @@ private function showSpinnerAnimation(): void {
 ```
 
 This example demonstrates professional CLI output formatting suitable for creating visually appealing and user-friendly command-line applications.
+
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command and output concepts
+
+### Enhanced Output Features
+- **[06-table-display](../06-table-display/)** - Structured data in formatted tables
+- **[07-progress-bars](../07-progress-bars/)** - Professional progress indicators
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive menus with formatting
+
+### Input with Formatting
+- **[03-user-input](../03-user-input/)** - User input with formatted prompts
+- **[11-masked-input](../11-masked-input/)** - Secure input with visual feedback
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full applications with consistent formatting
+- **[09-database-ops](../09-database-ops/)** - Database operations with formatted output
+- **[08-file-processing](../08-file-processing/)** - File operations with status formatting
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands with formatting templates

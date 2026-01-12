@@ -599,3 +599,25 @@ class QueryOptimizer {
     }
 }
 ```
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Database connection arguments
+
+### Enhanced Features
+- **[06-table-display](../06-table-display/)** - Display query results in tables
+- **[07-progress-bars](../07-progress-bars/)** - Progress for long database operations
+- **[05-interactive-commands](../05-interactive-commands/)** - Database management menus
+
+### User Interaction
+- **[03-user-input](../03-user-input/)** - Interactive database configuration
+- **[11-masked-input](../11-masked-input/)** - Secure database password input
+- **[04-output-formatting](../04-output-formatting/)** - Formatted database status
+
+### Data Processing
+- **[08-file-processing](../08-file-processing/)** - Import/export database data
+- **[10-multi-command-app](../10-multi-command-app/)** - Complete database CLI applications
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate database operation commands

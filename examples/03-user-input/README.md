@@ -373,3 +373,25 @@ private function collectBasicInfo() {
 - **User Experience**: Rich formatting with emojis and clear section divisions
 
 This example demonstrates advanced user input handling suitable for complex CLI applications requiring data collection and validation.
+
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Argument handling and validation
+
+### Enhanced Input Methods
+- **[11-masked-input](../11-masked-input/)** - Secure input for passwords and sensitive data
+- **[05-interactive-commands](../05-interactive-commands/)** - Menu-driven interactive workflows
+
+### Output Enhancement
+- **[04-output-formatting](../04-output-formatting/)** - Colors, styles, and formatting
+- **[06-table-display](../06-table-display/)** - Structured data presentation
+- **[07-progress-bars](../07-progress-bars/)** - Visual progress indicators
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full CLI applications with user management
+- **[09-database-ops](../09-database-ops/)** - Database operations with user input
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate interactive commands automatically
