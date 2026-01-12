@@ -302,3 +302,24 @@ php main.php progress-demo --style=custom --items=20 --delay=50
 - **[06-table-display](../06-table-display/)** - Data presentation techniques
 - **[08-file-processing](../08-file-processing/)** - File operations with progress
 - **[10-multi-command-app](../10-multi-command-app/)** - Complete CLI applications
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[04-output-formatting](../04-output-formatting/)** - Colors and formatting
+
+### Visual Enhancement
+- **[06-table-display](../06-table-display/)** - Structured data display
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive workflows with progress
+
+### Long-Running Operations
+- **[08-file-processing](../08-file-processing/)** - File operations with progress tracking
+- **[09-database-ops](../09-database-ops/)** - Database operations with progress indicators
+- **[03-user-input](../03-user-input/)** - Multi-step processes with progress
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full applications with progress feedback
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Commands with progress reporting
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands with progress bars

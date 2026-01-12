@@ -163,3 +163,25 @@ $this->assertContains('Password received: secret123', $output);
 ---
 
 **Ready to secure your CLI applications?** Try the different demo modes to see masked input in action!
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[03-user-input](../03-user-input/)** - User input fundamentals
+
+### Enhanced Input Methods
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Command arguments with validation
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive menus and workflows
+
+### Visual Enhancement
+- **[04-output-formatting](../04-output-formatting/)** - Colors and formatting for prompts
+- **[06-table-display](../06-table-display/)** - Display collected data in tables
+- **[07-progress-bars](../07-progress-bars/)** - Progress indicators for data processing
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full applications with secure authentication
+- **[09-database-ops](../09-database-ops/)** - Database operations with secure credentials
+- **[08-file-processing](../08-file-processing/)** - File operations with secure paths
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands with masked input

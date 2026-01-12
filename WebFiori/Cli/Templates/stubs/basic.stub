@@ -1,0 +1,23 @@
+<?php
+{{namespace}}{{use_statements}}
+
+/**
+ * {{class_name}} - Generated CLI command.
+ * 
+ * {{command_description}}
+ */
+class {{class_name}} extends Command {
+    
+    public function __construct() {
+        parent::__construct('{{command_name}}', {{arguments}}, '{{command_description}}');
+    }
+
+    public function exec(): int {
+        $this->println('🚀 Executing {{command_name}} command...');
+        
+        // TODO: Implement your command logic here
+        
+        $this->success('✅ Command completed successfully!');
+        return 0;
+    }
+}

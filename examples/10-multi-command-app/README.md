@@ -713,3 +713,23 @@ class ApiClient {
     }
 }
 ```
+## Related Examples
+
+### Building Blocks (Start Here)
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Command arguments and validation
+- **[03-user-input](../03-user-input/)** - User input and interaction
+
+### Feature Integration
+- **[04-output-formatting](../04-output-formatting/)** - Professional output styling
+- **[05-interactive-commands](../05-interactive-commands/)** - Menu-driven interfaces
+- **[06-table-display](../06-table-display/)** - Data presentation in tables
+- **[07-progress-bars](../07-progress-bars/)** - Visual progress feedback
+- **[11-masked-input](../11-masked-input/)** - Secure input handling
+
+### Specialized Operations
+- **[08-file-processing](../08-file-processing/)** - File management commands
+- **[09-database-ops](../09-database-ops/)** - Database operation commands
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands for your application

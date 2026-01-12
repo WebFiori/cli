@@ -128,3 +128,18 @@ class HelloCommand extends Command {
 ```
 
 This example serves as the foundation for understanding WebFiori CLI basics before moving to more advanced features.
+
+## Related Examples
+
+### Next Steps
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Learn advanced argument handling and validation
+- **[03-user-input](../03-user-input/)** - Add interactive user input to your commands
+- **[04-output-formatting](../04-output-formatting/)** - Enhance output with colors and formatting
+
+### Advanced Features
+- **[10-multi-command-app](../10-multi-command-app/)** - Build complete CLI applications
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate commands automatically
+
+### Similar Concepts
+- **[05-interactive-commands](../05-interactive-commands/)** - Interactive command workflows
+- **[11-masked-input](../11-masked-input/)** - Secure input handling

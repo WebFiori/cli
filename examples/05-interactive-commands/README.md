@@ -316,3 +316,26 @@ private function showContextHelp(): void {
 - **[03-user-input](../03-user-input/)**: Input validation and handling
 - **[04-output-formatting](../04-output-formatting/)**: ANSI colors and formatting
 
+## Related Examples
+
+### Prerequisites
+- **[01-basic-hello-world](../01-basic-hello-world/)** - Basic command structure
+- **[03-user-input](../03-user-input/)** - User input and validation fundamentals
+- **[04-output-formatting](../04-output-formatting/)** - ANSI colors and formatting
+
+### Enhanced Interactive Features
+- **[11-masked-input](../11-masked-input/)** - Secure input for sensitive operations
+- **[02-arguments-and-options](../02-arguments-and-options/)** - Command arguments and options
+
+### Visual Enhancements
+- **[06-table-display](../06-table-display/)** - Display data in formatted tables
+- **[07-progress-bars](../07-progress-bars/)** - Visual progress indicators
+
+### Complete Applications
+- **[10-multi-command-app](../10-multi-command-app/)** - Full CLI applications with menus
+- **[09-database-ops](../09-database-ops/)** - Database management with interactive menus
+- **[08-file-processing](../08-file-processing/)** - File operations with user interaction
+
+### Development Tools
+- **[12-command-scaffolding](../12-command-scaffolding/)** - Generate interactive commands automatically
+
