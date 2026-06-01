@@ -14,7 +14,7 @@ class InputValidator {
     private $callback;
     private $errPrompt;
     private $params;
-
+    private int $maxRetries = -1;
     /**
      * Creates new instance of the class.
      * 
@@ -47,6 +47,25 @@ class InputValidator {
      */
     public function getErrPrompt() : string {
         return $this->errPrompt;
+    }
+    /**
+     * Sets the maximum number of retry attempts for validation.
+     * 
+     * @param int $max Maximum number of retries. Use -1 for unlimited retries.
+     * 
+     * @return InputValidator Returns the same instance for method chaining.
+     */
+    public function setMaxRetries(int $max) : InputValidator {
+        $this->maxRetries = $max;
+        return $this;
+    }
+    /**
+     * Gets the maximum number of retry attempts.
+     * 
+     * @return int Maximum number of retries. -1 means unlimited.
+     */
+    public function getMaxRetries() : int {
+        return $this->maxRetries;
     }
     /**
      * Checks if a string represents a valid class or not.
