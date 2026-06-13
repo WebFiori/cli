@@ -142,11 +142,16 @@ class Runner {
             ArgumentOption::OPTIONAL => true,
             ArgumentOption::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
+        $this->addArg('--no-color', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Disable ANSI colored output.'
+        ]);
         $this->setBeforeStart(function (Runner $r) {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
             $r->checkIsInteractive();
+            $r->resolveAnsi();
         });
         $this->register(new HelpCommand(), ['-h']);
         $this->setDefaultCommand('help');
@@ -611,6 +616,18 @@ class Runner {
     }
 
     /**
+     * Returns whether ANSI output is currently enabled.
+     *
+     * If not explicitly forced via --ansi or --no-color, this checks whether
+     * the output stream is a real terminal (StdOut) and applies TTY detection.
+     *
+     * @return bool True if ANSI output is enabled, false otherwise.
+     */
+    public function isAnsi(): bool {
+        return $this->isAnsi;
+    }
+
+    /**
      * Check if auto-discovery is enabled.
      * 
      * @return bool
@@ -796,8 +813,12 @@ class Runner {
             }
         }
 
-        if ($ansi) {
-            $args[] = '--ansi';
+        if ($ansi || in_array('--ansi', $args)) {
+            $this->isAnsi = true;
+        }
+
+        if (in_array('--no-color', $args)) {
+            $this->isAnsi = false;
         }
         $this->setArgV($args);
         $this->setActiveCommand($c);
@@ -1075,6 +1096,35 @@ class Runner {
     }
 
     /**
+     * Determines if ANSI output should be used based on environment detection.
+     *
+     * Resolution precedence:
+     * 1. NO_COLOR env variable → false
+     * 2. posix_isatty(STDOUT) on Unix → true if TTY
+     * 3. Windows terminal env checks (ANSICON, ConEmuANSI, TERM)
+     * 4. Default → false
+     *
+     * @return bool True if ANSI should be enabled by default.
+     */
+    public static function shouldUseAnsi(): bool {
+        if (getenv('NO_COLOR') !== false || isset($_SERVER['NO_COLOR'])) {
+            return false;
+        }
+
+        if (function_exists('posix_isatty')) {
+            return defined('STDOUT') ? posix_isatty(STDOUT) : false;
+        }
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            return getenv('ANSICON') !== false
+                || getenv('ConEmuANSI') === 'ON'
+                || getenv('TERM') === 'xterm';
+        }
+
+        return false;
+    }
+
+    /**
      * Start command line process.
      * 
      * @return int The method will return an integer that represents exit status of
@@ -1087,7 +1137,11 @@ class Runner {
         }
 
         if ($this->isInteractive()) {
-            $this->isAnsi = in_array('--ansi', $this->getArgsVector());
+            if (in_array('--no-color', $this->getArgsVector())) {
+                $this->isAnsi = false;
+            } elseif (in_array('--ansi', $this->getArgsVector())) {
+                $this->isAnsi = true;
+            }
             $this->printMsg('Running in interactive mode.', '>>', 'blue');
             $this->printMsg("Type command name or 'exit' to close.", ">>", 'blue');
             $this->printMsg('', '>>', 'blue');
@@ -1126,6 +1180,7 @@ class Runner {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
     }
+
     /**
      * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
      * 
@@ -1173,9 +1228,7 @@ class Runner {
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
 
-        if (in_array('--ansi', $argsArr)) {
-            $argsArr = array_diff($argsArr, ['--ansi']);
-        }
+        $argsArr = $this->removeAnsiArgs($argsArr);
 
         // Preprocess help patterns
         $argsArr = $this->preprocessHelpPattern($argsArr);
@@ -1227,6 +1280,30 @@ class Runner {
             }
         }
     }
+    /**
+     * Removes --ansi and --no-color flags from an arguments array.
+     *
+     * @param array $argsArr The arguments array.
+     *
+     * @return array The filtered arguments array.
+     */
+    private function removeAnsiArgs(array $argsArr): array {
+        $tempArgs = [];
+
+        foreach ($argsArr as $argName => $val) {
+            if (gettype($argName) == 'integer') {
+                if ($val != '--ansi' && $val != '--no-color') {
+                    $tempArgs[] = $val;
+                }
+            } else {
+                if ($argName != '--ansi' && $argName != '--no-color') {
+                    $tempArgs[$argName] = $val;
+                }
+            }
+        }
+
+        return $tempArgs;
+    }
 
     private function removeCommandSignalHandlers(Command $c): void {
         if ($this->signalHandler !== null) {
@@ -1234,6 +1311,12 @@ class Runner {
                 $this->signalHandler->remove($signal);
             }
             $c->clearSignalHandlers();
+        }
+    }
+
+    private function resolveAnsi(): void {
+        if ($this->outputStream instanceof StdOut) {
+            $this->isAnsi = self::shouldUseAnsi();
         }
     }
 
@@ -1245,21 +1328,13 @@ class Runner {
     private function run(): int {
         $argsArr = array_slice($this->getArgsVector(), 1);
 
-        if (in_array('--ansi', $argsArr)) {
+        if (in_array('--no-color', $argsArr)) {
+            $this->isAnsi = false;
+        } elseif (in_array('--ansi', $argsArr)) {
             $this->isAnsi = true;
-            $tempArgs = [];
-
-            foreach ($argsArr as $argName => $val) {
-                if (gettype($argName) == 'integer') {
-                    if ($val != '--ansi') {
-                        $tempArgs[] = $val;
-                    }
-                } else {
-                    $tempArgs[$argName] = $val;
-                }
-            }
-            $argsArr = $tempArgs;
         }
+
+        $argsArr = $this->removeAnsiArgs($argsArr);
 
         // Preprocess help patterns for non-interactive mode
         $argsArr = $this->preprocessHelpPattern($argsArr);
