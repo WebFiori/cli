@@ -729,6 +729,9 @@ class Runner {
         }
         $this->commands[$cliCommand->getName()] = $cliCommand;
 
+        // Resolve group from attribute or name convention
+        $cliCommand->resolveGroup();
+
         // Register runtime aliases
         foreach ($aliases as $alias) {
             $this->registerAlias($alias, $cliCommand->getName());

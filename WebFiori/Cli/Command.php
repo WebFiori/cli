@@ -46,6 +46,11 @@ abstract class Command {
      */
     private $description;
     /**
+     * The group this command belongs to for help display.
+     * @var string|null
+     */
+    private $group;
+    /**
      * 
      * @var InputStream
      * 
@@ -99,6 +104,7 @@ abstract class Command {
         }
         $this->aliases = $aliases;
         $this->signalHandlers = [];
+        $this->group = null;
         $this->addArgs($args);
 
         if (!$this->setDescription($description)) {
@@ -381,6 +387,7 @@ abstract class Command {
      */
     public function excCommand() : int {
         $retVal = -1;
+        $lockManager = null;
 
         $runner = $this->getOwner();
 
@@ -390,20 +397,45 @@ abstract class Command {
             }
         }
 
-        if ($this->parseArgsHelper()) {
-            // Check for help first, before validating required arguments
-            if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
-                $help = $runner->getCommandByName('help');
-                $help->setArgValue('--command', $this->getName());
-                $help->setOwner($runner);
-                $help->setOutputStream($runner->getOutputStream());
-                $this->removeArgument('help');
+        // Check for SingleInstance attribute
+        $singleInstance = $this->resolveSingleInstance();
 
-                return $help->exec();
-            } else if ($this->checkIsArgsSetHelper()) {
-                $retVal = $this->exec();
+        if ($singleInstance !== null) {
+            $lockManager = new LockManager();
+
+            if (!$lockManager->acquire($this->getName(), $singleInstance->lockPath)) {
+                $this->warning('Command is already running.');
+
+                if ($runner !== null) {
+                    foreach ($runner->getArgs() as $arg) {
+                        $this->removeArgument($arg->getName());
+                        $arg->resetValue();
+                    }
+                }
+
+                return $singleInstance->exitCode;
             }
+        }
 
+        try {
+            if ($this->parseArgsHelper()) {
+                // Check for help first, before validating required arguments
+                if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
+                    $help = $runner->getCommandByName('help');
+                    $help->setArgValue('--command', $this->getName());
+                    $help->setOwner($runner);
+                    $help->setOutputStream($runner->getOutputStream());
+                    $this->removeArgument('help');
+
+                    $retVal = $help->exec();
+                } else if ($this->checkIsArgsSetHelper()) {
+                    $retVal = $this->exec();
+                }
+            }
+        } finally {
+            if ($lockManager !== null) {
+                $lockManager->release();
+            }
         }
 
         if ($runner !== null) {
@@ -544,6 +576,15 @@ abstract class Command {
      */
     public function getDescription() : string {
         return $this->description;
+    }
+
+    /**
+     * Returns the group this command belongs to.
+     *
+     * @return string|null The group name, or null if ungrouped.
+     */
+    public function getGroup(): ?string {
+        return $this->group;
     }
 
     /**
@@ -1101,6 +1142,32 @@ abstract class Command {
     }
 
     /**
+     * Resolves the group for this command from attributes or name convention.
+     *
+     * Priority: 1. Explicit setGroup() 2. #[Group] attribute 3. Colon prefix in name
+     */
+    public function resolveGroup(): void {
+        if ($this->group !== null) {
+            return;
+        }
+
+        $ref = new ReflectionClass($this);
+        $attrs = $ref->getAttributes(Attributes\Group::class);
+
+        if (count($attrs) > 0) {
+            $this->group = $attrs[0]->newInstance()->name;
+
+            return;
+        }
+
+        $colonPos = strpos($this->getName(), ':');
+
+        if ($colonPos !== false) {
+            $this->group = substr($this->getName(), 0, $colonPos);
+        }
+    }
+
+    /**
      * Ask the user to select one of multiple values.
      * 
      * This method will display a prompt and wait for the user to select 
@@ -1213,6 +1280,15 @@ abstract class Command {
         }
 
         return false;
+    }
+
+    /**
+     * Sets the group this command belongs to for help display organization.
+     *
+     * @param string $group The group name.
+     */
+    public function setGroup(string $group): void {
+        $this->group = $group;
     }
     /**
      * Sets the stream at which the command will read input from.
@@ -1781,5 +1857,21 @@ abstract class Command {
         $this->println();
 
         return $input;
+    }
+
+    /**
+     * Resolves the SingleInstance attribute on this command class.
+     *
+     * @return Attributes\SingleInstance|null The attribute instance, or null if not present.
+     */
+    private function resolveSingleInstance(): ?Attributes\SingleInstance {
+        $ref = new ReflectionClass($this);
+        $attrs = $ref->getAttributes(Attributes\SingleInstance::class);
+
+        if (count($attrs) > 0) {
+            return $attrs[0]->newInstance();
+        }
+
+        return null;
     }
 }
