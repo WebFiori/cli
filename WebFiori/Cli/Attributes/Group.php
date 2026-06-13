@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is licensed under MIT License.
+ *
+ * Copyright (c) 2026-present Webfiori Framework
+ *
+ * For more information on the license, please visit:
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ *
+ */
 
 declare(strict_types=1);
 namespace WebFiori\Cli\Attributes;
