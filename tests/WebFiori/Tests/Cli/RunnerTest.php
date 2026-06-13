@@ -60,9 +60,9 @@ class RunnerTest extends CommandTestCase {
         $this->assertTrue($runner->addArg('global-arg', [
             ArgumentOption::OPTIONAL => true
         ]));
-        $this->assertEquals(2, count($runner->getArgs()));
+        $this->assertEquals(6, count($runner->getArgs()));
         $runner->removeArgument('--ansi');
-        $this->assertEquals(1, count($runner->getArgs()));
+        $this->assertEquals(5, count($runner->getArgs()));
         $this->assertFalse($runner->hasArg('--ansi'));
         $runner->register(new Command00());
         $this->assertEquals(2, count($runner->getCommands())); // help + super-hero
@@ -150,6 +150,10 @@ class RunnerTest extends CommandTestCase {
         $runner->register(new Command00());
         // Don't register HelpCommand again - it's already automatically registered
         $runner->removeArgument('--ansi');
+        $runner->removeArgument('--no-color');
+        $runner->removeArgument('-q');
+        $runner->removeArgument('-v');
+        $runner->removeArgument('-vv');
         $runner->setDefaultCommand('help');
         $runner->setInputs([]);
         $this->assertEquals(0, $runner->runCommand(null, []));
@@ -172,6 +176,10 @@ class RunnerTest extends CommandTestCase {
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
+            "    --no-color:[Optional] Disable ANSI colored output.\n",
+            "      -q:[Optional] Quiet mode. Suppress non-critical output.\n",
+            "      -v:[Optional] Verbose output.\n",
+            "     -vv:[Optional] Debug output (most verbose).\n",
             "Available Commands:\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n"
@@ -198,6 +206,10 @@ class RunnerTest extends CommandTestCase {
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "\e[1;93mGlobal Arguments:\e[0m\n",
             "\e[1;33m    --ansi:\e[0m[Optional] Force the use of ANSI output.\n",
+            "\e[1;33m    --no-color:\e[0m[Optional] Disable ANSI colored output.\n",
+            "\e[1;33m      -q:\e[0m[Optional] Quiet mode. Suppress non-critical output.\n",
+            "\e[1;33m      -v:\e[0m[Optional] Verbose output.\n",
+            "\e[1;33m     -vv:\e[0m[Optional] Debug output (most verbose).\n",
             "\e[1;93mAvailable Commands:\e[0m\n",
             "\e[1;33m    help\e[0m:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "\e[1;33m    super-hero\e[0m:     A command to display hero's name.\n"
@@ -227,6 +239,10 @@ class RunnerTest extends CommandTestCase {
         $_SERVER['argv'] = [];
         $runner = new Runner();
         $runner->removeArgument('--ansi');
+        $runner->removeArgument('--no-color');
+        $runner->removeArgument('-q');
+        $runner->removeArgument('-v');
+        $runner->removeArgument('-vv');
         $runner->register(new Command00());
         // Don't register HelpCommand - it's automatically registered
         $runner->setDefaultCommand('help');
@@ -332,6 +348,10 @@ class RunnerTest extends CommandTestCase {
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
+            "    --no-color:[Optional] Disable ANSI colored output.\n",
+            "      -q:[Optional] Quiet mode. Suppress non-critical output.\n",
+            "      -v:[Optional] Verbose output.\n",
+            "     -vv:[Optional] Debug output (most verbose).\n",
             "Available Commands:\n",
             "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    super-hero:     A command to display hero's name.\n",

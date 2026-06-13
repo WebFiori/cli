@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 namespace WebFiori\Cli;
 
 use Error;
@@ -46,6 +46,11 @@ abstract class Command {
      */
     private $description;
     /**
+     * The group this command belongs to for help display.
+     * @var string|null
+     */
+    private $group;
+    /**
      * 
      * @var InputStream
      * 
@@ -58,6 +63,11 @@ abstract class Command {
      */
     private $outputStream;
     private $owner;
+    /**
+     * Per-command signal handlers that are active during command execution.
+     * @var array<int, callable>
+     */
+    private $signalHandlers;
     /**
      * Creates new instance of the class.
      * 
@@ -93,10 +103,23 @@ abstract class Command {
             $this->setName('new-command');
         }
         $this->aliases = $aliases;
+        $this->signalHandlers = [];
+        $this->group = null;
         $this->addArgs($args);
 
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
+        }
+    }
+
+    /**
+     * Adds an alias to the command.
+     * 
+     * @param string $alias The alias to add.
+     */
+    public function addAlias(string $alias): void {
+        if (!in_array($alias, $this->aliases)) {
+            $this->aliases[] = $alias;
         }
     }
     /**
@@ -253,6 +276,17 @@ abstract class Command {
         $this->prints("\e[2K");
         $this->prints("\r");
     }
+
+    /**
+     * Removes all registered signal handlers for this command.
+     *
+     * @return Command The method returns same instance for chaining.
+     */
+    public function clearSignalHandlers(): Command {
+        $this->signalHandlers = [];
+
+        return $this;
+    }
     /**
      * Asks the user to conform something.
      * 
@@ -318,6 +352,17 @@ abstract class Command {
     public function createProgressBar(int $total = 100): ProgressBar {
         return new ProgressBar($this->getOutputStream(), $total);
     }
+
+    /**
+     * Display a message only when verbosity is DEBUG (-vv).
+     *
+     * @param string $message The message that will be shown.
+     */
+    public function debug(string $message): void {
+        if ($this->getVerbosityLevel() >= Verbosity::DEBUG) {
+            $this->printMsg($message, 'Debug', 'gray');
+        }
+    }
     /**
      * Display a message that represents an error.
      * 
@@ -342,6 +387,7 @@ abstract class Command {
      */
     public function excCommand() : int {
         $retVal = -1;
+        $lockManager = null;
 
         $runner = $this->getOwner();
 
@@ -351,20 +397,45 @@ abstract class Command {
             }
         }
 
-        if ($this->parseArgsHelper()) {
-            // Check for help first, before validating required arguments
-            if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
-                $help = $runner->getCommandByName('help');
-                $help->setArgValue('--command', $this->getName());
-                $help->setOwner($runner);
-                $help->setOutputStream($runner->getOutputStream());
-                $this->removeArgument('help');
-                
-                return $help->exec();
-            } else if ($this->checkIsArgsSetHelper()) {
-                $retVal = $this->exec();
+        // Check for SingleInstance attribute
+        $singleInstance = $this->resolveSingleInstance();
+
+        if ($singleInstance !== null) {
+            $lockManager = new LockManager();
+
+            if (!$lockManager->acquire($this->getName(), $singleInstance->lockPath)) {
+                $this->warning('Command is already running.');
+
+                if ($runner !== null) {
+                    foreach ($runner->getArgs() as $arg) {
+                        $this->removeArgument($arg->getName());
+                        $arg->resetValue();
+                    }
+                }
+
+                return $singleInstance->exitCode;
             }
-            
+        }
+
+        try {
+            if ($this->parseArgsHelper()) {
+                // Check for help first, before validating required arguments
+                if ($this->isArgProvided('help') || $this->isArgProvided('-h')) {
+                    $help = $runner->getCommandByName('help');
+                    $help->setArgValue('--command', $this->getName());
+                    $help->setOwner($runner);
+                    $help->setOutputStream($runner->getOutputStream());
+                    $this->removeArgument('help');
+
+                    $retVal = $help->exec();
+                } else if ($this->checkIsArgsSetHelper()) {
+                    $retVal = $this->exec();
+                }
+            }
+        } finally {
+            if ($lockManager !== null) {
+                $lockManager->release();
+            }
         }
 
         if ($runner !== null) {
@@ -422,26 +493,6 @@ abstract class Command {
      */
     public function getAliases() : array {
         return $this->aliases;
-    }
-    
-    /**
-     * Sets the aliases for the command.
-     * 
-     * @param array $aliases An array of aliases.
-     */
-    public function setAliases(array $aliases): void {
-        $this->aliases = $aliases;
-    }
-    
-    /**
-     * Adds an alias to the command.
-     * 
-     * @param string $alias The alias to add.
-     */
-    public function addAlias(string $alias): void {
-        if (!in_array($alias, $this->aliases)) {
-            $this->aliases[] = $alias;
-        }
     }
     /**
      * Returns an object that holds argument info if the command.
@@ -528,6 +579,15 @@ abstract class Command {
     }
 
     /**
+     * Returns the group this command belongs to.
+     *
+     * @return string|null The group name, or null if ungrouped.
+     */
+    public function getGroup(): ?string {
+        return $this->group;
+    }
+
+    /**
      * Take an input value from the user.
      *
      * @param string $prompt The string that will be shown to the user. The
@@ -577,6 +637,9 @@ abstract class Command {
         }
 
         return null;
+    }
+    public function getInputStream() : InputStream {
+        return $this->inputStream;
     }
     /**
      * Reads user input with characters masked by a specified character.
@@ -635,27 +698,6 @@ abstract class Command {
      * an object. Other than that, the method will return null.
      * 
      */
-    public function getInputStream() : InputStream {
-        return $this->inputStream;
-    }
-    
-    /**
-     * Check if the current input stream supports interactive input.
-     * 
-     * @return bool True if the input stream supports interactive input (real-time user interaction),
-     *              false otherwise (files, pipes, arrays, etc.)
-     */
-    public function supportsInteractiveInput(): bool {
-        $stream = $this->getInputStream();
-        
-        // Only StdIn with tty supports true interaction
-        if ($stream instanceof Streams\StdIn) {
-            return function_exists('posix_isatty') && posix_isatty(STDIN);
-        }
-        
-        // All other stream types are non-interactive
-        return false;
-    }
     /**
      * Returns the name of the command.
      * 
@@ -689,6 +731,16 @@ abstract class Command {
     public function getOwner(): ?Runner {
         return $this->owner;
     }
+
+    /**
+     * Returns all signal handlers registered for this command.
+     *
+     * @return array<int, callable> An associative array mapping signal numbers
+     * to their handler callables.
+     */
+    public function getSignalHandlers(): array {
+        return $this->signalHandlers;
+    }
     /**
      * Checks if the command has a specific command line argument or not.
      * 
@@ -712,13 +764,15 @@ abstract class Command {
      * Display a message that represents extra information.
      * 
      * The message will be prefixed with the string 'Info:' in 
-     * blue.
+     * blue. Suppressed in quiet mode.
      * 
      * @param string $message The message that will be shown.
      * 
      */
     public function info(string $message): void {
-        $this->printMsg($message, 'Info', 'blue');
+        if ($this->getVerbosityLevel() >= Verbosity::NORMAL) {
+            $this->printMsg($message, 'Info', 'blue');
+        }
     }
     /**
      * Checks if an argument is provided in the CLI or not.
@@ -821,6 +875,23 @@ abstract class Command {
         }
     }
     /**
+     * Registers a signal handler for this command.
+     *
+     * The handler will be active only while this command is executing and will
+     * be automatically removed after the command finishes.
+     *
+     * @param int $signal The signal number (e.g., SIGINT, SIGTERM).
+     *
+     * @param callable $handler The callback to invoke when the signal is received.
+     *
+     * @return Command The method returns same instance for chaining.
+     */
+    public function onSignal(int $signal, callable $handler): Command {
+        $this->signalHandlers[$signal] = $handler;
+
+        return $this;
+    }
+    /**
      * Prints an array as a list of items.
      * 
      * This method is useful if the developer would like to print out a list 
@@ -859,7 +930,7 @@ abstract class Command {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $_[$argsCount - 1]['ansi'] = $this->isArgProvided('--ansi');
+            $_[$argsCount - 1]['ansi'] = $this->isAnsiEnabled();
             $str = Formatter::format($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
@@ -889,7 +960,7 @@ abstract class Command {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['ansi'] = $this->isArgProvided('--ansi');
+        $formattingOptions['ansi'] = $this->isAnsiEnabled();
 
         $formattedStr = Formatter::format($str, $formattingOptions);
 
@@ -953,6 +1024,7 @@ abstract class Command {
         $result = $this->getInput($prompt, $defaultStr, new InputValidator(function ($val) {
             return InputValidator::isFloat($val);
         }, 'Provided value is not a floating number!'));
+
         return (float)$result;
     }
 
@@ -999,6 +1071,7 @@ abstract class Command {
         $result = $this->getInput($prompt, $defaultStr, new InputValidator(function ($val) {
             return InputValidator::isInt($val);
         }, 'Provided value is not an integer!'));
+
         return (int)$result;
     }
     /**
@@ -1013,63 +1086,6 @@ abstract class Command {
      */
     public function readln() : string {
         return $this->getInputStream()->readLine();
-    }
-    /**
-     * Reads a line from input stream with character masking.
-     * 
-     * This method reads input character by character and displays mask characters
-     * instead of the actual input. It handles backspace for character deletion
-     * and ignores special keys like ESC and arrow keys.
-     * 
-     * @param string $mask The character to display instead of actual input characters.
-     * 
-     * @return string The actual input string (unmasked).
-     * 
-     * @since 1.1.0
-     */
-    private function readMaskedLine(string $mask = '*'): string {
-        $input = '';
-        
-        // For testing with ArrayInputStream, read the whole line at once
-        if ($this->getInputStream() instanceof \WebFiori\Cli\Streams\ArrayInputStream) {
-            $input = $this->getInputStream()->readLine();
-            // Simulate masking output for testing
-            $this->prints(str_repeat($mask, strlen($input)));
-            $this->println();
-            return $input;
-        }
-        
-        // Set terminal to raw mode with echo disabled for real-time character reading
-        $sttyMode = null;
-        if (function_exists('shell_exec') && PHP_OS_FAMILY !== 'Windows') {
-            $sttyMode = shell_exec('stty -g 2>/dev/null');
-            shell_exec('stty -echo -icanon 2>/dev/null');
-        }
-        
-        try {
-            // For real terminal input, read character by character
-            while (true) {
-                $char = KeysMap::readAndTranslate($this->getInputStream());
-                
-                if ($char === 'LF' || $char === 'CR' || $char === '') {
-                    break;
-                } elseif ($char === 'BACKSPACE' && strlen($input) > 0) {
-                    $input = substr($input, 0, -1);
-                    $this->prints("\x08 \x08"); // Backspace, space, backspace
-                } elseif ($char !== 'BACKSPACE' && $char !== 'ESC' && $char !== 'DOWN' && $char !== 'UP' && $char !== 'LEFT' && $char !== 'RIGHT') {
-                    $input .= $char === 'SPACE' ? ' ' : $char;
-                    $this->prints($mask);
-                }
-            }
-        } finally {
-            // Restore terminal settings
-            if ($sttyMode !== null) {
-                shell_exec('stty ' . $sttyMode . ' 2>/dev/null');
-            }
-        }
-        
-        $this->println();
-        return $input;
     }
     /**
      * Reads a string that represents class namespace.
@@ -1126,6 +1142,32 @@ abstract class Command {
     }
 
     /**
+     * Resolves the group for this command from attributes or name convention.
+     *
+     * Priority: 1. Explicit setGroup() 2. #[Group] attribute 3. Colon prefix in name
+     */
+    public function resolveGroup(): void {
+        if ($this->group !== null) {
+            return;
+        }
+
+        $ref = new ReflectionClass($this);
+        $attrs = $ref->getAttributes(Attributes\Group::class);
+
+        if (count($attrs) > 0) {
+            $this->group = $attrs[0]->newInstance()->name;
+
+            return;
+        }
+
+        $colonPos = strpos($this->getName(), ':');
+
+        if ($colonPos !== false) {
+            $this->group = substr($this->getName(), 0, $colonPos);
+        }
+    }
+
+    /**
      * Ask the user to select one of multiple values.
      * 
      * This method will display a prompt and wait for the user to select 
@@ -1153,6 +1195,7 @@ abstract class Command {
     public function select(string $prompt, array $choices, int $defaultIndex = -1, int $maxTrials = -1): ?string {
         if (count($choices) != 0) {
             $currentTry = 0;
+
             do {
                 $this->println($prompt, [
                     'color' => 'gray',
@@ -1176,6 +1219,15 @@ abstract class Command {
         }
 
         return null;
+    }
+
+    /**
+     * Sets the aliases for the command.
+     * 
+     * @param array $aliases An array of aliases.
+     */
+    public function setAliases(array $aliases): void {
+        $this->aliases = $aliases;
     }
     /**
      * Sets the value of an argument.
@@ -1228,6 +1280,15 @@ abstract class Command {
         }
 
         return false;
+    }
+
+    /**
+     * Sets the group this command belongs to for help display organization.
+     *
+     * @param string $group The group name.
+     */
+    public function setGroup(string $group): void {
+        $this->group = $group;
     }
     /**
      * Sets the stream at which the command will read input from.
@@ -1284,13 +1345,34 @@ abstract class Command {
     /**
      * Display a message that represents a success status.
      * 
-     * The message will be prefixed with the string "Success:" in green. 
+     * The message will be prefixed with the string "Success:" in green.
+     * Suppressed in quiet mode.
      * 
      * @param string $message The message that will be displayed.
      * 
      */
     public function success(string $message): void {
-        $this->printMsg($message, 'Success', 'light-green');
+        if ($this->getVerbosityLevel() >= Verbosity::NORMAL) {
+            $this->printMsg($message, 'Success', 'light-green');
+        }
+    }
+
+    /**
+     * Check if the current input stream supports interactive input.
+     * 
+     * @return bool True if the input stream supports interactive input (real-time user interaction),
+     *              false otherwise (files, pipes, arrays, etc.)
+     */
+    public function supportsInteractiveInput(): bool {
+        $stream = $this->getInputStream();
+
+        // Only StdIn with tty supports true interaction
+        if ($stream instanceof Streams\StdIn) {
+            return function_exists('posix_isatty') && posix_isatty(STDIN);
+        }
+
+        // All other stream types are non-interactive
+        return false;
     }
 
     /**
@@ -1432,6 +1514,17 @@ abstract class Command {
 
         return $this;
     }
+
+    /**
+     * Display a message only when verbosity is VERBOSE (-v) or higher.
+     *
+     * @param string $message The message that will be shown.
+     */
+    public function verbose(string $message): void {
+        if ($this->getVerbosityLevel() >= Verbosity::VERBOSE) {
+            $this->printMsg($message, 'Verbose', 'cyan');
+        }
+    }
     /**
      * Display a message that represents a warning.
      * 
@@ -1551,7 +1644,7 @@ abstract class Command {
             }
             $index++;
         }
-        
+
         return null;
     }
     /**
@@ -1612,6 +1705,40 @@ abstract class Command {
         // Default fallback
         return 80;
     }
+
+    /**
+     * Returns the current verbosity level from the Runner, or NORMAL as default.
+     *
+     * @return int One of the Verbosity constants.
+     */
+    private function getVerbosityLevel(): int {
+        $owner = $this->getOwner();
+
+        if ($owner !== null) {
+            return $owner->getVerbosity();
+        }
+
+        return Verbosity::NORMAL;
+    }
+
+    /**
+     * Checks if ANSI output is enabled for this command.
+     *
+     * Uses the Runner's resolved ANSI value if available, falls back to
+     * checking if --ansi argument is provided.
+     *
+     * @return bool True if ANSI output should be used.
+     */
+    private function isAnsiEnabled(): bool {
+        $owner = $this->getOwner();
+
+        if ($owner !== null) {
+            return $owner->isAnsi();
+        }
+
+        return $this->isArgProvided('--ansi');
+    }
+
     private function parseArgsHelper() : bool {
         $options = $this->getArgs();
         $invalidArgsVals = [];
@@ -1670,5 +1797,81 @@ abstract class Command {
 
         ]);
         $this->println($msg);
+    }
+    /**
+     * Reads a line from input stream with character masking.
+     * 
+     * This method reads input character by character and displays mask characters
+     * instead of the actual input. It handles backspace for character deletion
+     * and ignores special keys like ESC and arrow keys.
+     * 
+     * @param string $mask The character to display instead of actual input characters.
+     * 
+     * @return string The actual input string (unmasked).
+     * 
+     * @since 1.1.0
+     */
+    private function readMaskedLine(string $mask = '*'): string {
+        $input = '';
+
+        // For testing with ArrayInputStream, read the whole line at once
+        if ($this->getInputStream() instanceof Streams\ArrayInputStream) {
+            $input = $this->getInputStream()->readLine();
+            // Simulate masking output for testing
+            $this->prints(str_repeat($mask, strlen($input)));
+            $this->println();
+
+            return $input;
+        }
+
+        // Set terminal to raw mode with echo disabled for real-time character reading
+        $sttyMode = null;
+
+        if (function_exists('shell_exec') && PHP_OS_FAMILY !== 'Windows') {
+            $sttyMode = shell_exec('stty -g 2>/dev/null');
+            shell_exec('stty -echo -icanon 2>/dev/null');
+        }
+
+        try {
+            // For real terminal input, read character by character
+            while (true) {
+                $char = KeysMap::readAndTranslate($this->getInputStream());
+
+                if ($char === 'LF' || $char === 'CR' || $char === '') {
+                    break;
+                } elseif ($char === 'BACKSPACE' && strlen($input) > 0) {
+                    $input = substr($input, 0, -1);
+                    $this->prints("\x08 \x08"); // Backspace, space, backspace
+                } elseif ($char !== 'BACKSPACE' && $char !== 'ESC' && $char !== 'DOWN' && $char !== 'UP' && $char !== 'LEFT' && $char !== 'RIGHT') {
+                    $input .= $char === 'SPACE' ? ' ' : $char;
+                    $this->prints($mask);
+                }
+            }
+        } finally {
+            // Restore terminal settings
+            if ($sttyMode !== null) {
+                shell_exec('stty '.$sttyMode.' 2>/dev/null');
+            }
+        }
+
+        $this->println();
+
+        return $input;
+    }
+
+    /**
+     * Resolves the SingleInstance attribute on this command class.
+     *
+     * @return Attributes\SingleInstance|null The attribute instance, or null if not present.
+     */
+    private function resolveSingleInstance(): ?Attributes\SingleInstance {
+        $ref = new ReflectionClass($this);
+        $attrs = $ref->getAttributes(Attributes\SingleInstance::class);
+
+        if (count($attrs) > 0) {
+            return $attrs[0]->newInstance();
+        }
+
+        return null;
     }
 }

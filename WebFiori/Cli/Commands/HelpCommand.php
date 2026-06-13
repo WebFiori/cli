@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 namespace WebFiori\Cli\Commands;
 
@@ -59,9 +60,7 @@ class HelpCommand extends Command {
             $this->printGlobalArgs($formattingOptions);
             $this->println("Available Commands:", $formattingOptions);
 
-            foreach ($regCommands as $commandObj) {
-                $this->printCommandInfo($commandObj, $len);
-            }
+            $this->printCommandsGrouped($regCommands, $len, $formattingOptions);
         }
 
         return 0;
@@ -98,15 +97,16 @@ class HelpCommand extends Command {
 
     private function printArgsTable(array $args) {
         $rows = [];
+
         foreach ($args as $argObj) {
             $name = $argObj->getName();
             $required = $argObj->isOptional() ? 'No' : 'Yes';
             $default = $argObj->getDefault() ?: '-';
             $description = $argObj->getDescription() ?: '<NO DESCRIPTION>';
-            
+
             $rows[] = [$name, $required, $default, $description];
         }
-        
+
         $this->table($rows, ['Argument', 'Required', 'Default', 'Description']);
     }
 
@@ -129,7 +129,7 @@ class HelpCommand extends Command {
         $this->println(str_repeat(' ', $spacesCount)."%s", $cliCommand->getDescription());
 
         if ($withArgs) {
-            $args = array_filter($cliCommand->getArgs(), function($arg) {
+            $args = array_filter($cliCommand->getArgs(), function ($arg) {
                 return !in_array($arg->getName(), ['help', '-h']);
             });
 
@@ -146,6 +146,51 @@ class HelpCommand extends Command {
                         $this->printArg($argObj);
                     }
                 }
+            }
+        }
+    }
+
+    private function printCommandsGrouped(array $commands, int $len, array $formattingOptions) {
+        $grouped = [];
+        $ungrouped = [];
+
+        foreach ($commands as $commandObj) {
+            $group = $commandObj->getGroup();
+
+            if ($group !== null) {
+                $grouped[$group][] = $commandObj;
+            } else {
+                $ungrouped[] = $commandObj;
+            }
+        }
+
+        if (count($grouped) == 0) {
+            // No groups — flat list
+            foreach ($ungrouped as $commandObj) {
+                $this->printCommandInfo($commandObj, $len);
+            }
+
+            return;
+        }
+
+        // Print grouped commands first
+        ksort($grouped);
+
+        foreach ($grouped as $groupName => $groupCommands) {
+            $this->println("  %s:", $groupName, [
+                'bold' => true,
+                'color' => 'light-blue'
+            ]);
+
+            foreach ($groupCommands as $commandObj) {
+                $this->printCommandInfo($commandObj, $len);
+            }
+        }
+
+        // Print ungrouped commands
+        if (count($ungrouped) > 0) {
+            foreach ($ungrouped as $commandObj) {
+                $this->printCommandInfo($commandObj, $len);
             }
         }
     }

@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 namespace WebFiori\Cli;
 
 use Throwable;
@@ -105,6 +105,25 @@ class Runner {
     private $outputStream;
 
     /**
+     * Whether a shutdown has been requested via signal.
+     * 
+     * @var bool
+     */
+    private $shutdownRequested;
+
+    /**
+     * @var SignalHandler|null
+     */
+    private $signalHandler;
+
+    /**
+     * The current verbosity level.
+     * 
+     * @var int
+     */
+    private $verbosity;
+
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
@@ -118,6 +137,9 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commandExitVal = 0;
         $this->afterRunPool = [];
+        $this->signalHandler = null;
+        $this->shutdownRequested = false;
+        $this->verbosity = Verbosity::NORMAL;
 
         // Initialize discovery properties
         $this->commandDiscovery = null;
@@ -128,11 +150,29 @@ class Runner {
             ArgumentOption::OPTIONAL => true,
             ArgumentOption::DESCRIPTION => 'Force the use of ANSI output.'
         ]);
+        $this->addArg('--no-color', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Disable ANSI colored output.'
+        ]);
+        $this->addArg('-q', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Quiet mode. Suppress non-critical output.'
+        ]);
+        $this->addArg('-v', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Verbose output.'
+        ]);
+        $this->addArg('-vv', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Debug output (most verbose).'
+        ]);
         $this->setBeforeStart(function (Runner $r) {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
             $r->checkIsInteractive();
+            $r->resolveAnsi();
+            $r->resolveVerbosity();
         });
         $this->register(new HelpCommand(), ['-h']);
         $this->setDefaultCommand('help');
@@ -332,6 +372,44 @@ class Runner {
     }
 
     /**
+     * Enables signal handling with default handlers for SIGINT and SIGTERM.
+     *
+     * Default behavior:
+     * - SIGINT (Ctrl+C): In interactive mode, interrupts the current command 
+     *   but keeps the app running. In non-interactive mode, exits with code 130.
+     * - SIGTERM: Sets shutdown flag and exits with code 143.
+     *
+     * If pcntl is not available (e.g., on Windows), this method creates the
+     * handler instance but signal registration will be a no-op.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function enableSignalHandling(): Runner {
+        $this->signalHandler = new SignalHandler();
+        $this->shutdownRequested = false;
+
+        $this->signalHandler->register(defined('SIGINT') ? SIGINT : 2, function (int $signal) {
+            if ($this->isInteractive()) {
+                $this->commandExitVal = 130;
+                $this->getOutputStream()->println('');
+                $this->printMsg('Command interrupted.', '>>', 'yellow');
+            } else {
+                $this->commandExitVal = 130;
+                $this->shutdownRequested = true;
+            }
+        });
+
+        $this->signalHandler->register(defined('SIGTERM') ? SIGTERM : 15, function (int $signal) {
+            $this->commandExitVal = 143;
+            $this->shutdownRequested = true;
+        });
+
+        $this->signalHandler->enable();
+
+        return $this;
+    }
+
+    /**
      * Add a pattern to exclude files/directories from discovery.
      * 
      * @param string $pattern Glob pattern to exclude
@@ -521,6 +599,24 @@ class Runner {
     }
 
     /**
+     * Returns the signal handler instance if signal handling has been enabled.
+     *
+     * @return SignalHandler|null The signal handler instance, or null if not enabled.
+     */
+    public function getSignalHandler(): ?SignalHandler {
+        return $this->signalHandler;
+    }
+
+    /**
+     * Returns the current verbosity level.
+     *
+     * @return int One of the Verbosity constants.
+     */
+    public function getVerbosity(): int {
+        return $this->verbosity;
+    }
+
+    /**
      * Check if an alias is registered.
      * 
      * @param string $alias The alias to check.
@@ -547,6 +643,18 @@ class Runner {
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether ANSI output is currently enabled.
+     *
+     * If not explicitly forced via --ansi or --no-color, this checks whether
+     * the output stream is a real terminal (StdOut) and applies TTY detection.
+     *
+     * @return bool True if ANSI output is enabled, false otherwise.
+     */
+    public function isAnsi(): bool {
+        return $this->isAnsi;
     }
 
     /**
@@ -585,6 +693,15 @@ class Runner {
     }
 
     /**
+     * Checks if a shutdown has been requested via signal.
+     *
+     * @return bool True if shutdown was requested, false otherwise.
+     */
+    public function isShutdownRequested(): bool {
+        return $this->shutdownRequested;
+    }
+
+    /**
      * Register new command.
      * 
      * @param Command $cliCommand The command that will be registered.
@@ -596,12 +713,13 @@ class Runner {
     public function register(Command $cliCommand, array $aliases = []): Runner {
         if ($cliCommand->getName() != 'help') {
             $helpCommand = $this->getCommandByName('help');
+
             if ($helpCommand !== null) {
                 $cliCommand->addArg($helpCommand->getName(), [
                     ArgumentOption::OPTIONAL => true,
                     ArgumentOption::DESCRIPTION => 'Display command help.'
                 ]);
-                
+
                 foreach ($helpCommand->getAliases() as $alias) {
                     $cliCommand->addArg($alias, [
                         ArgumentOption::OPTIONAL => true
@@ -610,6 +728,9 @@ class Runner {
             }
         }
         $this->commands[$cliCommand->getName()] = $cliCommand;
+
+        // Resolve group from attribute or name convention
+        $cliCommand->resolveGroup();
 
         // Register runtime aliases
         foreach ($aliases as $alias) {
@@ -659,7 +780,7 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commands = [];
         $this->aliases = [];
-        
+
         // Re-register help command after reset
         $this->register(new HelpCommand());
 
@@ -725,11 +846,17 @@ class Runner {
             }
         }
 
-        if ($ansi) {
-            $args[] = '--ansi';
+        if ($ansi || in_array('--ansi', $args)) {
+            $this->isAnsi = true;
+        }
+
+        if (in_array('--no-color', $args)) {
+            $this->isAnsi = false;
         }
         $this->setArgV($args);
         $this->setActiveCommand($c);
+
+        $this->registerCommandSignalHandlers($c);
 
         try {
             $this->commandExitVal = $c->excCommand();
@@ -744,6 +871,7 @@ class Runner {
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
         }
 
+        $this->removeCommandSignalHandlers($c);
         $this->invokeAfterExc();
         $this->setActiveCommand();
 
@@ -979,6 +1107,70 @@ class Runner {
     }
 
     /**
+     * Sets a custom signal handler for a specific signal.
+     *
+     * If signal handling has not been enabled yet, this method will
+     * enable it first.
+     *
+     * @param int $signal The signal number (e.g., SIGINT, SIGTERM).
+     *
+     * @param callable $handler The callback to invoke when the signal is received.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function setSignalHandler(int $signal, callable $handler): Runner {
+        if ($this->signalHandler === null) {
+            $this->enableSignalHandling();
+        }
+
+        $this->signalHandler->register($signal, $handler);
+
+        return $this;
+    }
+
+    /**
+     * Sets the verbosity level.
+     *
+     * @param int $level One of the Verbosity constants.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function setVerbosity(int $level): Runner {
+        $this->verbosity = $level;
+
+        return $this;
+    }
+
+    /**
+     * Determines if ANSI output should be used based on environment detection.
+     *
+     * Resolution precedence:
+     * 1. NO_COLOR env variable → false
+     * 2. posix_isatty(STDOUT) on Unix → true if TTY
+     * 3. Windows terminal env checks (ANSICON, ConEmuANSI, TERM)
+     * 4. Default → false
+     *
+     * @return bool True if ANSI should be enabled by default.
+     */
+    public static function shouldUseAnsi(): bool {
+        if (getenv('NO_COLOR') !== false || isset($_SERVER['NO_COLOR'])) {
+            return false;
+        }
+
+        if (function_exists('posix_isatty')) {
+            return defined('STDOUT') ? posix_isatty(STDOUT) : false;
+        }
+
+        if (DIRECTORY_SEPARATOR === '\\') {
+            return getenv('ANSICON') !== false
+                || getenv('ConEmuANSI') === 'ON'
+                || getenv('TERM') === 'xterm';
+        }
+
+        return false;
+    }
+
+    /**
      * Start command line process.
      * 
      * @return int The method will return an integer that represents exit status of
@@ -991,12 +1183,16 @@ class Runner {
         }
 
         if ($this->isInteractive()) {
-            $this->isAnsi = in_array('--ansi', $this->getArgsVector());
+            if (in_array('--no-color', $this->getArgsVector())) {
+                $this->isAnsi = false;
+            } else if (in_array('--ansi', $this->getArgsVector())) {
+                $this->isAnsi = true;
+            }
             $this->printMsg('Running in interactive mode.', '>>', 'blue');
             $this->printMsg("Type command name or 'exit' to close.", ">>", 'blue');
             $this->printMsg('', '>>', 'blue');
 
-            while (true) {
+            while (!$this->shutdownRequested) {
                 $args = $this->readInteractive();
                 $this->setArgsVector($args);
                 $argsCount = count($args);
@@ -1012,6 +1208,8 @@ class Runner {
                 }
                 $this->printMsg('', '>>', 'blue');
             }
+
+            return $this->commandExitVal;
         } else {
             return $this->run();
         }
@@ -1027,6 +1225,33 @@ class Runner {
         foreach ($this->afterRunPool as $funcArr) {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
+    }
+
+    /**
+     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
+     * 
+     * @param array $args The arguments array to preprocess
+     * @return array The preprocessed arguments array
+     */
+    private function preprocessHelpPattern(array $args): array {
+        if (count($args) >= 2) {
+            $lastArg = end($args);
+
+            // Check if the last argument is 'help' or '-h'
+            if ($lastArg === 'help' || $lastArg === '-h') {
+                $commandName = $args[0];
+
+                // Check if the first argument is a valid command name
+                if ($this->getCommandByName($commandName) !== null) {
+                    // Remove 'help' or '-h' from the end
+                    array_pop($args);
+                    // Add it as a proper argument flag
+                    $args[] = $lastArg;
+                }
+            }
+        }
+
+        return $args;
     }
 
     private function printMsg(string $msg, ?string $prefix = null, ?string $color = null): void {
@@ -1049,9 +1274,7 @@ class Runner {
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
 
-        if (in_array('--ansi', $argsArr)) {
-            $argsArr = array_diff($argsArr, ['--ansi']);
-        }
+        $argsArr = $this->removeGlobalFlags($argsArr);
 
         // Preprocess help patterns
         $argsArr = $this->preprocessHelpPattern($argsArr);
@@ -1096,6 +1319,66 @@ class Runner {
         return $this;
     }
 
+    private function registerCommandSignalHandlers(Command $c): void {
+        if ($this->signalHandler !== null) {
+            foreach ($c->getSignalHandlers() as $signal => $handler) {
+                $this->signalHandler->register($signal, $handler);
+            }
+        }
+    }
+
+    private function removeCommandSignalHandlers(Command $c): void {
+        if ($this->signalHandler !== null) {
+            foreach ($c->getSignalHandlers() as $signal => $handler) {
+                $this->signalHandler->remove($signal);
+            }
+            $c->clearSignalHandlers();
+        }
+    }
+    /**
+     * Removes --ansi and --no-color flags from an arguments array.
+     *
+     * @param array $argsArr The arguments array.
+     *
+     * @return array The filtered arguments array.
+     */
+    private function removeGlobalFlags(array $argsArr): array {
+        $flags = ['--ansi', '--no-color', '-q', '-v', '-vv'];
+        $tempArgs = [];
+
+        foreach ($argsArr as $argName => $val) {
+            if (gettype($argName) == 'integer') {
+                if (!in_array($val, $flags)) {
+                    $tempArgs[] = $val;
+                }
+            } else {
+                if (!in_array($argName, $flags)) {
+                    $tempArgs[$argName] = $val;
+                }
+            }
+        }
+
+        return $tempArgs;
+    }
+
+    private function resolveAnsi(): void {
+        if ($this->outputStream instanceof StdOut) {
+            $this->isAnsi = self::shouldUseAnsi();
+        }
+    }
+
+    private function resolveVerbosity(): void {
+        $args = $this->getArgsVector();
+
+        if (in_array('-vv', $args)) {
+            $this->verbosity = Verbosity::DEBUG;
+        } else if (in_array('-v', $args)) {
+            $this->verbosity = Verbosity::VERBOSE;
+        } else if (in_array('-q', $args)) {
+            $this->verbosity = Verbosity::QUIET;
+        }
+    }
+
     /**
      * Run the command line as single run.
      *
@@ -1104,25 +1387,17 @@ class Runner {
     private function run(): int {
         $argsArr = array_slice($this->getArgsVector(), 1);
 
-        if (in_array('--ansi', $argsArr)) {
+        if (in_array('--no-color', $argsArr)) {
+            $this->isAnsi = false;
+        } else if (in_array('--ansi', $argsArr)) {
             $this->isAnsi = true;
-            $tempArgs = [];
-
-            foreach ($argsArr as $argName => $val) {
-                if (gettype($argName) == 'integer') {
-                    if ($val != '--ansi') {
-                        $tempArgs[] = $val;
-                    }
-                } else {
-                    $tempArgs[$argName] = $val;
-                }
-            }
-            $argsArr = $tempArgs;
         }
 
+        $argsArr = $this->removeGlobalFlags($argsArr);
 
         // Preprocess help patterns for non-interactive mode
         $argsArr = $this->preprocessHelpPattern($argsArr);
+
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
 
@@ -1143,31 +1418,5 @@ class Runner {
             }
         }
         $this->argsV = $argV;
-    }
-    /**
-     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
-     * 
-     * @param array $args The arguments array to preprocess
-     * @return array The preprocessed arguments array
-     */
-    private function preprocessHelpPattern(array $args): array {
-        if (count($args) >= 2) {
-            $lastArg = end($args);
-            
-            // Check if the last argument is 'help' or '-h'
-            if ($lastArg === 'help' || $lastArg === '-h') {
-                $commandName = $args[0];
-                
-                // Check if the first argument is a valid command name
-                if ($this->getCommandByName($commandName) !== null) {
-                    // Remove 'help' or '-h' from the end
-                    array_pop($args);
-                    // Add it as a proper argument flag
-                    $args[] = $lastArg;
-                }
-            }
-        }
-        
-        return $args;
     }
 }
