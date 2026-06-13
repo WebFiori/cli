@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.2.0](https://github.com/WebFiori/cli/compare/v2.1.1...v2.2.0) (2026-06-13)
+
+
+### Features
+
+* **command:** add #[Group] and #[SingleInstance] attributes ([9833f63](https://github.com/WebFiori/cli/commit/9833f6367c9640136b2693a523ce72ea8c6cc729))
+* **command:** add #[Group] and #[SingleInstance] attributes ([fa6475a](https://github.com/WebFiori/cli/commit/fa6475afda014ee315ec207ff1b0148fc29d26e1)), closes [#47](https://github.com/WebFiori/cli/issues/47) [#49](https://github.com/WebFiori/cli/issues/49)
+* **command:** add verbosity levels (-q, -v, -vv) ([14b17ef](https://github.com/WebFiori/cli/commit/14b17eff8682a034386d0ebdd26a4bf62d1616f8))
+* **command:** add verbosity levels (-q, -v, -vv) ([8142001](https://github.com/WebFiori/cli/commit/8142001295eb5dc841ef61187135a390a7de7f3e)), closes [#46](https://github.com/WebFiori/cli/issues/46)
+* **runner:** add signal handling support (SIGINT/SIGTERM) ([f256870](https://github.com/WebFiori/cli/commit/f256870c8e1b11fd2e362110d8bc65812fd7cdca))
+* **runner:** add signal handling support (SIGINT/SIGTERM) ([5b68bfe](https://github.com/WebFiori/cli/commit/5b68bfe47d0f5b1ba31a4de7b00ec9c0b596d9e6)), closes [#45](https://github.com/WebFiori/cli/issues/45)
+* **runner:** ANSI colors on by default with TTY auto-detection ([32eddbb](https://github.com/WebFiori/cli/commit/32eddbbf90f1f4bc77a6e08e1054c77ea607a726))
+* **runner:** ANSI colors on by default with TTY auto-detection ([34126fe](https://github.com/WebFiori/cli/commit/34126fedf894d84effd0742d3a424e0c35d26c73)), closes [#50](https://github.com/WebFiori/cli/issues/50)
+* signal handling, ANSI auto-detect, verbosity levels, and command attributes ([52cf653](https://github.com/WebFiori/cli/commit/52cf65334650d65629a2d309fb4cee8e56557eaa))
+
+
+### Miscellaneous Chores
+
+* add MIT license header to new source files ([4912537](https://github.com/WebFiori/cli/commit/4912537c70c257c579971600a9ce4a51a3da183c))
+* **deps:** update webfiori/file requirement from 2.0.* to 2.1.* ([309f227](https://github.com/WebFiori/cli/commit/309f227a460f73718d4ee7676704bea0b11aef0b))
+* **deps:** update webfiori/file requirement from 2.0.* to 2.1.* ([249d169](https://github.com/WebFiori/cli/commit/249d169864b0a09e12f64d7b65cc1c298fed11a5))
+
 ## [2.1.1](https://github.com/WebFiori/cli/compare/v2.1.0...v2.1.1) (2026-06-01)
 
 
