@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 namespace WebFiori\Cli;
 
 use Throwable;
@@ -105,6 +105,18 @@ class Runner {
     private $outputStream;
 
     /**
+     * Whether a shutdown has been requested via signal.
+     * 
+     * @var bool
+     */
+    private $shutdownRequested;
+
+    /**
+     * @var SignalHandler|null
+     */
+    private $signalHandler;
+
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
@@ -118,6 +130,8 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commandExitVal = 0;
         $this->afterRunPool = [];
+        $this->signalHandler = null;
+        $this->shutdownRequested = false;
 
         // Initialize discovery properties
         $this->commandDiscovery = null;
@@ -332,6 +346,44 @@ class Runner {
     }
 
     /**
+     * Enables signal handling with default handlers for SIGINT and SIGTERM.
+     *
+     * Default behavior:
+     * - SIGINT (Ctrl+C): In interactive mode, interrupts the current command 
+     *   but keeps the app running. In non-interactive mode, exits with code 130.
+     * - SIGTERM: Sets shutdown flag and exits with code 143.
+     *
+     * If pcntl is not available (e.g., on Windows), this method creates the
+     * handler instance but signal registration will be a no-op.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function enableSignalHandling(): Runner {
+        $this->signalHandler = new SignalHandler();
+        $this->shutdownRequested = false;
+
+        $this->signalHandler->register(defined('SIGINT') ? SIGINT : 2, function (int $signal) {
+            if ($this->isInteractive()) {
+                $this->commandExitVal = 130;
+                $this->getOutputStream()->println('');
+                $this->printMsg('Command interrupted.', '>>', 'yellow');
+            } else {
+                $this->commandExitVal = 130;
+                $this->shutdownRequested = true;
+            }
+        });
+
+        $this->signalHandler->register(defined('SIGTERM') ? SIGTERM : 15, function (int $signal) {
+            $this->commandExitVal = 143;
+            $this->shutdownRequested = true;
+        });
+
+        $this->signalHandler->enable();
+
+        return $this;
+    }
+
+    /**
      * Add a pattern to exclude files/directories from discovery.
      * 
      * @param string $pattern Glob pattern to exclude
@@ -521,6 +573,15 @@ class Runner {
     }
 
     /**
+     * Returns the signal handler instance if signal handling has been enabled.
+     *
+     * @return SignalHandler|null The signal handler instance, or null if not enabled.
+     */
+    public function getSignalHandler(): ?SignalHandler {
+        return $this->signalHandler;
+    }
+
+    /**
      * Check if an alias is registered.
      * 
      * @param string $alias The alias to check.
@@ -585,6 +646,15 @@ class Runner {
     }
 
     /**
+     * Checks if a shutdown has been requested via signal.
+     *
+     * @return bool True if shutdown was requested, false otherwise.
+     */
+    public function isShutdownRequested(): bool {
+        return $this->shutdownRequested;
+    }
+
+    /**
      * Register new command.
      * 
      * @param Command $cliCommand The command that will be registered.
@@ -596,12 +666,13 @@ class Runner {
     public function register(Command $cliCommand, array $aliases = []): Runner {
         if ($cliCommand->getName() != 'help') {
             $helpCommand = $this->getCommandByName('help');
+
             if ($helpCommand !== null) {
                 $cliCommand->addArg($helpCommand->getName(), [
                     ArgumentOption::OPTIONAL => true,
                     ArgumentOption::DESCRIPTION => 'Display command help.'
                 ]);
-                
+
                 foreach ($helpCommand->getAliases() as $alias) {
                     $cliCommand->addArg($alias, [
                         ArgumentOption::OPTIONAL => true
@@ -659,7 +730,7 @@ class Runner {
         $this->outputStream = new StdOut();
         $this->commands = [];
         $this->aliases = [];
-        
+
         // Re-register help command after reset
         $this->register(new HelpCommand());
 
@@ -731,6 +802,8 @@ class Runner {
         $this->setArgV($args);
         $this->setActiveCommand($c);
 
+        $this->registerCommandSignalHandlers($c);
+
         try {
             $this->commandExitVal = $c->excCommand();
         } catch (Throwable $ex) {
@@ -744,6 +817,7 @@ class Runner {
             $this->commandExitVal = $ex->getCode() == 0 ? -1 : $ex->getCode();
         }
 
+        $this->removeCommandSignalHandlers($c);
         $this->invokeAfterExc();
         $this->setActiveCommand();
 
@@ -979,6 +1053,28 @@ class Runner {
     }
 
     /**
+     * Sets a custom signal handler for a specific signal.
+     *
+     * If signal handling has not been enabled yet, this method will
+     * enable it first.
+     *
+     * @param int $signal The signal number (e.g., SIGINT, SIGTERM).
+     *
+     * @param callable $handler The callback to invoke when the signal is received.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function setSignalHandler(int $signal, callable $handler): Runner {
+        if ($this->signalHandler === null) {
+            $this->enableSignalHandling();
+        }
+
+        $this->signalHandler->register($signal, $handler);
+
+        return $this;
+    }
+
+    /**
      * Start command line process.
      * 
      * @return int The method will return an integer that represents exit status of
@@ -996,7 +1092,7 @@ class Runner {
             $this->printMsg("Type command name or 'exit' to close.", ">>", 'blue');
             $this->printMsg('', '>>', 'blue');
 
-            while (true) {
+            while (!$this->shutdownRequested) {
                 $args = $this->readInteractive();
                 $this->setArgsVector($args);
                 $argsCount = count($args);
@@ -1012,6 +1108,8 @@ class Runner {
                 }
                 $this->printMsg('', '>>', 'blue');
             }
+
+            return $this->commandExitVal;
         } else {
             return $this->run();
         }
@@ -1027,6 +1125,32 @@ class Runner {
         foreach ($this->afterRunPool as $funcArr) {
             call_user_func_array($funcArr['func'], array_merge([$this], $funcArr['params']));
         }
+    }
+    /**
+     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
+     * 
+     * @param array $args The arguments array to preprocess
+     * @return array The preprocessed arguments array
+     */
+    private function preprocessHelpPattern(array $args): array {
+        if (count($args) >= 2) {
+            $lastArg = end($args);
+
+            // Check if the last argument is 'help' or '-h'
+            if ($lastArg === 'help' || $lastArg === '-h') {
+                $commandName = $args[0];
+
+                // Check if the first argument is a valid command name
+                if ($this->getCommandByName($commandName) !== null) {
+                    // Remove 'help' or '-h' from the end
+                    array_pop($args);
+                    // Add it as a proper argument flag
+                    $args[] = $lastArg;
+                }
+            }
+        }
+
+        return $args;
     }
 
     private function printMsg(string $msg, ?string $prefix = null, ?string $color = null): void {
@@ -1096,6 +1220,23 @@ class Runner {
         return $this;
     }
 
+    private function registerCommandSignalHandlers(Command $c): void {
+        if ($this->signalHandler !== null) {
+            foreach ($c->getSignalHandlers() as $signal => $handler) {
+                $this->signalHandler->register($signal, $handler);
+            }
+        }
+    }
+
+    private function removeCommandSignalHandlers(Command $c): void {
+        if ($this->signalHandler !== null) {
+            foreach ($c->getSignalHandlers() as $signal => $handler) {
+                $this->signalHandler->remove($signal);
+            }
+            $c->clearSignalHandlers();
+        }
+    }
+
     /**
      * Run the command line as single run.
      *
@@ -1120,9 +1261,9 @@ class Runner {
             $argsArr = $tempArgs;
         }
 
-
         // Preprocess help patterns for non-interactive mode
         $argsArr = $this->preprocessHelpPattern($argsArr);
+
         if (count($argsArr) == 0) {
             $command = $this->getDefaultCommand();
 
@@ -1143,31 +1284,5 @@ class Runner {
             }
         }
         $this->argsV = $argV;
-    }
-    /**
-     * Preprocesses arguments to handle help patterns like 'command help' or 'command -h'.
-     * 
-     * @param array $args The arguments array to preprocess
-     * @return array The preprocessed arguments array
-     */
-    private function preprocessHelpPattern(array $args): array {
-        if (count($args) >= 2) {
-            $lastArg = end($args);
-            
-            // Check if the last argument is 'help' or '-h'
-            if ($lastArg === 'help' || $lastArg === '-h') {
-                $commandName = $args[0];
-                
-                // Check if the first argument is a valid command name
-                if ($this->getCommandByName($commandName) !== null) {
-                    // Remove 'help' or '-h' from the end
-                    array_pop($args);
-                    // Add it as a proper argument flag
-                    $args[] = $lastArg;
-                }
-            }
-        }
-        
-        return $args;
     }
 }
