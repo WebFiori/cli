@@ -346,6 +346,17 @@ abstract class Command {
     public function createProgressBar(int $total = 100): ProgressBar {
         return new ProgressBar($this->getOutputStream(), $total);
     }
+
+    /**
+     * Display a message only when verbosity is DEBUG (-vv).
+     *
+     * @param string $message The message that will be shown.
+     */
+    public function debug(string $message): void {
+        if ($this->getVerbosityLevel() >= Verbosity::DEBUG) {
+            $this->printMsg($message, 'Debug', 'gray');
+        }
+    }
     /**
      * Display a message that represents an error.
      * 
@@ -712,13 +723,15 @@ abstract class Command {
      * Display a message that represents extra information.
      * 
      * The message will be prefixed with the string 'Info:' in 
-     * blue.
+     * blue. Suppressed in quiet mode.
      * 
      * @param string $message The message that will be shown.
      * 
      */
     public function info(string $message): void {
-        $this->printMsg($message, 'Info', 'blue');
+        if ($this->getVerbosityLevel() >= Verbosity::NORMAL) {
+            $this->printMsg($message, 'Info', 'blue');
+        }
     }
     /**
      * Checks if an argument is provided in the CLI or not.
@@ -1256,13 +1269,16 @@ abstract class Command {
     /**
      * Display a message that represents a success status.
      * 
-     * The message will be prefixed with the string "Success:" in green. 
+     * The message will be prefixed with the string "Success:" in green.
+     * Suppressed in quiet mode.
      * 
      * @param string $message The message that will be displayed.
      * 
      */
     public function success(string $message): void {
-        $this->printMsg($message, 'Success', 'light-green');
+        if ($this->getVerbosityLevel() >= Verbosity::NORMAL) {
+            $this->printMsg($message, 'Success', 'light-green');
+        }
     }
 
     /**
@@ -1421,6 +1437,17 @@ abstract class Command {
         }
 
         return $this;
+    }
+
+    /**
+     * Display a message only when verbosity is VERBOSE (-v) or higher.
+     *
+     * @param string $message The message that will be shown.
+     */
+    public function verbose(string $message): void {
+        if ($this->getVerbosityLevel() >= Verbosity::VERBOSE) {
+            $this->printMsg($message, 'Verbose', 'cyan');
+        }
     }
     /**
      * Display a message that represents a warning.
@@ -1604,6 +1631,21 @@ abstract class Command {
     }
 
     /**
+     * Returns the current verbosity level from the Runner, or NORMAL as default.
+     *
+     * @return int One of the Verbosity constants.
+     */
+    private function getVerbosityLevel(): int {
+        $owner = $this->getOwner();
+
+        if ($owner !== null) {
+            return $owner->getVerbosity();
+        }
+
+        return Verbosity::NORMAL;
+    }
+
+    /**
      * Checks if ANSI output is enabled for this command.
      *
      * Uses the Runner's resolved ANSI value if available, falls back to
@@ -1620,6 +1662,7 @@ abstract class Command {
 
         return $this->isArgProvided('--ansi');
     }
+
     private function parseArgsHelper() : bool {
         $options = $this->getArgs();
         $invalidArgsVals = [];

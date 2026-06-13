@@ -117,6 +117,13 @@ class Runner {
     private $signalHandler;
 
     /**
+     * The current verbosity level.
+     * 
+     * @var int
+     */
+    private $verbosity;
+
+    /**
      * Creates new instance of the class.
      */
     public function __construct() {
@@ -132,6 +139,7 @@ class Runner {
         $this->afterRunPool = [];
         $this->signalHandler = null;
         $this->shutdownRequested = false;
+        $this->verbosity = Verbosity::NORMAL;
 
         // Initialize discovery properties
         $this->commandDiscovery = null;
@@ -146,12 +154,25 @@ class Runner {
             ArgumentOption::OPTIONAL => true,
             ArgumentOption::DESCRIPTION => 'Disable ANSI colored output.'
         ]);
+        $this->addArg('-q', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Quiet mode. Suppress non-critical output.'
+        ]);
+        $this->addArg('-v', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Verbose output.'
+        ]);
+        $this->addArg('-vv', [
+            ArgumentOption::OPTIONAL => true,
+            ArgumentOption::DESCRIPTION => 'Debug output (most verbose).'
+        ]);
         $this->setBeforeStart(function (Runner $r) {
             if (count($r->getArgsVector()) == 0) {
                 $r->setArgsVector($_SERVER['argv']);
             }
             $r->checkIsInteractive();
             $r->resolveAnsi();
+            $r->resolveVerbosity();
         });
         $this->register(new HelpCommand(), ['-h']);
         $this->setDefaultCommand('help');
@@ -584,6 +605,15 @@ class Runner {
      */
     public function getSignalHandler(): ?SignalHandler {
         return $this->signalHandler;
+    }
+
+    /**
+     * Returns the current verbosity level.
+     *
+     * @return int One of the Verbosity constants.
+     */
+    public function getVerbosity(): int {
+        return $this->verbosity;
     }
 
     /**
@@ -1096,6 +1126,19 @@ class Runner {
     }
 
     /**
+     * Sets the verbosity level.
+     *
+     * @param int $level One of the Verbosity constants.
+     *
+     * @return Runner The method returns same instance for chaining.
+     */
+    public function setVerbosity(int $level): Runner {
+        $this->verbosity = $level;
+
+        return $this;
+    }
+
+    /**
      * Determines if ANSI output should be used based on environment detection.
      *
      * Resolution precedence:
@@ -1139,7 +1182,7 @@ class Runner {
         if ($this->isInteractive()) {
             if (in_array('--no-color', $this->getArgsVector())) {
                 $this->isAnsi = false;
-            } elseif (in_array('--ansi', $this->getArgsVector())) {
+            } else if (in_array('--ansi', $this->getArgsVector())) {
                 $this->isAnsi = true;
             }
             $this->printMsg('Running in interactive mode.', '>>', 'blue');
@@ -1228,7 +1271,7 @@ class Runner {
 
         $argsArr = strlen($input) != 0 ? explode(' ', $input) : [];
 
-        $argsArr = $this->removeAnsiArgs($argsArr);
+        $argsArr = $this->removeGlobalFlags($argsArr);
 
         // Preprocess help patterns
         $argsArr = $this->preprocessHelpPattern($argsArr);
@@ -1280,30 +1323,6 @@ class Runner {
             }
         }
     }
-    /**
-     * Removes --ansi and --no-color flags from an arguments array.
-     *
-     * @param array $argsArr The arguments array.
-     *
-     * @return array The filtered arguments array.
-     */
-    private function removeAnsiArgs(array $argsArr): array {
-        $tempArgs = [];
-
-        foreach ($argsArr as $argName => $val) {
-            if (gettype($argName) == 'integer') {
-                if ($val != '--ansi' && $val != '--no-color') {
-                    $tempArgs[] = $val;
-                }
-            } else {
-                if ($argName != '--ansi' && $argName != '--no-color') {
-                    $tempArgs[$argName] = $val;
-                }
-            }
-        }
-
-        return $tempArgs;
-    }
 
     private function removeCommandSignalHandlers(Command $c): void {
         if ($this->signalHandler !== null) {
@@ -1313,10 +1332,47 @@ class Runner {
             $c->clearSignalHandlers();
         }
     }
+    /**
+     * Removes --ansi and --no-color flags from an arguments array.
+     *
+     * @param array $argsArr The arguments array.
+     *
+     * @return array The filtered arguments array.
+     */
+    private function removeGlobalFlags(array $argsArr): array {
+        $flags = ['--ansi', '--no-color', '-q', '-v', '-vv'];
+        $tempArgs = [];
+
+        foreach ($argsArr as $argName => $val) {
+            if (gettype($argName) == 'integer') {
+                if (!in_array($val, $flags)) {
+                    $tempArgs[] = $val;
+                }
+            } else {
+                if (!in_array($argName, $flags)) {
+                    $tempArgs[$argName] = $val;
+                }
+            }
+        }
+
+        return $tempArgs;
+    }
 
     private function resolveAnsi(): void {
         if ($this->outputStream instanceof StdOut) {
             $this->isAnsi = self::shouldUseAnsi();
+        }
+    }
+
+    private function resolveVerbosity(): void {
+        $args = $this->getArgsVector();
+
+        if (in_array('-vv', $args)) {
+            $this->verbosity = Verbosity::DEBUG;
+        } else if (in_array('-v', $args)) {
+            $this->verbosity = Verbosity::VERBOSE;
+        } else if (in_array('-q', $args)) {
+            $this->verbosity = Verbosity::QUIET;
         }
     }
 
@@ -1330,11 +1386,11 @@ class Runner {
 
         if (in_array('--no-color', $argsArr)) {
             $this->isAnsi = false;
-        } elseif (in_array('--ansi', $argsArr)) {
+        } else if (in_array('--ansi', $argsArr)) {
             $this->isAnsi = true;
         }
 
-        $argsArr = $this->removeAnsiArgs($argsArr);
+        $argsArr = $this->removeGlobalFlags($argsArr);
 
         // Preprocess help patterns for non-interactive mode
         $argsArr = $this->preprocessHelpPattern($argsArr);
