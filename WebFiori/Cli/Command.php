@@ -876,7 +876,7 @@ abstract class Command {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $_[$argsCount - 1]['ansi'] = $this->isArgProvided('--ansi');
+            $_[$argsCount - 1]['ansi'] = $this->isAnsiEnabled();
             $str = Formatter::format($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
@@ -906,7 +906,7 @@ abstract class Command {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['ansi'] = $this->isArgProvided('--ansi');
+        $formattingOptions['ansi'] = $this->isAnsiEnabled();
 
         $formattedStr = Formatter::format($str, $formattingOptions);
 
@@ -1601,6 +1601,24 @@ abstract class Command {
 
         // Default fallback
         return 80;
+    }
+
+    /**
+     * Checks if ANSI output is enabled for this command.
+     *
+     * Uses the Runner's resolved ANSI value if available, falls back to
+     * checking if --ansi argument is provided.
+     *
+     * @return bool True if ANSI output should be used.
+     */
+    private function isAnsiEnabled(): bool {
+        $owner = $this->getOwner();
+
+        if ($owner !== null) {
+            return $owner->isAnsi();
+        }
+
+        return $this->isArgProvided('--ansi');
     }
     private function parseArgsHelper() : bool {
         $options = $this->getArgs();
