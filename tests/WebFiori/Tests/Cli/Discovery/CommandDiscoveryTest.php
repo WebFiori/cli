@@ -7,6 +7,8 @@ use WebFiori\Cli\Discovery\CommandDiscovery;
 use WebFiori\Cli\Exceptions\CommandDiscoveryException;
 use WebFiori\Tests\Cli\Discovery\TestCommands\TestCommand;
 use WebFiori\Tests\Cli\Discovery\TestCommands\AutoDiscoverableCommand;
+use WebFiori\Tests\Cli\Discovery\FactoryTestCommands\CommandWithDependency;
+use WebFiori\Tests\Cli\Discovery\FactoryTestCommands\SimpleCommand;
 
 /**
  * Test cases for CommandDiscovery class.
@@ -202,5 +204,113 @@ class CommandDiscoveryTest extends TestCase {
         } catch (CommandDiscoveryException $e) {
             $this->assertInstanceOf(CommandDiscoveryException::class, $e);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function testSetFactoryUsedForInstantiation() {
+        $factoryPath = __DIR__ . '/FactoryTestCommands';
+        $cache = new CommandCache(enabled: false);
+        $discovery = new CommandDiscovery($cache);
+        $discovery->addSearchPath($factoryPath);
+        $discovery->setFactory(function (string $className) {
+            if ($className === CommandWithDependency::class) {
+                return new CommandWithDependency('injected-service');
+            }
+
+            return new $className();
+        });
+
+        $commands = $discovery->discover();
+
+        $depCommand = null;
+
+        foreach ($commands as $command) {
+            if ($command instanceof CommandWithDependency) {
+                $depCommand = $command;
+
+                break;
+            }
+        }
+
+        $this->assertNotNull($depCommand, 'CommandWithDependency should be discovered');
+        $this->assertEquals('injected-service', $depCommand->getService());
+    }
+
+    /**
+     * @test
+     */
+    public function testDefaultBehaviorWithoutFactory() {
+        $factoryPath = __DIR__ . '/FactoryTestCommands';
+        $cache = new CommandCache(enabled: false);
+        $discovery = new CommandDiscovery($cache);
+        $discovery->addSearchPath($factoryPath);
+
+        // Without factory, CommandWithDependency will fail but SimpleCommand should work
+        $commands = $discovery->discover();
+
+        $simpleFound = false;
+
+        foreach ($commands as $command) {
+            if ($command instanceof SimpleCommand) {
+                $simpleFound = true;
+
+                break;
+            }
+        }
+
+        $this->assertTrue($simpleFound, 'SimpleCommand should be discovered without factory');
+    }
+
+    /**
+     * @test
+     */
+    public function testFactoryExceptionHandledGracefully() {
+        $factoryPath = __DIR__ . '/FactoryTestCommands';
+        $cache = new CommandCache(enabled: false);
+        $discovery = new CommandDiscovery($cache);
+        $discovery->addSearchPath($factoryPath);
+        $discovery->setFactory(function (string $className) {
+            if ($className === CommandWithDependency::class) {
+                throw new \RuntimeException('Missing dependency');
+            }
+
+            return new $className();
+        });
+
+        $commands = $discovery->discover();
+
+        // Should not contain CommandWithDependency
+        foreach ($commands as $command) {
+            $this->assertNotInstanceOf(CommandWithDependency::class, $command);
+        }
+
+        // Should have recorded the error
+        $errors = $discovery->getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertStringContainsString('Missing dependency', $errors[0]);
+    }
+
+    /**
+     * @test
+     */
+    public function testFactoryExceptionInStrictModeThrows() {
+        $factoryPath = __DIR__ . '/FactoryTestCommands';
+        $cache = new CommandCache(enabled: false);
+        $discovery = new CommandDiscovery($cache);
+        $discovery->addSearchPath($factoryPath);
+        $discovery->setStrictMode(true);
+        $discovery->setFactory(function (string $className) {
+            if ($className === CommandWithDependency::class) {
+                throw new \RuntimeException('Missing dependency');
+            }
+
+            return new $className();
+        });
+
+        $this->expectException(CommandDiscoveryException::class);
+        $this->expectExceptionMessage('Missing dependency');
+        $discovery->discover();
     }
 }

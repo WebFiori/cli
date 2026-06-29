@@ -17,6 +17,14 @@ class CommandDiscovery {
     private CommandCache $cache;
     private array $errors = [];
     private array $excludePatterns = [];
+    /**
+     * A callable that receives a fully qualified class name and returns
+     * a Command instance. When set, this factory is used instead of
+     * directly calling `new $className()`.
+     *
+     * @var callable|null
+     */
+    private $factory = null;
     private array $searchPaths = [];
     private bool $strictMode = false;
 
@@ -172,6 +180,38 @@ class CommandDiscovery {
     }
 
     /**
+     * Set a factory callable for instantiating discovered commands.
+     *
+     * When set, the factory is called with the fully qualified class name
+     * instead of using `new $className()`. This enables dependency injection
+     * for auto-discovered commands.
+     *
+     * Example with a DI container:
+     * ```php
+     * $discovery->setFactory(fn($class) => $container->get($class));
+     * ```
+     *
+     * Example with manual mapping:
+     * ```php
+     * $discovery->setFactory(function($class) use ($db) {
+     *     return match($class) {
+     *         MigrateCommand::class => new MigrateCommand($db),
+     *         default => new $class(),
+     *     };
+     * });
+     * ```
+     *
+     * @param callable $factory A callable that accepts a class name string
+     *                          and returns a Command instance.
+     * @return self
+     */
+    public function setFactory(callable $factory): self {
+        $this->factory = $factory;
+
+        return $this;
+    }
+
+    /**
      * Extract class name from PHP file.
      * 
      * @param string $filePath
@@ -226,9 +266,11 @@ class CommandDiscovery {
                         }
                     }
 
-                    $commands[] = new $className();
+                    $commands[] = $this->factory
+                        ? ($this->factory)($className)
+                        : new $className();
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->errors[] = "Failed to instantiate {$metadata['className']}: ".$e->getMessage();
 
                 if ($this->strictMode) {

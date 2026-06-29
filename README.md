@@ -472,6 +472,36 @@ public function exec(): int {
 
 **[📖 View Table Display Example](https://github.com/WebFiori/cli/tree/main/examples/06-table-display)**
 
+### Auto-Discovery
+
+Automatically discover and register commands from a directory:
+
+```php
+$runner = new Runner();
+$runner->addDiscoveryPath(__DIR__ . '/commands');
+$runner->discoverCommands();
+```
+
+#### Factory for Dependency Injection
+
+By default, auto-discovery instantiates commands using `new $className()`. If your commands require constructor dependencies, set a factory callable:
+
+```php
+use WebFiori\Cli\Discovery\CommandDiscovery;
+use WebFiori\Cli\Discovery\CommandCache;
+
+$discovery = new CommandDiscovery(new CommandCache(enabled: false));
+$discovery->addSearchPath(__DIR__ . '/commands');
+$discovery->setFactory(fn($class) => $container->get($class));
+
+$runner->setCommandDiscovery($discovery);
+$runner->discoverCommands();
+```
+
+The factory receives the fully qualified class name and must return a `Command` instance. This works with any DI container or a simple closure.
+
+**[📖 View Auto-Discovery Example](https://github.com/WebFiori/cli/tree/main/examples/13-auto-discovery)**
+
 ## The `help` Command
 One of the commands which comes by default with the library is the `help` command. It can be used to display help instructions for all registered commands. 
 
