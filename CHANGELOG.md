@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.1](https://github.com/WebFiori/cli/compare/v2.2.0...v2.2.1) (2026-06-29)
+
+
+### Features
+
+* **discovery:** add factory callable for command instantiation ([5f531b5](https://github.com/WebFiori/cli/commit/5f531b5212741c5f7b41cc8f38eeac6528275a48)), closes [#48](https://github.com/WebFiori/cli/issues/48)
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#57](https://github.com/WebFiori/cli/issues/57) from WebFiori/dev ([8537fbe](https://github.com/WebFiori/cli/commit/8537fbefe2b2e1aa1eae32c9f5f8eae86fd24fc7))
+
 ## [2.2.0](https://github.com/WebFiori/cli/compare/v2.1.1...v2.2.0) (2026-06-13)
 
 
