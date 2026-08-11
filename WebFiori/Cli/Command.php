@@ -559,7 +559,16 @@ abstract class Command {
                 return $arg->getValue();
             }
 
-            return Argument::extractValue($trimmedOptName, $runner);
+            $extracted = Argument::extractValue($trimmedOptName, $runner);
+
+            if ($extracted !== null) {
+                return $extracted;
+            }
+
+            // Fall back to default value if the argument was not provided
+            $default = $arg->getDefault();
+
+            return $default !== '' ? $default : null;
         }
 
         return null;
