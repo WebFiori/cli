@@ -21,7 +21,7 @@ jobs:
   code-coverage:
     name: Coverage
     needs: test
-    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.5
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.7
     with:
       php-version: '8.3'
       coverage-file: 'php-8.3-coverage.xml'
