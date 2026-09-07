@@ -12,7 +12,7 @@ jobs:
 
   test:
     name: Run Tests
-    uses: WebFiori/workflows/.github/workflows/test-php.yaml@v1.2.5
+    uses: WebFiori/workflows/.github/workflows/test-php.yaml@v1.2.7
     with:
       php-version: '8.3'
       phpunit-config: 'tests/phpunit.xml'
